@@ -1,0 +1,45 @@
+name: Deploy Web (Server Build)
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "sawrly-web/**"
+      - ".github/workflows/deploy_web.yml"
+
+concurrency:
+  group: deploy-web-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SAWRLY_SSH_HOST }}
+          username: ${{ secrets.SAWRLY_SSH_USER }}
+          key: ${{ secrets.SAWRLY_SSH_KEY }}
+          port: ${{ secrets.SAWRLY_SSH_PORT }}
+          script: |
+            set -euo pipefail
+            WEB_PATH="${{ secrets.SAWRLY_WEB_PATH }}"
+            REPO_URL="https://github.com/morti26/sawrly.git"
+            TMP="/tmp/sawrly-repo-${GITHUB_SHA}"
+
+            rm -rf "$TMP"
+            git clone --depth 1 "$REPO_URL" "$TMP"
+            rsync -a --delete --exclude ".env" --exclude "public/downloads" "$TMP/sawrly-web/" "$WEB_PATH/"
+            rm -rf "$TMP"
+
+            cd "$WEB_PATH"
+            npm ci
+            npm run build
+
+            if [ "$(id -u)" = "0" ]; then
+              systemctl restart sawrly.service
+            else
+              sudo -n systemctl restart sawrly.service
+            fi
+

@@ -1,9 +1,58 @@
 import Link from 'next/link';
+import fs from 'fs/promises';
+import path from 'path';
 import { LandingPreviewSlider } from '@/components/landing-preview-slider';
 import { APP_SETTING_KEYS, getAppSetting } from '@/lib/app_settings';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+type LatestApkInfo = {
+    fileName: string;
+    number: number | null;
+};
+
+async function getLatestApkInfo(): Promise<LatestApkInfo | null> {
+    const downloadsDir = path.join(process.cwd(), 'public', 'downloads');
+    try {
+        const entries = await fs.readdir(downloadsDir, { withFileTypes: true });
+        const apks = entries
+            .filter(entry => entry.isFile() && entry.name.toLowerCase().endsWith('.apk'))
+            .map(entry => entry.name);
+
+        if (apks.length === 0) return null;
+
+        let bestNumber = -1;
+        let bestNumberFile: string | null = null;
+        for (const name of apks) {
+            const match = /^sawrly-(\d+)\.apk$/i.exec(name);
+            if (!match) continue;
+            const value = Number.parseInt(match[1], 10);
+            if (!Number.isFinite(value)) continue;
+            if (value > bestNumber) {
+                bestNumber = value;
+                bestNumberFile = name;
+            }
+        }
+
+        if (bestNumberFile) {
+            return { fileName: bestNumberFile, number: bestNumber };
+        }
+
+        const stats = await Promise.all(
+            apks.map(async name => {
+                const stat = await fs.stat(path.join(downloadsDir, name));
+                return { name, mtimeMs: stat.mtimeMs };
+            }),
+        );
+        stats.sort((a, b) => b.mtimeMs - a.mtimeMs);
+        const latest = stats[0]?.name;
+        if (!latest) return null;
+        return { fileName: latest, number: null };
+    } catch {
+        return null;
+    }
+}
 
 export default async function Home() {
     const [
@@ -13,6 +62,7 @@ export default async function Home() {
         aboutCard2BodySetting,
         aboutCard3TitleSetting,
         aboutCard3BodySetting,
+        latestApk,
     ] = await Promise.all([
         getAppSetting(APP_SETTING_KEYS.aboutCard1Title),
         getAppSetting(APP_SETTING_KEYS.aboutCard1Body),
@@ -20,6 +70,7 @@ export default async function Home() {
         getAppSetting(APP_SETTING_KEYS.aboutCard2Body),
         getAppSetting(APP_SETTING_KEYS.aboutCard3Title),
         getAppSetting(APP_SETTING_KEYS.aboutCard3Body),
+        getLatestApkInfo(),
     ]);
 
     const aboutCard1Title = aboutCard1TitleSetting ?? 'من نحن';
@@ -34,6 +85,9 @@ export default async function Home() {
     const aboutCard3Body =
         aboutCard3BodySetting ??
         'نفس الإحساس الداكن والواجهات اللامعة، مع لون وردي يعطي الصفحة طابعاً أنيقاً وحديثاً.';
+
+    const latestApkLabel =
+        latestApk?.number != null ? String(latestApk.number).padStart(2, '0') : null;
 
     return (
         <main id="home" dir="rtl" className="relative min-h-screen overflow-hidden px-6 py-8 text-white">
@@ -117,8 +171,11 @@ export default async function Home() {
 
                             <div className="rounded-3xl border border-white/10 bg-white/[0.07] p-4 shadow-sm backdrop-blur">
                                 <div className="flex items-start justify-between gap-3">
-                                    <div className="grid h-10 w-10 place-items-center rounded-2xl border border-white/10 bg-[#ff4a97]/15 text-xs font-bold text-[#ff8ad4] shadow-[0_10px_30px_rgba(255,74,151,0.2)]">
-                                        APK
+                                    <div className="grid h-10 w-10 place-items-center rounded-2xl border border-white/10 bg-[#ff4a97]/15 text-[10px] font-extrabold text-[#ff8ad4] shadow-[0_10px_30px_rgba(255,74,151,0.2)] leading-none">
+                                        <div className="grid gap-0.5 text-center">
+                                            <div>APK</div>
+                                            {latestApkLabel ? <div className="text-white/80">{latestApkLabel}</div> : null}
+                                        </div>
                                     </div>
                                     <div className="text-left">
                                         <div className="text-[10px] font-semibold tracking-[0.18em] text-white/50">ANDROID</div>
@@ -131,12 +188,19 @@ export default async function Home() {
                                     <Link href="/downloads" className="text-xs text-white/60 hover:text-white/80">
                                         قائمة الملفات
                                     </Link>
-                                    <a
-                                        href="/api/downloads/latest-apk"
-                                        className="rounded-2xl bg-[#ff4a97] px-4 py-2 text-xs font-extrabold text-white shadow-[0_8px_22px_rgba(255,74,151,0.35)] hover:bg-[#ff4a97]/90"
-                                    >
-                                        تحميل APK
-                                    </a>
+                                    <div className="flex items-center gap-2">
+                                        {latestApkLabel ? (
+                                            <div className="rounded-2xl border border-white/10 bg-black/25 px-3 py-2 text-[10px] font-semibold text-white/75">
+                                                v{latestApkLabel}
+                                            </div>
+                                        ) : null}
+                                        <a
+                                            href="/api/downloads/latest-apk"
+                                            className="rounded-2xl bg-[#ff4a97] px-4 py-2 text-xs font-extrabold text-white shadow-[0_8px_22px_rgba(255,74,151,0.35)] hover:bg-[#ff4a97]/90"
+                                        >
+                                            تحميل APK
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -1,0 +1,14 @@
+.trae/
+.git-backups/
+sawrly-server-snapshot-*/
+
+sawrly-web/public/downloads/*.apk
+sawrly-web/public/downloads/*.aab
+
+sawrly-mobile/.dart_tool/
+sawrly-mobile/build/
+sawrly-mobile/android/.gradle/
+sawrly-mobile/android/local.properties
+sawrly-mobile/android/key.properties
+sawrly-mobile/android/keystore/
+
