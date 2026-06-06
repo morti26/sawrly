@@ -18,17 +18,12 @@ interface AdminSettingsResponse {
     };
 }
 
-type ApkBuildState = 'idle' | 'running' | 'done' | 'error';
-
-type ApkBuildStatus = {
-    state: ApkBuildState;
-    jobId?: string;
-    startedAt?: string;
-    finishedAt?: string;
-    log?: string;
-    apkFile?: string;
-    apkUrl?: string;
-    error?: string;
+type ApkStatusResponse = {
+    latestFile: string | null;
+    latestNumber: number | null;
+    latestUrl: string | null;
+    nextFile: string;
+    nextNumber: number;
 };
 
 export default function AdminSettingsPage() {
@@ -50,10 +45,11 @@ export default function AdminSettingsPage() {
     const [isTestingGateway, setIsTestingGateway] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [apkBuildStatus, setApkBuildStatus] = useState<ApkBuildStatus | null>(null);
-    const [isBuildingApk, setIsBuildingApk] = useState(false);
-    const [apkBuildMessage, setApkBuildMessage] = useState<string | null>(null);
-    const [apkBuildError, setApkBuildError] = useState<string | null>(null);
+    const [apkStatus, setApkStatus] = useState<ApkStatusResponse | null>(null);
+    const [apkFile, setApkFile] = useState<File | null>(null);
+    const [isUploadingApk, setIsUploadingApk] = useState(false);
+    const [apkMessage, setApkMessage] = useState<string | null>(null);
+    const [apkError, setApkError] = useState<string | null>(null);
 
     const displayLogo = useMemo(() => {
         if (previewUrl) return previewUrl;
@@ -115,7 +111,7 @@ export default function AdminSettingsPage() {
         };
     }, []);
 
-    const fetchApkStatus = async (): Promise<ApkBuildStatus> => {
+    const fetchApkStatus = async (): Promise<ApkStatusResponse> => {
         const token = localStorage.getItem('token');
         if (!token) {
             throw new Error('جلسة الأدمن غير متاحة. أعد تسجيل الدخول.');
@@ -127,7 +123,7 @@ export default function AdminSettingsPage() {
         if (!res.ok) {
             throw new Error(data?.error || 'فشل تحميل حالة بناء APK');
         }
-        return data as ApkBuildStatus;
+        return data as ApkStatusResponse;
     };
 
     useEffect(() => {
@@ -136,8 +132,7 @@ export default function AdminSettingsPage() {
             try {
                 const status = await fetchApkStatus();
                 if (!active) return;
-                setApkBuildStatus(status);
-                setIsBuildingApk(status.state === 'running');
+                setApkStatus(status);
             } catch {}
         })();
         return () => {
@@ -145,38 +140,14 @@ export default function AdminSettingsPage() {
         };
     }, []);
 
-    useEffect(() => {
-        if (!isBuildingApk) return;
-        let disposed = false;
-        const interval = setInterval(async () => {
-            if (disposed) return;
-            try {
-                const status = await fetchApkStatus();
-                if (disposed) return;
-                setApkBuildStatus(status);
-                const stillRunning = status.state === 'running';
-                setIsBuildingApk(stillRunning);
-                if (!stillRunning && status.state === 'done' && status.apkUrl) {
-                    setApkBuildMessage(`تم إنشاء APK بنجاح: ${status.apkUrl}`);
-                    setApkBuildError(null);
-                }
-                if (!stillRunning && status.state === 'error') {
-                    setApkBuildError(status.error || 'فشل بناء APK');
-                }
-            } catch (e) {
-                setApkBuildError(e instanceof Error ? e.message : 'فشل تحميل حالة بناء APK');
-            }
-        }, 3000);
-        return () => {
-            disposed = true;
-            clearInterval(interval);
-        };
-    }, [isBuildingApk]);
-
-    const handleBuildApk = async () => {
-        setApkBuildMessage(null);
-        setApkBuildError(null);
-        setIsBuildingApk(true);
+    const handleUploadApk = async () => {
+        setApkMessage(null);
+        setApkError(null);
+        if (!apkFile) {
+            setApkError('اختر ملف APK أولاً');
+            return;
+        }
+        setIsUploadingApk(true);
         try {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -185,18 +156,21 @@ export default function AdminSettingsPage() {
             const res = await fetch('/api/admin/builds/apk', {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },
+                body: apkFile,
             });
             const data = await res.json();
             if (!res.ok) {
-                setIsBuildingApk(false);
-                throw new Error(data?.error || 'فشل بدء بناء APK');
+                setIsUploadingApk(false);
+                throw new Error(data?.error || 'فشل رفع APK');
             }
-            setApkBuildMessage('تم بدء بناء APK على السيرفر...');
-            const status = await fetchApkStatus();
-            setApkBuildStatus(status);
+            setApkMessage('تم رفع APK بنجاح');
+            setApkStatus(data as ApkStatusResponse);
+            setApkFile(null);
         } catch (e) {
-            setIsBuildingApk(false);
-            setApkBuildError(e instanceof Error ? e.message : 'فشل بدء بناء APK');
+            setIsUploadingApk(false);
+            setApkError(e instanceof Error ? e.message : 'فشل رفع APK');
+        } finally {
+            setIsUploadingApk(false);
         }
     };
 
@@ -734,30 +708,35 @@ export default function AdminSettingsPage() {
 
                         <div className="space-y-3 border-t border-gray-100 pt-6">
                             <div>
-                                <h4 className="text-base font-semibold text-gray-800">بناء APK (السيرفر)</h4>
+                                <h4 className="text-base font-semibold text-gray-800">رفع APK</h4>
                                 <p className="text-xs text-gray-500 mt-1">
-                                    سيقوم السيرفر ببناء ملف APK ووضعه داخل /public/downloads ليصبح قابلاً للتحميل من صفحة الموقع.
+                                    ارفع ملف APK وسيتم حفظه تلقائياً داخل /public/downloads باسم sawrly-XX.apk ليتاح لزملائك تحميل آخر نسخة.
                                 </p>
                             </div>
 
                             <div className="flex flex-wrap gap-2">
+                                <input
+                                    type="file"
+                                    accept=".apk,application/vnd.android.package-archive"
+                                    onChange={e => setApkFile(e.target.files?.[0] || null)}
+                                    className="text-sm"
+                                />
                                 <button
                                     type="button"
-                                    onClick={handleBuildApk}
-                                    disabled={isLoading || isSaving || isBuildingApk}
+                                    onClick={handleUploadApk}
+                                    disabled={isLoading || isSaving || isUploadingApk || !apkFile}
                                     className="text-sm rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-purple-700 hover:bg-purple-100 disabled:opacity-50"
                                 >
-                                    {isBuildingApk ? 'جاري البناء...' : 'بناء APK الآن'}
+                                    {isUploadingApk ? 'جاري الرفع...' : 'رفع APK'}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={async () => {
                                         try {
                                             const status = await fetchApkStatus();
-                                            setApkBuildStatus(status);
-                                            setIsBuildingApk(status.state === 'running');
+                                            setApkStatus(status);
                                         } catch (e) {
-                                            setApkBuildError(e instanceof Error ? e.message : 'فشل تحميل حالة بناء APK');
+                                            setApkError(e instanceof Error ? e.message : 'فشل تحميل حالة APK');
                                         }
                                     }}
                                     disabled={isLoading || isSaving}
@@ -767,34 +746,32 @@ export default function AdminSettingsPage() {
                                 </button>
                             </div>
 
-                            {apkBuildMessage ? (
+                            {apkMessage ? (
                                 <div className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-md px-3 py-2">
-                                    {apkBuildMessage}
+                                    {apkMessage}
                                 </div>
                             ) : null}
 
-                            {apkBuildError ? (
+                            {apkError ? (
                                 <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2">
-                                    {apkBuildError}
+                                    {apkError}
                                 </div>
                             ) : null}
 
-                            {apkBuildStatus?.apkUrl ? (
+                            {apkStatus?.nextFile ? (
                                 <div className="text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-md px-3 py-2 break-all">
-                                    <div className="font-semibold">APK URL</div>
-                                    <a className="text-blue-600 hover:underline" href={apkBuildStatus.apkUrl}>
-                                        {apkBuildStatus.apkUrl}
+                                    <div className="font-semibold">الملف التالي</div>
+                                    <div dir="ltr">{apkStatus.nextFile}</div>
+                                </div>
+                            ) : null}
+
+                            {apkStatus?.latestUrl ? (
+                                <div className="text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-md px-3 py-2 break-all">
+                                    <div className="font-semibold">آخر APK</div>
+                                    <a className="text-blue-600 hover:underline" href={apkStatus.latestUrl}>
+                                        {apkStatus.latestUrl}
                                     </a>
                                 </div>
-                            ) : null}
-
-                            {apkBuildStatus?.log ? (
-                                <textarea
-                                    value={apkBuildStatus.log}
-                                    readOnly
-                                    className="w-full h-40 rounded-md border border-gray-200 bg-white p-2 text-xs font-mono text-left"
-                                    dir="ltr"
-                                />
                             ) : null}
                         </div>
 
