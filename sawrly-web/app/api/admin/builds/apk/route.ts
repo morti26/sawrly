@@ -1,109 +1,82 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
-import { spawn } from 'child_process';
+import { pipeline } from 'stream/promises';
+import { Readable } from 'stream';
 import { requireSuperAdmin } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 
-type ApkBuildState = 'idle' | 'running' | 'done' | 'error';
-
-type ApkBuildStatus = {
-    state: ApkBuildState;
-    jobId?: string;
-    startedAt?: string;
-    finishedAt?: string;
-    log?: string;
-    apkFile?: string;
-    apkUrl?: string;
-    error?: string;
+type ApkStatusResponse = {
+    latestFile: string | null;
+    latestNumber: number | null;
+    latestUrl: string | null;
+    nextFile: string;
+    nextNumber: number;
 };
 
-const statusPath = path.join(os.tmpdir(), 'sawrly-apk-build-status.json');
-const lockPath = path.join(os.tmpdir(), 'sawrly-apk-build.lock');
-
-function readStatus(): ApkBuildStatus {
-    try {
-        if (!fs.existsSync(statusPath)) return { state: 'idle' };
-        const raw = fs.readFileSync(statusPath, 'utf8');
-        if (!raw.trim()) return { state: 'idle' };
-        const parsed = JSON.parse(raw);
-        if (!parsed || typeof parsed !== 'object') return { state: 'idle' };
-        const state = (parsed as any).state;
-        if (state !== 'idle' && state !== 'running' && state !== 'done' && state !== 'error') {
-            return { state: 'idle' };
-        }
-        return parsed as ApkBuildStatus;
-    } catch {
-        return { state: 'idle' };
-    }
+function getPublicOrigin(req: NextRequest): string {
+    const forwardedProto = req.headers.get('x-forwarded-proto')?.trim();
+    const forwardedHost = req.headers.get('x-forwarded-host')?.trim();
+    const host = forwardedHost || req.headers.get('host') || req.nextUrl.host;
+    const proto = forwardedProto || (host.startsWith('localhost') ? 'http' : 'https');
+    return `${proto}://${host}`;
 }
 
-function writeStatus(update: Partial<ApkBuildStatus>): ApkBuildStatus {
-    const current = readStatus();
-    const next: ApkBuildStatus = { ...current, ...update } as ApkBuildStatus;
-    fs.writeFileSync(statusPath, JSON.stringify(next, null, 2), 'utf8');
-    return next;
+function getDownloadsDir(): string {
+    return path.join(process.cwd(), 'public', 'downloads');
 }
 
-function appendLog(chunk: string) {
-    const current = readStatus();
-    const existing = current.log || '';
-    const next = (existing + chunk).slice(-20000);
-    writeStatus({ log: next });
+function getApkNumber(fileName: string): number | null {
+    const match = /^sawrly-(\d+)\.apk$/i.exec(fileName);
+    if (!match) return null;
+    const value = Number.parseInt(match[1], 10);
+    if (!Number.isFinite(value)) return null;
+    return value;
 }
 
-function resolveCandidateDir(candidates: string[]): string | null {
-    for (const candidate of candidates) {
-        try {
-            if (candidate && fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
-                return candidate;
-            }
-        } catch {}
-    }
-    return null;
-}
-
-function resolveMobileDir(): string | null {
-    const configured = process.env.APK_BUILD_MOBILE_PATH?.trim();
-    const cwd = process.cwd();
-    return resolveCandidateDir([
-        configured || '',
-        path.resolve(cwd, 'sawrly-mobile'),
-        path.resolve(cwd, '..', 'sawrly-mobile'),
-    ]);
-}
-
-function resolveDownloadsDir(): string | null {
-    const configured = process.env.APK_BUILD_DOWNLOADS_PATH?.trim();
-    const cwd = process.cwd();
-    return resolveCandidateDir([
-        configured || '',
-        path.resolve(cwd, 'public', 'downloads'),
-        path.resolve(cwd, '..', 'sawrly-web', 'public', 'downloads'),
-    ]);
-}
-
-function getNextApkFileName(downloadsDir: string): string {
+function getNextApkFileName(files: string[]): { fileName: string; number: number } {
     let max = 0;
-    try {
-        const files = fs.readdirSync(downloadsDir);
-        for (const file of files) {
-            const match = /^sawrly-(\d+)\.apk$/i.exec(file);
-            if (!match) continue;
-            const value = Number.parseInt(match[1], 10);
-            if (!Number.isFinite(value)) continue;
-            max = Math.max(max, value);
-        }
-    } catch {}
+    for (const file of files) {
+        const value = getApkNumber(file);
+        if (value == null) continue;
+        max = Math.max(max, value);
+    }
     const next = max + 1;
     const padded = String(next).padStart(2, '0');
-    return `sawrly-${padded}.apk`;
+    return { fileName: `sawrly-${padded}.apk`, number: next };
 }
 
-async function safeMkdir(dir: string) {
-    await fs.promises.mkdir(dir, { recursive: true });
+async function readApkStatus(origin: string): Promise<ApkStatusResponse> {
+    const downloadsDir = getDownloadsDir();
+    await fs.promises.mkdir(downloadsDir, { recursive: true });
+
+    const entries = await fs.promises.readdir(downloadsDir, { withFileTypes: true });
+    const files = entries
+        .filter(entry => entry.isFile() && entry.name.toLowerCase().endsWith('.apk'))
+        .map(entry => entry.name);
+
+    let latestNumber = -1;
+    let latestFile: string | null = null;
+    for (const name of files) {
+        const n = getApkNumber(name);
+        if (n == null) continue;
+        if (n > latestNumber) {
+            latestNumber = n;
+            latestFile = name;
+        }
+    }
+
+    const next = getNextApkFileName(files);
+    const latestUrl = latestFile ? `${origin}/downloads/${encodeURIComponent(latestFile)}` : null;
+
+    return {
+        latestFile,
+        latestNumber: latestFile ? latestNumber : null,
+        latestUrl,
+        nextFile: next.fileName,
+        nextNumber: next.number,
+    };
 }
 
 export async function GET(req: NextRequest) {
@@ -112,7 +85,8 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
 
-    const status = readStatus();
+    const origin = getPublicOrigin(req);
+    const status = await readApkStatus(origin);
     return NextResponse.json(status);
 }
 
@@ -122,97 +96,32 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
 
-    const current = readStatus();
-    if (current.state === 'running' && fs.existsSync(lockPath)) {
-        return NextResponse.json({ error: 'Build already running', status: current }, { status: 409 });
+    const origin = getPublicOrigin(req);
+    const downloadsDir = getDownloadsDir();
+    await fs.promises.mkdir(downloadsDir, { recursive: true });
+
+    const entries = await fs.promises.readdir(downloadsDir, { withFileTypes: true });
+    const files = entries
+        .filter(entry => entry.isFile() && entry.name.toLowerCase().endsWith('.apk'))
+        .map(entry => entry.name);
+
+    const next = getNextApkFileName(files);
+    const destinationPath = path.join(downloadsDir, next.fileName);
+
+    if (!req.body) {
+        return NextResponse.json({ error: 'Missing file body' }, { status: 400 });
     }
 
-    const mobileDir = resolveMobileDir();
-    const downloadsDir = resolveDownloadsDir();
-    if (!mobileDir) {
-        return NextResponse.json(
-            { error: 'Missing APK build mobile path. Set APK_BUILD_MOBILE_PATH on the server.' },
-            { status: 500 }
-        );
-    }
-    if (!downloadsDir) {
-        return NextResponse.json(
-            { error: 'Missing downloads directory. Set APK_BUILD_DOWNLOADS_PATH on the server.' },
-            { status: 500 }
-        );
-    }
+    const incoming = Readable.fromWeb(req.body as any);
+    await pipeline(incoming, fs.createWriteStream(destinationPath));
 
-    await safeMkdir(downloadsDir);
+    const status: ApkStatusResponse = {
+        latestFile: next.fileName,
+        latestNumber: next.number,
+        latestUrl: `${origin}/downloads/${encodeURIComponent(next.fileName)}`,
+        nextFile: `sawrly-${String(next.number + 1).padStart(2, '0')}.apk`,
+        nextNumber: next.number + 1,
+    };
 
-    const jobId = `${Date.now()}`;
-    const startedAt = new Date().toISOString();
-    fs.writeFileSync(lockPath, jobId, 'utf8');
-    writeStatus({
-        state: 'running',
-        jobId,
-        startedAt,
-        finishedAt: undefined,
-        error: undefined,
-        apkFile: undefined,
-        apkUrl: undefined,
-        log: '',
-    });
-
-    const buildOutputApk = path.join(mobileDir, 'build', 'app', 'outputs', 'flutter-apk', 'app-profile.apk');
-    const destinationFile = getNextApkFileName(downloadsDir);
-    const destinationPath = path.join(downloadsDir, destinationFile);
-
-    const child = spawn('bash', ['-lc', 'flutter build apk --profile'], {
-        cwd: mobileDir,
-        env: process.env,
-    });
-
-    child.stdout.on('data', (data) => appendLog(data.toString()));
-    child.stderr.on('data', (data) => appendLog(data.toString()));
-
-    child.on('error', (error) => {
-        try {
-            fs.unlinkSync(lockPath);
-        } catch {}
-        writeStatus({
-            state: 'error',
-            finishedAt: new Date().toISOString(),
-            error: error.message,
-        });
-    });
-
-    child.on('close', async (code) => {
-        try {
-            if (code !== 0) {
-                writeStatus({
-                    state: 'error',
-                    finishedAt: new Date().toISOString(),
-                    error: `flutter build failed (exit ${code ?? 'unknown'})`,
-                });
-                return;
-            }
-
-            await fs.promises.copyFile(buildOutputApk, destinationPath);
-            const apkUrl = `${req.nextUrl.origin}/downloads/${destinationFile}`;
-            writeStatus({
-                state: 'done',
-                finishedAt: new Date().toISOString(),
-                apkFile: destinationFile,
-                apkUrl,
-            });
-        } catch (e) {
-            writeStatus({
-                state: 'error',
-                finishedAt: new Date().toISOString(),
-                error: e instanceof Error ? e.message : 'Build finished but failed to publish APK',
-            });
-        } finally {
-            try {
-                fs.unlinkSync(lockPath);
-            } catch {}
-        }
-    });
-
-    return NextResponse.json({ ok: true, jobId });
+    return NextResponse.json(status);
 }
-

@@ -18,6 +18,24 @@ export async function GET() {
             return NextResponse.json({ error: 'No APK available' }, { status: 404 });
         }
 
+        let bestNumber = -1;
+        let bestNumberFile: string | null = null;
+        for (const name of apks) {
+            const match = /^sawrly-(\d+)\.apk$/i.exec(name);
+            if (!match) continue;
+            const value = Number.parseInt(match[1], 10);
+            if (!Number.isFinite(value)) continue;
+            if (value > bestNumber) {
+                bestNumber = value;
+                bestNumberFile = name;
+            }
+        }
+
+        if (bestNumberFile) {
+            const url = new URL(`/downloads/${encodeURIComponent(bestNumberFile)}`, 'https://sawrly.com');
+            return NextResponse.redirect(url, 302);
+        }
+
         const stats = await Promise.all(
             apks.map(async name => {
                 const stat = await fs.stat(path.join(downloadsDir, name));
@@ -38,4 +56,3 @@ export async function GET() {
         return NextResponse.json({ error: 'No APK available' }, { status: 404 });
     }
 }
-
