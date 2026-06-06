@@ -30,7 +30,7 @@ jobs:
 
             rm -rf "$TMP"
             git clone --depth 1 "$REPO_URL" "$TMP"
-            rsync -a --delete --exclude ".env" --exclude "public/downloads" "$TMP/sawrly-web/" "$WEB_PATH/"
+            rsync -a --delete --exclude ".env" --exclude "public/downloads" --exclude "public/uploads" "$TMP/sawrly-web/" "$WEB_PATH/"
             rm -rf "$TMP"
 
             cd "$WEB_PATH"
@@ -42,4 +42,3 @@ jobs:
             else
               sudo -n systemctl restart sawrly.service
             fi
-
