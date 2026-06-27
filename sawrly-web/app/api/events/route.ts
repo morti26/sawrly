@@ -5,13 +5,42 @@ import { saveFile } from '@/lib/upload';
 
 export const runtime = 'nodejs';
 
+async function ensureEventSchema() {
+    await query(`
+        ALTER TABLE events
+        ADD COLUMN IF NOT EXISTS calendar_status VARCHAR(20) NOT NULL DEFAULT 'event'
+            CHECK (calendar_status IN ('event', 'booked', 'busy'))
+    `);
+    await query(`
+        ALTER TABLE events
+        ADD COLUMN IF NOT EXISTS notes TEXT
+    `);
+    await query(`
+        ALTER TABLE events
+        ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    `);
+}
+
+function normalizeCalendarStatus(value: unknown): 'event' | 'booked' | 'busy' {
+    const normalized = String(value ?? '').trim().toLowerCase();
+    if (normalized === 'booked' || normalized === 'busy') return normalized;
+    return 'event';
+}
+
+function defaultTitleForStatus(status: 'event' | 'booked' | 'busy') {
+    if (status === 'booked') return 'محجوز';
+    if (status === 'busy') return 'مشغول';
+    return 'فعالية';
+}
+
 // GET /api/events?creatorId=...
 export async function GET(req: NextRequest) {
+    await ensureEventSchema();
     const { searchParams } = new URL(req.url);
     const creatorId = searchParams.get('creatorId');
 
     let sql = `
-        SELECT id, creator_id, title, date_time, location, cover_image_url, created_at
+        SELECT id, creator_id, title, date_time, calendar_status, location, notes, cover_image_url, created_at, updated_at
         FROM events
         WHERE 1=1
     `;
@@ -34,6 +63,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/events
 export async function POST(req: NextRequest) {
+    await ensureEventSchema();
     const auth = await requireActiveCreator(req);
     if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
@@ -74,17 +104,23 @@ export async function POST(req: NextRequest) {
         // FALLBACK UPDATE via POST (JSON)
         if (id || methodOverride === 'PATCH') {
             if (contentType.includes('application/json')) {
-                const { title, dateTime, location, coverImageUrl } = body;
+                const { title, dateTime, location, notes, coverImageUrl } = body;
+                const calendarStatus = normalizeCalendarStatus(body.calendarStatus);
+                const resolvedTitle = typeof title === 'string' && title.trim().length > 0
+                    ? title.trim()
+                    : defaultTitleForStatus(calendarStatus);
                 const res = await query(`
                     UPDATE events 
                     SET title = COALESCE($1, title),
                         date_time = COALESCE($2, date_time),
-                        location = COALESCE($3, location),
-                        cover_image_url = COALESCE($4, cover_image_url),
+                        calendar_status = COALESCE($3, calendar_status),
+                        location = COALESCE($4, location),
+                        notes = COALESCE($5, notes),
+                        cover_image_url = COALESCE($6, cover_image_url),
                         updated_at = NOW()
-                    WHERE id = $5::uuid AND creator_id = $6::uuid
+                    WHERE id = $7::uuid AND creator_id = $8::uuid
                     RETURNING id
-                `, [title, dateTime, location, coverImageUrl, id, auth.user!.userId]);
+                `, [resolvedTitle, dateTime, calendarStatus, location, notes, coverImageUrl, id, auth.user!.userId]);
 
                 if (res.rows.length === 0) {
                     return NextResponse.json({ error: 'Event not found or unauthorized' }, { status: 404 });
@@ -94,15 +130,19 @@ export async function POST(req: NextRequest) {
         }
 
         if (contentType.includes('application/json')) {
-            const { title, dateTime, location, coverImageUrl } = body;
-            if (!title || !dateTime) {
+            const { title, dateTime, location, notes, coverImageUrl } = body;
+            const calendarStatus = normalizeCalendarStatus(body.calendarStatus);
+            const resolvedTitle = typeof title === 'string' && title.trim().length > 0
+                ? title.trim()
+                : defaultTitleForStatus(calendarStatus);
+            if (!resolvedTitle || !dateTime) {
                 return NextResponse.json({ error: 'Title and dateTime are required' }, { status: 400 });
             }
             const res = await query(`
-                INSERT INTO events (creator_id, title, date_time, location, cover_image_url)
-                VALUES ($1::uuid, $2, $3, $4, $5)
-                RETURNING id, title
-            `, [auth.user!.userId, title, dateTime, location, coverImageUrl ?? null]);
+                INSERT INTO events (creator_id, title, date_time, calendar_status, location, notes, cover_image_url)
+                VALUES ($1::uuid, $2, $3, $4, $5, $6, $7)
+                RETURNING id, title, calendar_status
+            `, [auth.user!.userId, resolvedTitle, dateTime, calendarStatus, location ?? null, notes ?? null, coverImageUrl ?? null]);
 
             return NextResponse.json(res.rows[0], { status: 201 });
         }
@@ -112,7 +152,10 @@ export async function POST(req: NextRequest) {
         const title = formData.get('title') as string;
         const dateTime = formData.get('dateTime') as string; // ISO string
         const location = formData.get('location') as string;
+        const notes = formData.get('notes') as string;
+        const calendarStatus = normalizeCalendarStatus(formData.get('calendarStatus'));
         const coverImage = formData.get('coverImage') as File;
+        const resolvedTitle = title?.trim() ? title.trim() : defaultTitleForStatus(calendarStatus);
 
         let coverImageUrl = null;
         if (coverImage) {
@@ -126,10 +169,10 @@ export async function POST(req: NextRequest) {
 
         // Insert into DB
         const res = await query(`
-            INSERT INTO events (creator_id, title, date_time, location, cover_image_url)
-            VALUES ($1::uuid, $2, $3, $4, $5)
-            RETURNING id, title
-        `, [auth.user!.userId, title, dateTime, location, coverImageUrl]);
+            INSERT INTO events (creator_id, title, date_time, calendar_status, location, notes, cover_image_url)
+            VALUES ($1::uuid, $2, $3, $4, $5, $6, $7)
+            RETURNING id, title, calendar_status
+        `, [auth.user!.userId, resolvedTitle, dateTime, calendarStatus, location || null, notes || null, coverImageUrl]);
 
         return NextResponse.json(res.rows[0], { status: 201 });
     } catch (e: any) {
@@ -139,10 +182,15 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/events - Update Event
 export async function PATCH(req: NextRequest) {
+    await ensureEventSchema();
     const auth = await requireActiveCreator(req);
     if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-    const { id, title, dateTime, location, coverImageUrl } = await req.json();
+    const { id, title, dateTime, location, notes, coverImageUrl, calendarStatus: rawStatus } = await req.json();
+    const calendarStatus = normalizeCalendarStatus(rawStatus);
+    const resolvedTitle = typeof title === 'string' && title.trim().length > 0
+        ? title.trim()
+        : defaultTitleForStatus(calendarStatus);
 
     if (!id) return NextResponse.json({ error: 'Missing event ID' }, { status: 400 });
 
@@ -151,12 +199,14 @@ export async function PATCH(req: NextRequest) {
             UPDATE events 
             SET title = COALESCE($1, title),
                 date_time = COALESCE($2, date_time),
-                location = COALESCE($3, location),
-                cover_image_url = COALESCE($4, cover_image_url),
+                calendar_status = COALESCE($3, calendar_status),
+                location = COALESCE($4, location),
+                notes = COALESCE($5, notes),
+                cover_image_url = COALESCE($6, cover_image_url),
                 updated_at = NOW()
-            WHERE id = $5::uuid AND creator_id = $6::uuid
+            WHERE id = $7::uuid AND creator_id = $8::uuid
             RETURNING id
-        `, [title, dateTime, location, coverImageUrl, id, auth.user!.userId]);
+        `, [resolvedTitle, dateTime, calendarStatus, location, notes, coverImageUrl, id, auth.user!.userId]);
 
         if (res.rows.length === 0) {
             return NextResponse.json({ error: 'Event not found or unauthorized' }, { status: 404 });
@@ -170,6 +220,7 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE /api/events - Delete Event
 export async function DELETE(req: NextRequest) {
+    await ensureEventSchema();
     const auth = await requireActiveCreator(req);
     if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
 

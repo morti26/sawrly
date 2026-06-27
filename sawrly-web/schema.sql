@@ -218,9 +218,13 @@ CREATE TABLE events (
     creator_id UUID NOT NULL REFERENCES users(id),
     title VARCHAR(255) NOT NULL,
     date_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    calendar_status VARCHAR(20) NOT NULL DEFAULT 'event'
+        CHECK (calendar_status IN ('event', 'booked', 'busy')),
     location VARCHAR(255),
+    notes TEXT,
     cover_image_url TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- 14. SUPPORT MESSAGES --
