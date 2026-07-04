@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
                     q.creator_id,
                     q.price_snapshot::float8 AS price_snapshot,
                     q.status,
+                    q.scheduled_for,
                     q.created_at,
                     offer.title AS offer_title,
                     offer.image_url AS offer_image_url,

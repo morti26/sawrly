@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
                     p.quote_id,
                     p.project_id,
                     p.amount::float8 AS amount,
+                    p.payment_portion,
                     p.method,
                     p.status,
                     p.proof_url,

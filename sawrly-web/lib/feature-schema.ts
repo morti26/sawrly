@@ -18,7 +18,7 @@ function isInsufficientPrivilegeError(error: any): boolean {
 async function isOfferSchemaReady(): Promise<boolean> {
     try {
         await query(`
-            SELECT discount_percent, original_price_iqd, view_count
+            SELECT discount_percent, original_price_iqd, partial_payment_iqd, full_payment_iqd, view_count
             FROM offers
             LIMIT 1
         `);
@@ -81,6 +81,14 @@ async function ensureOfferSchemaInternal(): Promise<void> {
     await query(`
         ALTER TABLE offers
         ADD COLUMN IF NOT EXISTS original_price_iqd DECIMAL(12, 2)
+    `);
+    await query(`
+        ALTER TABLE offers
+        ADD COLUMN IF NOT EXISTS partial_payment_iqd DECIMAL(12, 2)
+    `);
+    await query(`
+        ALTER TABLE offers
+        ADD COLUMN IF NOT EXISTS full_payment_iqd DECIMAL(12, 2)
     `);
     await query(`
         ALTER TABLE offers

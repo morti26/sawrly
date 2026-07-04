@@ -5,6 +5,7 @@ import { ensureOfferSchema } from '@/lib/feature-schema';
 
 type OfferMediaType = 'image' | 'video';
 type OfferMediaItem = { url: string; type: OfferMediaType };
+const MINIMUM_OFFER_PRICE_IQD = 1200;
 
 function isProbablyVideoUrl(url: string): boolean {
     const normalized = url.toLowerCase();
@@ -67,6 +68,21 @@ async function replaceOfferMediaItems(
     }
 }
 
+function normalizeOfferPrice(value: unknown): number | null {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return null;
+    return numeric;
+}
+
+function normalizeOptionalPositiveAmount(value: unknown): number | null {
+    if (value === undefined || value === null || String(value).trim() === '') {
+        return null;
+    }
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric) || numeric <= 0) return null;
+    return numeric;
+}
+
 // GET /api/offers - List Active Offers
 // ?sort=popular   → sorted by likes + orders
 // ?sort=newest    → sorted by date (default)
@@ -85,6 +101,7 @@ export async function GET(req: NextRequest) {
     let sql = `
       SELECT o.id, o.title, o.description, o.price_iqd, o.image_url, o.creator_id,
              o.discount_percent, o.original_price_iqd,
+             o.partial_payment_iqd, o.full_payment_iqd,
              u.name as creator_name,
              COALESCE(lk.like_count, 0)::int as like_count,
              COALESCE(qc.order_count, 0)::int as order_count,
@@ -191,10 +208,45 @@ export async function POST(req: NextRequest) {
         }
     } catch {}
 
-    const { title, description, priceIqd, imageUrl, mediaItems, discountPercent, originalPriceIqd } = body;
+    const {
+        title,
+        description,
+        priceIqd,
+        imageUrl,
+        mediaItems,
+        discountPercent,
+        originalPriceIqd,
+        partialPaymentIqd,
+        fullPaymentIqd,
+    } = body;
     const parsedMedia = parseOfferMediaItems(mediaItems);
     if (parsedMedia.error) {
         return NextResponse.json({ error: parsedMedia.error }, { status: 400 });
+    }
+    const normalizedPrice = normalizeOfferPrice(priceIqd);
+    if (priceIqd !== undefined && (normalizedPrice === null || normalizedPrice < MINIMUM_OFFER_PRICE_IQD)) {
+        return NextResponse.json({ error: `Minimum offer price is ${MINIMUM_OFFER_PRICE_IQD} IQD` }, { status: 400 });
+    }
+    const normalizedOriginalPrice = normalizeOfferPrice(originalPriceIqd);
+    if (originalPriceIqd !== undefined && normalizedOriginalPrice !== null && normalizedOriginalPrice < MINIMUM_OFFER_PRICE_IQD) {
+        return NextResponse.json({ error: `Minimum offer price is ${MINIMUM_OFFER_PRICE_IQD} IQD` }, { status: 400 });
+    }
+    const normalizedPartialPayment = normalizeOptionalPositiveAmount(partialPaymentIqd);
+    if (partialPaymentIqd !== undefined && normalizedPartialPayment === null) {
+        return NextResponse.json({ error: 'Partial payment amount must be greater than 0' }, { status: 400 });
+    }
+    const normalizedFullPayment = normalizeOptionalPositiveAmount(fullPaymentIqd);
+    if (fullPaymentIqd !== undefined && normalizedFullPayment === null) {
+        return NextResponse.json({ error: 'Full payment amount must be greater than 0' }, { status: 400 });
+    }
+    if (normalizedFullPayment !== null && normalizedFullPayment < MINIMUM_OFFER_PRICE_IQD) {
+        return NextResponse.json({ error: `Minimum full payment amount is ${MINIMUM_OFFER_PRICE_IQD} IQD` }, { status: 400 });
+    }
+    if (normalizedPartialPayment !== null) {
+        const comparisonFull = normalizedFullPayment ?? normalizedPrice;
+        if (comparisonFull !== null && normalizedPartialPayment >= comparisonFull) {
+            return NextResponse.json({ error: 'Partial payment amount must be less than full payment amount' }, { status: 400 });
+        }
     }
     const finalMediaItems = parsedMedia.items;
     const finalImageUrl = derivePrimaryImageUrl(finalMediaItems, imageUrl);
@@ -216,11 +268,24 @@ export async function POST(req: NextRequest) {
                         image_url = COALESCE($4, image_url),
                         discount_percent = COALESCE($7, discount_percent),
                         original_price_iqd = COALESCE($8, original_price_iqd),
+                        partial_payment_iqd = COALESCE($9, partial_payment_iqd),
+                        full_payment_iqd = COALESCE($10, full_payment_iqd),
                         updated_at = NOW()
                     WHERE id = $5::uuid AND creator_id = $6::uuid
                     RETURNING id
                 `,
-                [title, description, priceIqd, finalImageUrl, id, auth.user!.userId, discountPercent ?? null, originalPriceIqd ?? null]
+                [
+                    title,
+                    description,
+                    normalizedPrice,
+                    finalImageUrl,
+                    id,
+                    auth.user!.userId,
+                    discountPercent ?? null,
+                    normalizedOriginalPrice ?? null,
+                    normalizedPartialPayment,
+                    normalizedFullPayment,
+                ]
             );
 
             if (res.rows.length === 0) {
@@ -244,17 +309,42 @@ export async function POST(req: NextRequest) {
     // CREATE NEW OFFER
     const client = await getClient();
     try {
+        if (normalizedPrice === null) {
+            return NextResponse.json({ error: 'Invalid offer price' }, { status: 400 });
+        }
         const finalDiscount = discountPercent && discountPercent > 0 ? discountPercent : 0;
-        const finalOriginal = originalPriceIqd && originalPriceIqd > 0 ? originalPriceIqd : null;
+        const finalOriginal = normalizedOriginalPrice && normalizedOriginalPrice > 0 ? normalizedOriginalPrice : null;
+        const finalFullPayment = normalizedFullPayment ?? normalizedPrice;
+        const finalPartialPayment = normalizedPartialPayment;
 
         await client.query('BEGIN');
         const res = await client.query(
             `
-                INSERT INTO offers (creator_id, title, description, price_iqd, image_url, discount_percent, original_price_iqd)
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
+                INSERT INTO offers (
+                    creator_id,
+                    title,
+                    description,
+                    price_iqd,
+                    image_url,
+                    discount_percent,
+                    original_price_iqd,
+                    partial_payment_iqd,
+                    full_payment_iqd
+                )
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                 RETURNING id
             `,
-            [auth.user!.userId, title, description, priceIqd, finalImageUrl, finalDiscount, finalOriginal]
+            [
+                auth.user!.userId,
+                title,
+                description,
+                normalizedPrice,
+                finalImageUrl,
+                finalDiscount,
+                finalOriginal,
+                finalPartialPayment,
+                finalFullPayment,
+            ]
         );
         const offerId = res.rows[0]?.id as string;
         await replaceOfferMediaItems(client, offerId, finalMediaItems ?? []);
@@ -292,11 +382,47 @@ export async function PATCH(req: NextRequest) {
     const auth = await requireActiveCreator(req);
     if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-    const { id, title, description, priceIqd, imageUrl, mediaItems, discountPercent, originalPriceIqd } = await req.json();
+    const {
+        id,
+        title,
+        description,
+        priceIqd,
+        imageUrl,
+        mediaItems,
+        discountPercent,
+        originalPriceIqd,
+        partialPaymentIqd,
+        fullPaymentIqd,
+    } = await req.json();
     if (!id) return NextResponse.json({ error: 'Missing offer ID' }, { status: 400 });
     const parsedMedia = parseOfferMediaItems(mediaItems);
     if (parsedMedia.error) {
         return NextResponse.json({ error: parsedMedia.error }, { status: 400 });
+    }
+    const normalizedPrice = normalizeOfferPrice(priceIqd);
+    if (priceIqd !== undefined && (normalizedPrice === null || normalizedPrice < MINIMUM_OFFER_PRICE_IQD)) {
+        return NextResponse.json({ error: `Minimum offer price is ${MINIMUM_OFFER_PRICE_IQD} IQD` }, { status: 400 });
+    }
+    const normalizedOriginalPrice = normalizeOfferPrice(originalPriceIqd);
+    if (originalPriceIqd !== undefined && normalizedOriginalPrice !== null && normalizedOriginalPrice < MINIMUM_OFFER_PRICE_IQD) {
+        return NextResponse.json({ error: `Minimum offer price is ${MINIMUM_OFFER_PRICE_IQD} IQD` }, { status: 400 });
+    }
+    const normalizedPartialPayment = normalizeOptionalPositiveAmount(partialPaymentIqd);
+    if (partialPaymentIqd !== undefined && normalizedPartialPayment === null) {
+        return NextResponse.json({ error: 'Partial payment amount must be greater than 0' }, { status: 400 });
+    }
+    const normalizedFullPayment = normalizeOptionalPositiveAmount(fullPaymentIqd);
+    if (fullPaymentIqd !== undefined && normalizedFullPayment === null) {
+        return NextResponse.json({ error: 'Full payment amount must be greater than 0' }, { status: 400 });
+    }
+    if (normalizedFullPayment !== null && normalizedFullPayment < MINIMUM_OFFER_PRICE_IQD) {
+        return NextResponse.json({ error: `Minimum full payment amount is ${MINIMUM_OFFER_PRICE_IQD} IQD` }, { status: 400 });
+    }
+    if (normalizedPartialPayment !== null) {
+        const comparisonFull = normalizedFullPayment ?? normalizedPrice;
+        if (comparisonFull !== null && normalizedPartialPayment >= comparisonFull) {
+            return NextResponse.json({ error: 'Partial payment amount must be less than full payment amount' }, { status: 400 });
+        }
     }
     const finalMediaItems = parsedMedia.items;
     const finalImageUrl = derivePrimaryImageUrl(finalMediaItems, imageUrl);
@@ -313,11 +439,24 @@ export async function PATCH(req: NextRequest) {
                     image_url = COALESCE($4, image_url),
                     discount_percent = COALESCE($7, discount_percent),
                     original_price_iqd = COALESCE($8, original_price_iqd),
+                    partial_payment_iqd = COALESCE($9, partial_payment_iqd),
+                    full_payment_iqd = COALESCE($10, full_payment_iqd),
                     updated_at = NOW()
                 WHERE id = $5::uuid AND creator_id = $6::uuid
                 RETURNING id
             `,
-            [title, description, priceIqd, finalImageUrl, id, auth.user!.userId, discountPercent ?? null, originalPriceIqd ?? null]
+            [
+                title,
+                description,
+                normalizedPrice,
+                finalImageUrl,
+                id,
+                auth.user!.userId,
+                discountPercent ?? null,
+                normalizedOriginalPrice ?? null,
+                normalizedPartialPayment,
+                normalizedFullPayment,
+            ]
         );
 
         if (res.rows.length === 0) {

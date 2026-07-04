@@ -77,6 +77,8 @@ CREATE TABLE offers (
     price_iqd DECIMAL(12, 2) NOT NULL,
     discount_percent INTEGER NOT NULL DEFAULT 0 CHECK (discount_percent >= 0 AND discount_percent <= 100),
     original_price_iqd DECIMAL(12, 2),
+    partial_payment_iqd DECIMAL(12, 2),
+    full_payment_iqd DECIMAL(12, 2),
     view_count INTEGER NOT NULL DEFAULT 0,
     status offer_status DEFAULT 'active',
     image_url TEXT,
@@ -94,6 +96,7 @@ CREATE TABLE quotes (
     client_id UUID NOT NULL REFERENCES users(id),
     creator_id UUID NOT NULL REFERENCES users(id), -- Denormalized for query speed
     price_snapshot DECIMAL(12, 2) NOT NULL, -- Locked price
+    scheduled_for TIMESTAMP WITH TIME ZONE,
     status quote_status DEFAULT 'accepted',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -105,6 +108,7 @@ CREATE TABLE payments (
     quote_id UUID REFERENCES quotes(id), 
     project_id UUID, -- Nullable initially, populated after project creation
     amount DECIMAL(12, 2) NOT NULL,
+    payment_portion VARCHAR(20) NOT NULL DEFAULT 'full',
     method payment_method NOT NULL,
     status payment_status DEFAULT 'pending',
     proof_url TEXT, -- Screenshot or note
