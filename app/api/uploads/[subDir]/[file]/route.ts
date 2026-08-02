@@ -35,7 +35,7 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
   }
 
-  const fullPath = join(process.cwd(), 'public', 'uploads', subDir, file);
+  const fullPath = join(process.cwd(), 'uploads', subDir, file);
 
   try {
     const bytes = await readFile(fullPath);

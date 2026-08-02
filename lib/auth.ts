@@ -81,14 +81,85 @@ export const verifyToken = (token: string): TokenPayload | null => {
     }
 };
 
+export type AuthDebugInfo = {
+    foundIn: 'bearer' | 'cookie' | 'none';
+    tokenPresent: boolean;
+    tokenValid: boolean;
+    tokenParsed: Partial<TokenPayload> | null;
+    role?: AppRole;
+    rolesNeeded?: AppRole[];
+    allow?: boolean;
+    errorReason?: string;
+};
+
 // Middleware helper to get user from request
 export const getUserFromRequest = (req: NextRequest): TokenPayload | null => {
     const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return null;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
+        if (token) {
+            const p = verifyToken(token);
+            if (p) return p;
+        }
     }
-    const token = authHeader.split(' ')[1];
-    return verifyToken(token);
+    const cookieToken = req.cookies.get('admin_token')?.value
+        ?? req.cookies.get('token')?.value
+        ?? req.cookies.get('jwt')?.value;
+    if (cookieToken) return verifyToken(cookieToken);
+    return null;
+};
+
+export const debugAuth = (req: NextRequest, allowedRoles?: AppRole[]): AuthDebugInfo => {
+    const info: AuthDebugInfo = {
+        foundIn: 'none', tokenPresent: false, tokenValid: false, tokenParsed: null,
+        rolesNeeded: allowedRoles,
+    };
+    let raw: string | undefined;
+    const authHeader = req.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        raw = authHeader.split(' ')[1];
+        info.foundIn = 'bearer';
+    }
+    if (!raw) {
+        raw = req.cookies.get('admin_token')?.value
+            ?? req.cookies.get('token')?.value
+            ?? req.cookies.get('jwt')?.value;
+        if (raw) info.foundIn = 'cookie';
+    }
+    if (!raw) {
+        info.errorReason = 'INGEN token hittades varken i Authorization-header eller cookie (admin_token/token/jwt). Logga in på nytt via admin.';
+        return info;
+    }
+    info.tokenPresent = true;
+    try {
+        const parts = raw.split('.');
+        if (parts.length === 3) {
+            const payloadB64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+            try { info.tokenParsed = JSON.parse(Buffer.from(payloadB64, 'base64').toString('utf8')) || null; }
+            catch { info.tokenParsed = null; }
+            info.role = (info.tokenParsed as any)?.role;
+        }
+    } catch { /* noop */ }
+    const parsed = verifyToken(raw);
+    if (!parsed) {
+        info.tokenValid = false;
+        if (!info.errorReason) info.errorReason = 'Token kunde inte verifieras (fel JWT_SECRET, utgången eller korrupt).';
+        return info;
+    }
+    info.tokenValid = true;
+    info.tokenParsed = parsed;
+    info.role = parsed.role;
+    if (allowedRoles?.length) {
+        if (allowedRoles.includes(parsed.role)) {
+            info.allow = true;
+        } else {
+            info.allow = false;
+            info.errorReason = `Token har roll=${parsed.role}. Behövs någon av: ${allowedRoles.join(', ')}.`;
+        }
+    } else {
+        info.allow = true;
+    }
+    return info;
 };
 
 export const getActiveCreatorFreezeUntil = async (userId: string): Promise<string | null> => {
@@ -143,14 +214,19 @@ export const requireActiveCreator = async (req: NextRequest) => {
 
 // Role Guard
 export const requireRole = (req: NextRequest, allowedRoles: AppRole[]) => {
-    const user = getUserFromRequest(req);
+    const debug = debugAuth(req, allowedRoles);
+    const user = debug.tokenValid && debug.tokenParsed ? debug.tokenParsed as TokenPayload : null;
+    const msg = debug.errorReason ?? (user ? null : 'Unauthorized');
+    const wantDebug = process.env.NODE_ENV !== 'production' || req.headers.get('x-debug-auth');
     if (!user) {
-        return { error: 'Unauthorized', status: 401, user: null };
+        if (wantDebug) console.log('[requireRole] 401:', JSON.stringify(debug));
+        return { error: msg ?? 'Unauthorized', status: 401, user: null, debug };
     }
     if (!allowedRoles.includes(user.role)) {
-        return { error: 'Forbidden', status: 403, user: null };
+        if (wantDebug) console.log('[requireRole] 403:', JSON.stringify(debug));
+        return { error: debug.errorReason ?? `Forbidden (roll=${user.role}, behövs: ${allowedRoles.join('/')})`, status: 403, user: null, debug };
     }
-    return { error: null, user };
+    return { error: null, user, debug };
 };
 
 export const requireSuperAdmin = (req: NextRequest) => {

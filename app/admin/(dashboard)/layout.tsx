@@ -22,6 +22,8 @@ export default function AdminLayout({
         { label: 'العروض', href: '/admin/offers' },
         { label: 'المشاريع', href: '/admin/projects' },
         { label: 'المدفوعات', href: '/admin/payments' },
+        { label: 'خطط الاشتراك', href: '/admin/subscription-plans' },
+        { label: 'المهام والمناقشات', href: '/admin/tasks' },
         { label: 'الإشعارات', href: '/admin/notifications' },
         { label: 'البلاغات', href: '/admin/reports' },
         { label: 'سجل التدقيق', href: '/admin/audit-logs' },
