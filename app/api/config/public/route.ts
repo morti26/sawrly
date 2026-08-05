@@ -47,6 +47,16 @@ export type PublicThemeConfig = {
         categoriesActive: string | null;
         ordersActive: string | null;
         profileActive: string | null;
+        homeId: string | null;
+        searchId: string | null;
+        categoriesId: string | null;
+        ordersId: string | null;
+        profileId: string | null;
+        homeActiveId: string | null;
+        searchActiveId: string | null;
+        categoriesActiveId: string | null;
+        ordersActiveId: string | null;
+        profileActiveId: string | null;
     };
     effects: PublicThemeEffects;
 };
@@ -82,6 +92,19 @@ const NAV_ICON_KEYS = [
     ['categoriesActive', APP_SETTING_KEYS.navIconCategoriesActiveUrl] as const,
     ['ordersActive', APP_SETTING_KEYS.navIconOrdersActiveUrl] as const,
     ['profileActive', APP_SETTING_KEYS.navIconProfileActiveUrl] as const,
+];
+
+const NAV_ICON_ID_KEYS = [
+    ['homeId', APP_SETTING_KEYS.navIconHomeId] as const,
+    ['searchId', APP_SETTING_KEYS.navIconSearchId] as const,
+    ['categoriesId', APP_SETTING_KEYS.navIconCategoriesId] as const,
+    ['ordersId', APP_SETTING_KEYS.navIconOrdersId] as const,
+    ['profileId', APP_SETTING_KEYS.navIconProfileId] as const,
+    ['homeActiveId', APP_SETTING_KEYS.navIconHomeActiveId] as const,
+    ['searchActiveId', APP_SETTING_KEYS.navIconSearchActiveId] as const,
+    ['categoriesActiveId', APP_SETTING_KEYS.navIconCategoriesActiveId] as const,
+    ['ordersActiveId', APP_SETTING_KEYS.navIconOrdersActiveId] as const,
+    ['profileActiveId', APP_SETTING_KEYS.navIconProfileActiveId] as const,
 ];
 
 const EFFECT_KEYS: [keyof PublicThemeEffects, string][] = [
@@ -128,6 +151,16 @@ function emptyTheme(): PublicThemeConfig {
         categoriesActive: null,
         ordersActive: null,
         profileActive: null,
+        homeId: null,
+        searchId: null,
+        categoriesId: null,
+        ordersId: null,
+        profileId: null,
+        homeActiveId: null,
+        searchActiveId: null,
+        categoriesActiveId: null,
+        ordersActiveId: null,
+        profileActiveId: null,
     };
     const effects: PublicThemeEffects = {
         primaryGradientAngle: null,
@@ -182,6 +215,7 @@ export async function GET() {
             getAppSetting(APP_SETTING_KEYS.unlimitedYearlySubscriptionIconUrl),
             ...COLOR_KEYS.map(([, k]) => getAppSetting(k)),
             ...NAV_ICON_KEYS.map(([, k]) => getAppSetting(k)),
+            ...NAV_ICON_ID_KEYS.map(([, k]) => getAppSetting(k)),
             ...EFFECT_KEYS.map(([, k]) => getAppSetting(k)),
         ]);
         homeLogoUrl = reads[0];
@@ -203,6 +237,13 @@ export async function GET() {
             const t = typeof raw === 'string' ? raw.trim() : '';
             const ok = t.length === 0 ? false : t.startsWith('/') || /^https?:\/\//i.test(t);
             (theme.navIcons as any)[key] = ok ? t : null;
+        }
+        for (const [key] of NAV_ICON_ID_KEYS) {
+            const raw = reads[cursor];
+            cursor += 1;
+            const t = typeof raw === 'string' ? raw.trim() : '';
+            const ok = t.length > 0 && /^[a-z0-9_.-]{1,80}$/i.test(t);
+            (theme.navIcons as any)[key] = ok ? t.toLowerCase() : null;
         }
         for (const [key] of EFFECT_KEYS) {
             const raw = reads[cursor];

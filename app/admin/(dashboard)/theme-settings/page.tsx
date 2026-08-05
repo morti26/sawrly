@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import * as Pi from "@phosphor-icons/react";
 
 type ThemeColors = {
     primary: string | null;
@@ -34,6 +35,16 @@ type NavIcons = {
     categoriesActive: string | null;
     ordersActive: string | null;
     profileActive: string | null;
+    homeId: string | null;
+    searchId: string | null;
+    categoriesId: string | null;
+    ordersId: string | null;
+    profileId: string | null;
+    homeActiveId: string | null;
+    searchActiveId: string | null;
+    categoriesActiveId: string | null;
+    ordersActiveId: string | null;
+    profileActiveId: string | null;
 };
 
 type ThemeEffects = {
@@ -86,6 +97,16 @@ const EMPTY_NAV_ICONS: NavIcons = {
     categoriesActive: null,
     ordersActive: null,
     profileActive: null,
+    homeId: null,
+    searchId: null,
+    categoriesId: null,
+    ordersId: null,
+    profileId: null,
+    homeActiveId: null,
+    searchActiveId: null,
+    categoriesActiveId: null,
+    ordersActiveId: null,
+    profileActiveId: null,
 };
 
 const EMPTY_EFFECTS: ThemeEffects = {
@@ -261,6 +282,157 @@ const NAV_ORDER: { inKey: NavIconField; activeKey: NavIconField; label: string }
     { inKey: "profile", activeKey: "profileActive", label: "الملف" },
 ];
 
+const NAV_ICON_ID_FIELDS: { key: NavIconField; label: string; desc: string }[] = [
+    { key: "homeId", label: "الرئيسية عادية (ID)", desc: "معرف Phosphor للحالة العادية." },
+    { key: "homeActiveId", label: "الرئيسية مفعّلة (ID)", desc: "معرف Phosphor عند فتح الرئيسية." },
+    { key: "searchId", label: "البحث عادي (ID)", desc: "معرف Phosphor للبحث العادي." },
+    { key: "searchActiveId", label: "البحث مفعّل (ID)", desc: "معرف Phosphor عند فتح البحث." },
+    { key: "categoriesId", label: "الفئات عادية (ID)", desc: "معرف Phosphor للفئات العادي." },
+    { key: "categoriesActiveId", label: "الفئات مفعّلة (ID)", desc: "معرف Phosphor عند فتح الفئات." },
+    { key: "ordersId", label: "الطلبات عادي (ID)", desc: "معرف Phosphor للطلبات العادي." },
+    { key: "ordersActiveId", label: "الطلبات مفعّلة (ID)", desc: "معرف Phosphor عند فتح الطلبات." },
+    { key: "profileId", label: "الملف عادي (ID)", desc: "معرف Phosphor للحساب العادي." },
+    { key: "profileActiveId", label: "الملف مفعّل (ID)", desc: "معرف Phosphor عند فتح الحساب." },
+];
+
+const PHOSPHOR_WEIGHTS: { key: string; label: string }[] = [
+    { key: "thin", label: "رفيع جداً" },
+    { key: "light", label: "رفيع" },
+    { key: "regular", label: "عادي" },
+    { key: "bold", label: "عريض" },
+    { key: "fill", label: "مملوء" },
+    { key: "duotone", label: "ثنائي اللون" },
+];
+
+const PHOSPHOR_ICONS: { name: string; label: string }[] = [
+    { name: "house", label: "منزل" },
+    { name: "magnifying-glass", label: "بحث" },
+    { name: "squares-four", label: "فئات" },
+    { name: "shopping-bag", label: "طلبات" },
+    { name: "user", label: "ملف شخصي" },
+    { name: "heart", label: "حب" },
+    { name: "star", label: "نجمة" },
+    { name: "gem", label: "ماس" },
+    { name: "compass", label: "بوصلة" },
+    { name: "bell", label: "جرس" },
+    { name: "bookmark", label: "حفظ" },
+    { name: "bolt", label: "صاعقة" },
+    { name: "gift", label: "هدية" },
+    { name: "chat-circle", label: "دردشة" },
+    { name: "calendar", label: "تقويم" },
+    { name: "map-pin", label: "موقع" },
+    { name: "shopping-cart", label: "عربة" },
+    { name: "crown", label: "تاج" },
+    { name: "flame", label: "لهب" },
+    { name: "camera", label: "كاميرا" },
+    { name: "music-note", label: "موسيقى" },
+    { name: "film-strip", label: "فيلم" },
+    { name: "headphones", label: "سماعات" },
+    { name: "game-controller", label: "لعبة" },
+    { name: "wallet", label: "محفظة" },
+    { name: "credit-card", label: "بطاقة" },
+    { name: "ticket", label: "تذكرة" },
+    { name: "couch", label: "أريكة" },
+    { name: "car", label: "سيارة" },
+    { name: "airplane", label: "طائرة" },
+    { name: "briefcase", label: "حقيبة عمل" },
+    { name: "paw-print", label: "حيوان" },
+    { name: "leaf", label: "ورقة" },
+    { name: "sun", label: "شمس" },
+    { name: "moon", label: "قمر" },
+    { name: "sparkle", label: "بريق" },
+    { name: "fire", label: "نار" },
+    { name: "lightbulb", label: "مصباح" },
+    { name: "rocket", label: "صاروخ" },
+    { name: "trophy", label: "كأس" },
+    { name: "award", label: "جائزة" },
+    { name: "scissors", label: "مقص" },
+    { name: "scooter", label: "سكوتر" },
+    { name: "truck", label: "شاحنة" },
+    { name: "flower-lotus", label: "زهرة" },
+    { name: "coffee", label: "قهوة" },
+    { name: "cake", label: "كعكة" },
+    { name: "hand-heart", label: "حب يدوي" },
+    { name: "user-circle", label: "دائرة مستخدم" },
+    { name: "users", label: "مستخدمون" },
+    { name: "image", label: "صورة" },
+    { name: "video", label: "فيديو" },
+    { name: "notebook", label: "دفتر" },
+    { name: "archive", label: "أرشيف" },
+    { name: "folder", label: "مجلد" },
+    { name: "tag", label: "وسم" },
+    { name: "hash", label: "هاشتاج" },
+    { name: "rss", label: "RSS" },
+    { name: "chat-teardrop", label: "رسالة" },
+    { name: "envelope-simple", label: "بريد" },
+    { name: "phone", label: "هاتف" },
+    { name: "fingerprint", label: "بصمة" },
+    { name: "lock-key", label: "قفل" },
+    { name: "gear-six", label: "إعدادات" },
+    { name: "sliders-horizontal", label: "مرشحات" },
+    { name: "funnel", label: "فلتر" },
+    { name: "arrows-left-right", label: "تبديل" },
+    { name: "trash", label: "حذف" },
+    { name: "pencil-simple", label: "تعديل" },
+    { name: "eye", label: "عين" },
+    { name: "heartbeat", label: "نبض" },
+    { name: "diamonds-four", label: "ماسات" },
+    { name: "pentagram", label: "نجوم خماسية" },
+    { name: "list-dashes", label: "قائمة" },
+    { name: "grid-four", label: "شبكة 4" },
+    { name: "dot-nine", label: "نقاط 9" },
+    { name: "baseball", label: "كرة بيسبول" },
+    { name: "basketball", label: "كرة سلة" },
+    { name: "soccer-ball", label: "كرة قدم" },
+    { name: "tennis-ball", label: "كرة تنس" },
+    { name: "volleyball", label: "كرة طائرة" },
+];
+
+type ParsedIconId = { name: string; weight: string } | null;
+
+function parseIconId(raw: string | null | undefined): ParsedIconId {
+    if (!raw || typeof raw !== "string") return null;
+    const trimmed = raw.trim();
+    if (!trimmed) return null;
+    const lower = trimmed.toLowerCase();
+    const parts = lower.split(/[.]+/).filter((s) => s.length > 0);
+    if (parts.length === 0) return null;
+    let name: string;
+    let weight: string;
+    if (parts[0] === "phosphor") {
+        name = parts[1] ?? "circle";
+        weight = parts[2] ?? "regular";
+    } else {
+        name = parts[0] ?? "circle";
+        weight = parts[1] ?? "regular";
+    }
+    const validWeights = ["thin", "light", "regular", "bold", "fill", "duotone"];
+    if (!validWeights.includes(weight)) weight = "regular";
+    if (!/^[a-z0-9-]{1,40}$/.test(name)) return null;
+    return { name, weight };
+}
+
+function buildIconId(name: string, weight: string): string {
+    const n = name.trim().toLowerCase();
+    const w = weight.trim().toLowerCase();
+    return `phosphor.${n}.${w}`;
+}
+
+function iconNameToPascal(name: string): string {
+    return name
+        .split("-")
+        .filter((s) => s.length > 0)
+        .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+        .join("");
+}
+
+function iconComponent(name: string, weight: string) {
+    const pascalName = iconNameToPascal(name);
+    const capitalWeight = weight.charAt(0).toUpperCase() + weight.slice(1);
+    const key = `${pascalName}${capitalWeight === "Regular" ? "" : capitalWeight}` as keyof typeof Pi;
+    return (Pi as any)[key] || null;
+}
+
 function hexToCss(hex: string | null, fallback: string): string {
     if (!hex) return fallback;
     const trimmed = hex.trim();
@@ -327,11 +499,13 @@ export default function AdminThemeSettingsPage() {
     const [previewUrls, setPreviewUrls] = useState<Partial<Record<NavIconField, string>>>({});
     const [colorInputs, setColorInputs] = useState<Partial<Record<ColorField, string>>>({});
     const [effectInputs, setEffectInputs] = useState<Partial<Record<EffectField, number>>>({});
+    const [iconIdInputs, setIconIdInputs] = useState<Partial<Record<NavIconField, string>>>({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [activeNav, setActiveNav] = useState(0);
+    const [iconPickerField, setIconPickerField] = useState<NavIconField | null>(null);
 
     useEffect(() => {
         void loadSettings();
@@ -379,13 +553,51 @@ export default function AdminThemeSettingsPage() {
     }, [effectInputs, settings.effects]);
 
     const effectiveNavIcons = useMemo<NavIcons>(() => {
-        const next: any = { ...settings.navIcons };
-        for (const key of Object.keys(EMPTY_NAV_ICONS) as NavIconField[]) {
-            const preview = previewUrls[key];
-            if (preview) next[key] = preview;
+        const next: any = { ...EMPTY_NAV_ICONS, ...settings.navIcons };
+        for (const [key, value] of Object.entries(iconIdInputs)) {
+            if (typeof value === "string" && value.trim().length > 0) {
+                next[key as NavIconField] = value;
+            }
+        }
+        for (const [key, value] of Object.entries(previewUrls)) {
+            if (typeof value === "string" && value.trim().length > 0) {
+                next[key as NavIconField] = value;
+            }
         }
         return next;
-    }, [previewUrls, settings.navIcons]);
+    }, [previewUrls, settings.navIcons, iconIdInputs]);
+
+    function navFieldToIdField(field: NavIconField): NavIconField | null {
+        const mapping: Partial<Record<NavIconField, NavIconField>> = {
+            home: "homeId",
+            search: "searchId",
+            categories: "categoriesId",
+            orders: "ordersId",
+            profile: "profileId",
+            homeActive: "homeActiveId",
+            searchActive: "searchActiveId",
+            categoriesActive: "categoriesActiveId",
+            ordersActive: "ordersActiveId",
+            profileActive: "profileActiveId",
+        };
+        return mapping[field] ?? null;
+    }
+
+    function navFieldFromIdField(field: NavIconField): NavIconField | null {
+        const mapping: Partial<Record<NavIconField, NavIconField>> = {
+            homeId: "home",
+            searchId: "search",
+            categoriesId: "categories",
+            ordersId: "orders",
+            profileId: "profile",
+            homeActiveId: "homeActive",
+            searchActiveId: "searchActive",
+            categoriesActiveId: "categoriesActive",
+            ordersActiveId: "ordersActive",
+            profileActiveId: "profileActive",
+        };
+        return mapping[field] ?? null;
+    }
 
     async function loadSettings() {
         setLoading(true);
@@ -415,11 +627,38 @@ export default function AdminThemeSettingsPage() {
                 if (typeof raw === "number" && Number.isFinite(raw)) eff[f.key] = raw;
             }
             setEffectInputs(eff);
+            const iconIds: Partial<Record<NavIconField, string>> = {};
+            for (const f of NAV_ICON_ID_FIELDS) {
+                const raw = navIcons[f.key];
+                if (typeof raw === "string" && raw.trim().length > 0) iconIds[f.key] = raw;
+            }
+            setIconIdInputs(iconIds);
         } catch (e) {
             setError(e instanceof Error ? e.message : "حدث خطأ غير متوقع");
         } finally {
             setLoading(false);
         }
+    }
+
+    function handlePickIconId(field: NavIconField, name: string, weight: string) {
+        setMessage(null);
+        setError(null);
+        const id = buildIconId(name, weight);
+        setIconIdInputs((prev) => ({ ...prev, [field]: id }));
+    }
+
+    function handleClearIconId(field: NavIconField) {
+        setMessage(null);
+        setError(null);
+        setIconIdInputs((prev) => {
+            const next = { ...prev };
+            delete next[field];
+            return next;
+        });
+        setSettings((prev) => ({
+            ...prev,
+            navIcons: { ...prev.navIcons, [field]: null },
+        }));
     }
 
     function handleColorChange(key: ColorField, value: string) {
@@ -509,6 +748,10 @@ export default function AdminThemeSettingsPage() {
             ...prev,
             navIcons: { ...prev.navIcons, [key]: null },
         }));
+        const idKey = navFieldToIdField(key);
+        if (idKey) {
+            handleClearIconId(idKey);
+        }
     }
 
     async function uploadFile(file: File, token: string): Promise<string> {
@@ -567,6 +810,16 @@ export default function AdminThemeSettingsPage() {
                 const file = selectedFiles[f.key];
                 if (file) nextNavIcons[f.key] = await uploadFile(file, token);
             }
+            for (const f of NAV_ICON_ID_FIELDS) {
+                const raw = iconIdInputs[f.key];
+                if (raw == null) continue;
+                const trimmed = raw.trim();
+                if (trimmed.length === 0) {
+                    nextNavIcons[f.key] = null;
+                } else if (/^[a-z0-9_.-]{1,80}$/i.test(trimmed)) {
+                    nextNavIcons[f.key] = trimmed.toLowerCase();
+                }
+            }
 
             const res = await fetch("/api/admin/theme-settings", {
                 method: "PUT",
@@ -596,6 +849,12 @@ export default function AdminThemeSettingsPage() {
                 if (typeof v === "number" && Number.isFinite(v)) cleanEff[f.key] = v;
             }
             setEffectInputs(cleanEff);
+            const cleanIconIds: Partial<Record<NavIconField, string>> = {};
+            for (const f of NAV_ICON_ID_FIELDS) {
+                const v = data?.navIcons?.[f.key];
+                if (typeof v === "string" && v.trim().length > 0) cleanIconIds[f.key] = v;
+            }
+            setIconIdInputs(cleanIconIds);
             setSelectedFiles({});
             Object.values(previewUrls).forEach((url) => {
                 if (url) URL.revokeObjectURL(url);
@@ -888,6 +1147,15 @@ export default function AdminThemeSettingsPage() {
                                             const iconUrl = isActive
                                                 ? effectiveNavIcons[item.activeKey]
                                                 : effectiveNavIcons[item.inKey];
+                                            const idField = navFieldToIdField(
+                                                isActive ? item.activeKey : item.inKey
+                                            );
+                                            const iconId =
+                                                idField != null ? effectiveNavIcons[idField] ?? null : null;
+                                            const parsed = parseIconId(iconId);
+                                            const IconComp = parsed
+                                                ? iconComponent(parsed.name, parsed.weight)
+                                                : null;
                                             return (
                                                 <button
                                                     key={item.inKey}
@@ -904,7 +1172,17 @@ export default function AdminThemeSettingsPage() {
                                                             : "none",
                                                     }}
                                                 >
-                                                    {iconUrl ? (
+                                                    {IconComp ? (
+                                                        <IconComp
+                                                            size={22}
+                                                            weight={parsed?.weight ?? "regular"}
+                                                            color={
+                                                                isActive
+                                                                    ? primaryLight
+                                                                    : textSecondary
+                                                            }
+                                                        />
+                                                    ) : iconUrl ? (
                                                         <Image
                                                             src={iconUrl}
                                                             alt={item.label}
@@ -1207,139 +1485,225 @@ export default function AdminThemeSettingsPage() {
                         <div className="text-right">
                             <h3 className="font-bold text-slate-900">أيقونات شريط التنقل السفلي</h3>
                             <p className="mt-1 text-sm text-slate-500">
-                                لكل زر حالتان: عادية (غير محدّدة) ومفعّلة (عند فتح القسم). يمكنك
-                                رفع PNG/WEBP شفاف بحجم 48x48 تقريباً. إذا تركتها فارغة يستخدم
-                                التطبيق الأيقونات الافتراضية.
+                                لكل زر حالتان: عادية (غير محدّدة) ومفعّلة (عند فتح القسم). اختر
+                                من مكتبة الأيقونات الجاهزة (Phosphor — 78 أيقونة مع 6 أنماط)
+                                أو ارفع صورة مخصصة PNG/WEBP.
                             </p>
                         </div>
 
-                        <div className="mt-4 space-y-4">
+                        <div className="mt-4 space-y-5">
                             {NAV_ORDER.map((pair) => {
                                 const inactive = NAV_ICON_FIELDS.find((f) => f.key === pair.inKey)!;
                                 const active = NAV_ICON_FIELDS.find((f) => f.key === pair.activeKey)!;
+                                const inIdKey = navFieldToIdField(pair.inKey)!;
+                                const activeIdKey = navFieldToIdField(pair.activeKey)!;
                                 const inactiveUrl =
                                     previewUrls[pair.inKey] ?? settings.navIcons[pair.inKey] ?? null;
                                 const activeUrl =
                                     previewUrls[pair.activeKey] ??
                                     settings.navIcons[pair.activeKey] ??
                                     null;
+                                const inactiveId =
+                                    iconIdInputs[inIdKey] ?? settings.navIcons[inIdKey] ?? null;
+                                const activeId =
+                                    iconIdInputs[activeIdKey] ?? settings.navIcons[activeIdKey] ?? null;
+                                const inParsed = parseIconId(inactiveId);
+                                const activeParsed = parseIconId(activeId);
+                                const InIconComp = inParsed
+                                    ? iconComponent(inParsed.name, inParsed.weight)
+                                    : null;
+                                const ActiveIconComp = activeParsed
+                                    ? iconComponent(activeParsed.name, activeParsed.weight)
+                                    : null;
                                 return (
                                     <div
                                         key={pair.inKey}
-                                        className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-slate-50/60 p-4 md:grid-cols-2"
+                                        className="space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-4"
                                     >
-                                        <div className="space-y-3 text-right">
-                                            <div>
-                                                <div className="font-semibold text-slate-900">
-                                                    {pair.label} — عادية
-                                                </div>
-                                                <div className="text-[11px] text-slate-500">
-                                                    {inactive.desc}
-                                                </div>
+                                        <div className="text-right">
+                                            <div className="text-base font-bold text-slate-900">
+                                                {pair.label}
                                             </div>
-                                            <div className="flex justify-center">
-                                                <div
-                                                    className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed border-slate-300"
-                                                    style={{
-                                                        background: hexToCss(
-                                                            c.menuBackground,
-                                                            DEFAULT_COLORS.menuBackground!
-                                                        ),
-                                                    }}
-                                                >
-                                                    {inactiveUrl ? (
-                                                        <Image
-                                                            src={inactiveUrl}
-                                                            alt={inactive.label}
-                                                            width={64}
-                                                            height={64}
-                                                            className="h-16 w-16 object-contain"
-                                                            unoptimized
-                                                        />
-                                                    ) : (
-                                                        <span className="text-center text-[11px] text-slate-300">
-                                                            لا توجد أيقونة
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col gap-2">
-                                                <label className="cursor-pointer rounded-lg bg-slate-900 px-4 py-2 text-center text-sm font-medium text-white transition hover:bg-slate-800">
-                                                    اختر أيقونة عادية
-                                                    <input
-                                                        type="file"
-                                                        accept="image/png,image/webp,image/jpeg"
-                                                        className="hidden"
-                                                        onChange={(event) =>
-                                                            handleFileChange(pair.inKey, event)
-                                                        }
-                                                    />
-                                                </label>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleRemoveIcon(pair.inKey)}
-                                                    className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-                                                >
-                                                    إزالة الأيقونة العادية
-                                                </button>
+                                            <div className="text-[11px] text-slate-500">
+                                                {inactive.desc}
                                             </div>
                                         </div>
 
-                                        <div className="space-y-3 text-right">
-                                            <div>
-                                                <div className="font-semibold text-slate-900">
-                                                    {pair.label} — مفعّلة
+                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                            <div className="space-y-3 text-right">
+                                                <div className="text-sm font-semibold text-slate-900">
+                                                    حالة عادية (غير محدّدة)
                                                 </div>
-                                                <div className="text-[11px] text-slate-500">
-                                                    {active.desc}
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setIconPickerField(inIdKey)}
+                                                        className="rounded-lg bg-slate-900 px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-slate-800"
+                                                    >
+                                                        اختر من المكتبة
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleClearIconId(inIdKey)}
+                                                        disabled={!inactiveId}
+                                                        className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                                    >
+                                                        إزالة الأيقونة
+                                                    </button>
                                                 </div>
-                                            </div>
-                                            <div className="flex justify-center">
-                                                <div
-                                                    className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed"
-                                                    style={{
-                                                        background: withAlpha(primary, 0.18),
-                                                        borderColor: hexToCss(
-                                                            c.primaryLight,
-                                                            DEFAULT_COLORS.primaryLight!
-                                                        ),
-                                                    }}
-                                                >
-                                                    {activeUrl ? (
-                                                        <Image
-                                                            src={activeUrl}
-                                                            alt={active.label}
-                                                            width={64}
-                                                            height={64}
-                                                            className="h-16 w-16 object-contain"
-                                                            unoptimized
+                                                <div className="flex justify-center">
+                                                    <div
+                                                        className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed border-slate-300"
+                                                        style={{
+                                                            background: hexToCss(
+                                                                c.menuBackground,
+                                                                DEFAULT_COLORS.menuBackground!
+                                                            ),
+                                                        }}
+                                                    >
+                                                        {InIconComp ? (
+                                                            <InIconComp
+                                                                size={48}
+                                                                weight={inParsed?.weight ?? "regular"}
+                                                                color={hexToCss(
+                                                                    c.textSecondary,
+                                                                    DEFAULT_COLORS.textSecondary!
+                                                                )}
+                                                            />
+                                                        ) : inactiveUrl ? (
+                                                            <Image
+                                                                src={inactiveUrl}
+                                                                alt={inactive.label}
+                                                                width={64}
+                                                                height={64}
+                                                                className="h-16 w-16 object-contain"
+                                                                unoptimized
+                                                            />
+                                                        ) : (
+                                                            <span className="text-center text-[11px] text-slate-300">
+                                                                لا توجد أيقونة
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                {inParsed ? (
+                                                    <div
+                                                        dir="ltr"
+                                                        className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-center font-mono text-[11px] text-slate-600"
+                                                    >
+                                                        {buildIconId(inParsed.name, inParsed.weight)}
+                                                    </div>
+                                                ) : null}
+                                                <div className="space-y-2 border-t border-dashed border-slate-300 pt-3">
+                                                    <div className="text-[11px] font-medium text-slate-600">
+                                                        أو صورة مخصصة (PNG/WEBP):
+                                                    </div>
+                                                    <label className="block cursor-pointer rounded-lg border border-slate-300 bg-white px-3 py-2 text-center text-xs font-medium text-slate-700 transition hover:bg-slate-100">
+                                                        اختيار ملف
+                                                        <input
+                                                            type="file"
+                                                            accept="image/png,image/webp,image/jpeg"
+                                                            className="hidden"
+                                                            onChange={(event) =>
+                                                                handleFileChange(pair.inKey, event)
+                                                            }
                                                         />
-                                                    ) : (
-                                                        <span className="text-center text-[11px] text-slate-300">
-                                                            لا توجد أيقونة مفعّلة
-                                                        </span>
-                                                    )}
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveIcon(pair.inKey)}
+                                                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-700 transition hover:bg-slate-100"
+                                                    >
+                                                        إزالة الصورة
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-col gap-2">
-                                                <label className="cursor-pointer rounded-lg bg-purple-600 px-4 py-2 text-center text-sm font-medium text-white transition hover:bg-purple-700">
-                                                    اختر أيقونة مفعّلة
-                                                    <input
-                                                        type="file"
-                                                        accept="image/png,image/webp,image/jpeg"
-                                                        className="hidden"
-                                                        onChange={(event) =>
-                                                            handleFileChange(pair.activeKey, event)
-                                                        }
-                                                    />
-                                                </label>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleRemoveIcon(pair.activeKey)}
-                                                    className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-                                                >
-                                                    إزالة الأيقونة المفعّلة
-                                                </button>
+
+                                            <div className="space-y-3 text-right">
+                                                <div className="text-sm font-semibold text-slate-900">
+                                                    حالة مفعّلة (عند فتح القسم)
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setIconPickerField(activeIdKey)}
+                                                        className="rounded-lg bg-purple-600 px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-purple-700"
+                                                    >
+                                                        اختر من المكتبة
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleClearIconId(activeIdKey)}
+                                                        disabled={!activeId}
+                                                        className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                                    >
+                                                        إزالة الأيقونة
+                                                    </button>
+                                                </div>
+                                                <div className="flex justify-center">
+                                                    <div
+                                                        className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed"
+                                                        style={{
+                                                            background: withAlpha(primary, 0.18),
+                                                            borderColor: hexToCss(
+                                                                c.primaryLight,
+                                                                DEFAULT_COLORS.primaryLight!
+                                                            ),
+                                                        }}
+                                                    >
+                                                        {ActiveIconComp ? (
+                                                            <ActiveIconComp
+                                                                size={48}
+                                                                weight={activeParsed?.weight ?? "fill"}
+                                                                color={primaryLight}
+                                                            />
+                                                        ) : activeUrl ? (
+                                                            <Image
+                                                                src={activeUrl}
+                                                                alt={active.label}
+                                                                width={64}
+                                                                height={64}
+                                                                className="h-16 w-16 object-contain"
+                                                                unoptimized
+                                                            />
+                                                        ) : (
+                                                            <span className="text-center text-[11px] text-slate-300">
+                                                                لا توجد أيقونة مفعّلة
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                {activeParsed ? (
+                                                    <div
+                                                        dir="ltr"
+                                                        className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-center font-mono text-[11px] text-slate-600"
+                                                    >
+                                                        {buildIconId(activeParsed.name, activeParsed.weight)}
+                                                    </div>
+                                                ) : null}
+                                                <div className="space-y-2 border-t border-dashed border-slate-300 pt-3">
+                                                    <div className="text-[11px] font-medium text-slate-600">
+                                                        أو صورة مخصصة (PNG/WEBP):
+                                                    </div>
+                                                    <label className="block cursor-pointer rounded-lg border border-purple-300 bg-purple-50 px-3 py-2 text-center text-xs font-medium text-purple-700 transition hover:bg-purple-100">
+                                                        اختيار ملف
+                                                        <input
+                                                            type="file"
+                                                            accept="image/png,image/webp,image/jpeg"
+                                                            className="hidden"
+                                                            onChange={(event) =>
+                                                                handleFileChange(pair.activeKey, event)
+                                                            }
+                                                        />
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveIcon(pair.activeKey)}
+                                                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-700 transition hover:bg-slate-100"
+                                                    >
+                                                        إزالة الصورة
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1347,6 +1711,20 @@ export default function AdminThemeSettingsPage() {
                             })}
                         </div>
                     </div>
+
+                    {iconPickerField ? (
+                        <IconPickerModal
+                            field={iconPickerField}
+                            onClose={() => setIconPickerField(null)}
+                            onPick={(name, weight) => {
+                                handlePickIconId(iconPickerField, name, weight);
+                                setIconPickerField(null);
+                            }}
+                            defaultWeight={
+                                iconPickerField.toLowerCase().includes("active") ? "fill" : "regular"
+                            }
+                        />
+                    ) : null}
                 </div>
             </div>
 
@@ -1355,6 +1733,134 @@ export default function AdminThemeSettingsPage() {
                     جارٍ تحميل إعدادات المظهر...
                 </div>
             ) : null}
+        </div>
+    );
+}
+
+function IconPickerModal(props: {
+    field: string;
+    onClose: () => void;
+    onPick: (name: string, weight: string) => void;
+    defaultWeight?: string;
+}) {
+    const [query, setQuery] = useState("");
+    const [weight, setWeight] = useState<string>(props.defaultWeight ?? "regular");
+
+    const filtered = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if (!q) return PHOSPHOR_ICONS;
+        return PHOSPHOR_ICONS.filter(
+            (i) => i.name.toLowerCase().includes(q) || i.label.includes(q)
+        );
+    }, [query]);
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+            <div className="flex h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+                <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-5 py-3">
+                    <div className="text-right">
+                        <div className="font-bold text-slate-900">اختيار أيقونة — Phosphor Icons</div>
+                        <div className="text-[11px] text-slate-500">
+                            اختر الأيقونة ثمّ النمط (الوزن) الملائم. النمط المقترح:{" "}
+                            <span className="font-semibold">
+                                {weight === "fill" ? "مملوء (الحالة المفعّلة)" : "عادي (الحالة العادية)"}
+                            </span>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={props.onClose}
+                        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100"
+                    >
+                        إغلاق
+                    </button>
+                </div>
+
+                <div className="space-y-3 border-b border-slate-200 px-5 py-3">
+                    <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                            {PHOSPHOR_WEIGHTS.map((w) => {
+                                const Comp = iconComponent("house", w.key);
+                                const active = w.key === weight;
+                                return (
+                                    <button
+                                        key={w.key}
+                                        type="button"
+                                        onClick={() => setWeight(w.key)}
+                                        className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                                            active
+                                                ? "border-purple-500 bg-purple-50 text-purple-700 shadow-sm"
+                                                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                                        }`}
+                                    >
+                                        {Comp ? <Comp size={16} /> : null}
+                                        {w.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <div
+                            dir="ltr"
+                            className="flex items-center overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-purple-400 focus-within:ring-2 focus-within:ring-purple-100"
+                        >
+                            <Pi.MagnifyingGlass
+                                size={16}
+                                className="ml-2 shrink-0 text-slate-400"
+                                weight="bold"
+                            />
+                            <input
+                                type="text"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                placeholder="ابحث باسم الأيقونة (home, search, gem, heart...)"
+                                className="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto px-5 py-4">
+                    {filtered.length === 0 ? (
+                        <div className="rounded-xl border border-dashed border-slate-300 py-12 text-center text-sm text-slate-500">
+                            لا توجد أيقونات مطابقة للبحث.
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-5 gap-2 sm:grid-cols-7 md:grid-cols-9 lg:grid-cols-12">
+                            {filtered.map((item) => {
+                                const Comp = iconComponent(item.name, weight);
+                                if (!Comp) return null;
+                                return (
+                                    <button
+                                        key={item.name}
+                                        type="button"
+                                        title={`${item.label} — ${item.name} (${weight})`}
+                                        onClick={() => props.onPick(item.name, weight)}
+                                        className="group flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border border-slate-200 bg-slate-50/50 p-1.5 text-center transition hover:-translate-y-0.5 hover:border-purple-400 hover:bg-purple-50 hover:shadow-md active:translate-y-0"
+                                    >
+                                        <Comp
+                                            size={24}
+                                            className="text-slate-700 group-hover:text-purple-600"
+                                        />
+                                        <span className="truncate text-[9px] font-medium text-slate-500 group-hover:text-purple-700">
+                                            {item.label}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex items-center justify-between gap-2 border-t border-slate-200 bg-slate-50 px-5 py-2.5 text-[11px] text-slate-500">
+                    <span>
+                        المكتبة تحتوي على 78 أيقونة × 6 أنماط (Phosphor Icons) — يتطابق مع Flutter
+                        مباشرةً.
+                    </span>
+                    <span dir="ltr" className="font-mono">
+                        {filtered.length} / {PHOSPHOR_ICONS.length}
+                    </span>
+                </div>
+            </div>
         </div>
     );
 }

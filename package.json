@@ -12,6 +12,7 @@
     "backup:db:schedule": "powershell -ExecutionPolicy Bypass -File ./scripts/register_backup_task.ps1"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "@prisma/client": "^5.10.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^2.4.3",

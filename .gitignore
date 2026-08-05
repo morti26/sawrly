@@ -8,8 +8,11 @@ build/
 .env.*
 !.env.example
 
+uploads/
 public/uploads/
+legacy_wwwroot/
 public/legacy_wwwroot/
+downloads/
 public/downloads/
 downloads/*.apk
 backups/

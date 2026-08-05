@@ -35,6 +35,19 @@ const NAV_ICON_KEYS = [
     ['profileActive', APP_SETTING_KEYS.navIconProfileActiveUrl] as const,
 ];
 
+const NAV_ICON_ID_KEYS = [
+    ['homeId', APP_SETTING_KEYS.navIconHomeId] as const,
+    ['searchId', APP_SETTING_KEYS.navIconSearchId] as const,
+    ['categoriesId', APP_SETTING_KEYS.navIconCategoriesId] as const,
+    ['ordersId', APP_SETTING_KEYS.navIconOrdersId] as const,
+    ['profileId', APP_SETTING_KEYS.navIconProfileId] as const,
+    ['homeActiveId', APP_SETTING_KEYS.navIconHomeActiveId] as const,
+    ['searchActiveId', APP_SETTING_KEYS.navIconSearchActiveId] as const,
+    ['categoriesActiveId', APP_SETTING_KEYS.navIconCategoriesActiveId] as const,
+    ['ordersActiveId', APP_SETTING_KEYS.navIconOrdersActiveId] as const,
+    ['profileActiveId', APP_SETTING_KEYS.navIconProfileActiveId] as const,
+];
+
 const EFFECT_KEYS = [
     ['primaryGradientAngle', APP_SETTING_KEYS.effPrimaryGradientAngle] as const,
     ['cardRadius', APP_SETTING_KEYS.effCardRadius] as const,
@@ -79,6 +92,16 @@ export type AdminNavIcons = {
     categoriesActive: string | null;
     ordersActive: string | null;
     profileActive: string | null;
+    homeId: string | null;
+    searchId: string | null;
+    categoriesId: string | null;
+    ordersId: string | null;
+    profileId: string | null;
+    homeActiveId: string | null;
+    searchActiveId: string | null;
+    categoriesActiveId: string | null;
+    ordersActiveId: string | null;
+    profileActiveId: string | null;
 };
 
 export type AdminThemeEffects = {
@@ -115,6 +138,9 @@ function _emptyNavIcons(): AdminNavIcons {
         home: null, search: null, categories: null, orders: null, profile: null,
         homeActive: null, searchActive: null, categoriesActive: null,
         ordersActive: null, profileActive: null,
+        homeId: null, searchId: null, categoriesId: null, ordersId: null, profileId: null,
+        homeActiveId: null, searchActiveId: null, categoriesActiveId: null,
+        ordersActiveId: null, profileActiveId: null,
     };
 }
 
@@ -161,6 +187,15 @@ function normalizeUrl(value: unknown): string | null {
     return null;
 }
 
+function normalizeIconId(value: unknown): string | null {
+    if (typeof value !== 'string') return null;
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const lowered = trimmed.toLowerCase();
+    if (/^[a-z0-9_.-]{1,80}$/.test(lowered)) return lowered;
+    return null;
+}
+
 function normalizeEffect(key: string, value: unknown): number | null {
     if (value == null) return null;
     if (typeof value === 'number') {
@@ -185,6 +220,7 @@ async function readThemeSettings(): Promise<ThemeSettingsResponse> {
     const reads = await Promise.all([
         ...THEME_COLOR_KEYS.map(([, k]) => getAppSetting(k)),
         ...NAV_ICON_KEYS.map(([, k]) => getAppSetting(k)),
+        ...NAV_ICON_ID_KEYS.map(([, k]) => getAppSetting(k)),
         ...EFFECT_KEYS.map(([, k]) => getAppSetting(k)),
     ]);
     const colors = _emptyColors();
@@ -197,6 +233,10 @@ async function readThemeSettings(): Promise<ThemeSettingsResponse> {
     }
     for (const [key] of NAV_ICON_KEYS) {
         (navIcons as any)[key] = normalizeUrl(reads[cursor]);
+        cursor += 1;
+    }
+    for (const [key] of NAV_ICON_ID_KEYS) {
+        (navIcons as any)[key] = normalizeIconId(reads[cursor]);
         cursor += 1;
     }
     for (const [key] of EFFECT_KEYS) {
@@ -242,6 +282,10 @@ export async function PUT(req: NextRequest) {
             const raw = (body.navIcons ?? {})[key as keyof AdminNavIcons];
             updates.push([dbKey, normalizeUrl(raw)]);
         }
+        for (const [key, dbKey] of NAV_ICON_ID_KEYS) {
+            const raw = (body.navIcons ?? {})[key as keyof AdminNavIcons];
+            updates.push([dbKey, normalizeIconId(raw)]);
+        }
         for (const [key, dbKey] of EFFECT_KEYS) {
             const raw = (body.effects ?? {})[key as keyof AdminThemeEffects];
             const value = normalizeEffect(key, raw);
@@ -278,6 +322,23 @@ export async function PUT(req: NextRequest) {
         if (invalidIcon) {
             return NextResponse.json(
                 { error: 'Invalid icon URL (use /path or https://host/path)' },
+                { status: 400 }
+            );
+        }
+
+        const invalidIconId = updates.find(([dbKey, v]) => {
+            const isIdKey = NAV_ICON_ID_KEYS.some(([, k]) => k === dbKey);
+            if (!isIdKey) return false;
+            const fromBody = NAV_ICON_ID_KEYS.find(([, k]) => k === dbKey)?.[0];
+            if (!fromBody) return false;
+            const raw = (body.navIcons ?? {})[fromBody as keyof AdminNavIcons];
+            if (raw == null) return false;
+            if (typeof raw === 'string' && raw.trim().length === 0) return false;
+            return v === null;
+        });
+        if (invalidIconId) {
+            return NextResponse.json(
+                { error: 'Invalid icon id (use phosphor.&lt;name&gt;.&lt;weight&gt;), ex: phosphor.house.fill' },
                 { status: 400 }
             );
         }
