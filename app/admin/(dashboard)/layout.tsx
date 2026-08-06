@@ -33,6 +33,7 @@ export default function AdminLayout({
         { label: 'المتجر', href: '/admin/categories' },
         { label: 'محتوى الصفحات', href: '/admin/content-pages' },
         { label: 'الإعدادات', href: '/admin/settings' },
+        { label: 'ميزات التطبيق', href: '/admin/app-features' },
         { label: 'جاهزية الإطلاق', href: '/admin/readiness' },
     ];
 
