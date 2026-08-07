@@ -98,10 +98,10 @@ export default function NotificationsPage() {
         <div className="max-w-3xl mx-auto space-y-6" dir="rtl">
             <div>
                 <h1 className="text-3xl font-bold mb-2">إرسال الإشعارات</h1>
-                <p className="text-sm text-gray-500">يمكنك إرسال إشعار عام لكل المستخدمين أو توجيهه إلى مستخدم محدد.</p>
+                <p className="text-sm text-m3-on-surface-variant">يمكنك إرسال إشعار عام لكل المستخدمين أو توجيهه إلى مستخدم محدد.</p>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div className="bg-surface-card p-6 rounded-xl shadow-sm border border-m3-surface-container-low">
                 {status && (
                     <div
                         className={`p-4 mb-4 rounded ${status.type === 'success'
@@ -115,7 +115,7 @@ export default function NotificationsPage() {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">العنوان</label>
+                        <label className="block text-sm font-medium text-m3-on-surface mb-1">العنوان</label>
                         <input
                             type="text"
                             required
@@ -127,7 +127,7 @@ export default function NotificationsPage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">الرسالة</label>
+                        <label className="block text-sm font-medium text-m3-on-surface mb-1">الرسالة</label>
                         <textarea
                             required
                             rows={4}
@@ -146,20 +146,20 @@ export default function NotificationsPage() {
                             checked={isBroadcast}
                             onChange={(e) => setIsBroadcast(e.target.checked)}
                         />
-                        <label htmlFor="broadcast" className="text-sm font-medium text-gray-700">
+                        <label htmlFor="broadcast" className="text-sm font-medium text-m3-on-surface">
                             إرسال الإشعار إلى جميع المستخدمين
                         </label>
                     </div>
 
                     {!isBroadcast && (
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">اختر المستخدم</label>
+                            <label className="block text-sm font-medium text-m3-on-surface mb-1">اختر المستخدم</label>
                             <select
                                 value={targetUserId}
                                 onChange={(e) => setTargetUserId(e.target.value)}
                                 required={!isBroadcast}
                                 disabled={usersLoading}
-                                className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 bg-white"
+                                className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 bg-surface-card"
                             >
                                 <option value="">
                                     {usersLoading ? 'جاري تحميل المستخدمين...' : 'اختر مستخدماً واحداً'}
@@ -176,7 +176,7 @@ export default function NotificationsPage() {
                     <button
                         type="submit"
                         disabled={isSubmitting || (!isBroadcast && !targetUserId)}
-                        className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50"
+                        className="w-full bg-blue-600 text-m3-on-surface py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50"
                     >
                         {isSubmitting ? 'جاري الإرسال...' : 'إرسال الإشعار'}
                     </button>

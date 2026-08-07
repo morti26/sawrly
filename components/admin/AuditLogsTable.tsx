@@ -51,7 +51,7 @@ const eventClassName = (eventType: string): string => {
     if (eventType.includes('updated')) {
         return 'bg-amber-100 text-amber-700';
     }
-    return 'bg-slate-100 text-slate-700';
+    return 'bg-m3-surface-container-lowest text-m3-on-surface';
 };
 
 const formatMetadataValue = (value: unknown): string => {
@@ -135,21 +135,21 @@ export default function AuditLogsTable() {
         <div dir="rtl" className="space-y-4">
             <form onSubmit={handleSearchSubmit} className="flex flex-wrap items-end gap-3">
                 <div className="min-w-[260px] flex-1">
-                    <label className="mb-1 block text-sm font-medium text-slate-700">بحث</label>
+                    <label className="mb-1 block text-sm font-medium text-m3-on-surface">بحث</label>
                     <input
                         type="text"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         placeholder="ابحث بالحدث أو المستخدم أو المعرف أو التفاصيل"
-                        className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                        className="w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2"
                     />
                 </div>
                 <div className="min-w-[180px]">
-                    <label className="mb-1 block text-sm font-medium text-slate-700">نوع الكيان</label>
+                    <label className="mb-1 block text-sm font-medium text-m3-on-surface">نوع الكيان</label>
                     <select
                         value={entityType}
                         onChange={(e) => setEntityType(e.target.value as 'all' | AuditEntityType)}
-                        className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                        className="w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2"
                     >
                         <option value="all">الكل</option>
                         <option value="project">المشاريع</option>
@@ -162,13 +162,13 @@ export default function AuditLogsTable() {
                 </div>
                 <button
                     type="submit"
-                    className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-m3-on-surface hover:bg-blue-700"
                 >
                     بحث
                 </button>
             </form>
 
-            <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+            <div className="rounded-lg border border-m3-outline-variant/60 bg-m3-background px-4 py-3 text-sm text-m3-on-surface-variant">
                 أحدث {logs.length} سجل من النظام
             </div>
 
@@ -178,15 +178,15 @@ export default function AuditLogsTable() {
                 </div>
             )}
 
-            <div className="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
-                <table className="min-w-full bg-white text-sm">
+            <div className="overflow-x-auto rounded-lg border border-m3-outline-variant/60 shadow-sm">
+                <table className="min-w-full bg-surface-card text-sm">
                     <thead>
-                        <tr className="border-b border-slate-200 bg-slate-50">
-                            <th className="px-4 py-4 text-right font-semibold text-slate-600">الحدث</th>
-                            <th className="px-4 py-4 text-right font-semibold text-slate-600">الكيان</th>
-                            <th className="px-4 py-4 text-right font-semibold text-slate-600">المنفذ</th>
-                            <th className="px-4 py-4 text-right font-semibold text-slate-600">التفاصيل</th>
-                            <th className="px-4 py-4 text-right font-semibold text-slate-600">التاريخ</th>
+                        <tr className="border-b border-m3-outline-variant/60 bg-m3-background">
+                            <th className="px-4 py-4 text-right font-semibold text-m3-on-surface-variant">الحدث</th>
+                            <th className="px-4 py-4 text-right font-semibold text-m3-on-surface-variant">الكيان</th>
+                            <th className="px-4 py-4 text-right font-semibold text-m3-on-surface-variant">المنفذ</th>
+                            <th className="px-4 py-4 text-right font-semibold text-m3-on-surface-variant">التفاصيل</th>
+                            <th className="px-4 py-4 text-right font-semibold text-m3-on-surface-variant">التاريخ</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -194,28 +194,28 @@ export default function AuditLogsTable() {
                             const metadataEntries = getMetadataEntries(log.metadata);
 
                             return (
-                                <tr key={log.id} className="transition-colors hover:bg-slate-50">
+                                <tr key={log.id} className="transition-colors hover:bg-m3-background">
                                     <td className="px-4 py-4 text-right">
                                         <div className="space-y-2">
                                             <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${eventClassName(log.event_type)}`}>
                                                 {eventLabels[log.event_type] || log.event_type}
                                             </span>
-                                            <div className="text-[11px] font-mono text-slate-400" dir="ltr">{log.event_type}</div>
+                                            <div className="text-[11px] font-mono text-m3-outline" dir="ltr">{log.event_type}</div>
                                         </div>
                                     </td>
                                     <td className="px-4 py-4 text-right">
-                                        <div className="font-medium text-slate-800">{entityLabels[log.entity_type]}</div>
+                                        <div className="font-medium text-m3-on-surface">{entityLabels[log.entity_type]}</div>
                                         {log.entity_title && (
-                                            <div className="mt-1 text-xs text-slate-500">{log.entity_title}</div>
+                                            <div className="mt-1 text-xs text-m3-on-surface-variant">{log.entity_title}</div>
                                         )}
-                                        <div className="mt-1 text-[11px] font-mono text-slate-400" dir="ltr">{log.entity_id}</div>
+                                        <div className="mt-1 text-[11px] font-mono text-m3-outline" dir="ltr">{log.entity_id}</div>
                                     </td>
                                     <td className="px-4 py-4 text-right">
-                                        <div className="font-medium text-slate-800">{log.actor_name || 'غير معروف'}</div>
+                                        <div className="font-medium text-m3-on-surface">{log.actor_name || 'غير معروف'}</div>
                                         {log.actor_email && (
-                                            <div className="mt-1 text-xs text-slate-500" dir="ltr">{log.actor_email}</div>
+                                            <div className="mt-1 text-xs text-m3-on-surface-variant" dir="ltr">{log.actor_email}</div>
                                         )}
-                                        <div className="mt-1 text-[11px] font-mono text-slate-400" dir="ltr">{log.actor_id}</div>
+                                        <div className="mt-1 text-[11px] font-mono text-m3-outline" dir="ltr">{log.actor_id}</div>
                                     </td>
                                     <td className="px-4 py-4 text-right">
                                         {metadataEntries.length > 0 ? (
@@ -223,21 +223,21 @@ export default function AuditLogsTable() {
                                                 {metadataEntries.slice(0, 4).map(([key, value]) => (
                                                     <span
                                                         key={`${log.id}-${key}`}
-                                                        className="inline-flex max-w-full items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700"
+                                                        className="inline-flex max-w-full items-center gap-1 rounded-full bg-m3-surface-container-lowest px-3 py-1 text-xs text-m3-on-surface"
                                                         title={formatMetadataValue(value)}
                                                     >
-                                                        <span className="font-semibold text-slate-600">{key}:</span>
+                                                        <span className="font-semibold text-m3-on-surface-variant">{key}:</span>
                                                         <span className="truncate">{formatMetadataValue(value)}</span>
                                                     </span>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <span className="text-slate-400">لا توجد تفاصيل إضافية</span>
+                                            <span className="text-m3-outline">لا توجد تفاصيل إضافية</span>
                                         )}
                                     </td>
-                                    <td className="px-4 py-4 text-right text-slate-500">
+                                    <td className="px-4 py-4 text-right text-m3-on-surface-variant">
                                         <div>{new Date(log.created_at).toLocaleDateString('ar-IQ')}</div>
-                                        <div className="mt-1 text-xs text-slate-400">
+                                        <div className="mt-1 text-xs text-m3-outline">
                                             {new Date(log.created_at).toLocaleTimeString('ar-IQ')}
                                         </div>
                                     </td>
@@ -246,7 +246,7 @@ export default function AuditLogsTable() {
                         })}
                         {logs.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="py-12 text-center font-medium text-slate-500">
+                                <td colSpan={5} className="py-12 text-center font-medium text-m3-on-surface-variant">
                                     لا توجد سجلات مطابقة حالياً.
                                 </td>
                             </tr>

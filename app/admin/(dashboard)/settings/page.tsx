@@ -465,41 +465,41 @@ export default function AdminSettingsPage() {
         <div className="space-y-6" dir="rtl">
             <div>
                 <h2 className="text-2xl font-bold mb-2">إعدادات التطبيق</h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-m3-on-surface-variant">
                     يمكنك تغيير شعار التطبيق وإعداد بوابة الدفع من هنا.
                 </p>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 max-w-3xl">
+            <div className="bg-surface-card p-6 rounded-xl shadow-sm border border-m3-surface-container-low max-w-3xl">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="text-right">
-                        <h3 className="text-lg font-semibold text-gray-900">اختصارات مهمة</h3>
-                        <p className="text-sm text-gray-500">
+                        <h3 className="text-lg font-semibold text-m3-on-background">اختصارات مهمة</h3>
+                        <p className="text-sm text-m3-on-surface-variant">
                             إذا أردت رفع أيقونات الحساب أو الاشتراكات، ادخل من هنا مباشرة.
                         </p>
                     </div>
                     <Link
                         href="/admin/icon-settings"
-                        className="inline-flex items-center justify-center rounded-lg bg-purple-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-purple-700"
+                        className="inline-flex items-center justify-center rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-m3-on-surface transition hover:bg-primary-container"
                     >
                         صفحة أيقونات الحساب والاشتراك
                     </Link>
                 </div>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-6 max-w-3xl">
+            <div className="bg-surface-card p-6 rounded-xl shadow-sm border border-m3-surface-container-low space-y-6 max-w-3xl">
                 <h3 className="text-lg font-semibold border-b pb-2">إعدادات التطبيق</h3>
 
                 {isLoading ? (
-                    <p className="text-gray-500">جاري تحميل الإعدادات...</p>
+                    <p className="text-m3-on-surface-variant">جاري تحميل الإعدادات...</p>
                 ) : (
                     <>
-                        <div className="space-y-5 border-b border-gray-100 pb-6">
-                            <h4 className="text-base font-semibold text-gray-800">شعار التطبيق (الموبايل)</h4>
+                        <div className="space-y-5 border-b border-m3-surface-container-low pb-6">
+                            <h4 className="text-base font-semibold text-m3-on-surface">شعار التطبيق (الموبايل)</h4>
 
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">المعاينة الحالية</label>
-                                <div className="h-20 rounded-lg border border-gray-200 bg-[#0f1725] flex items-center px-4">
+                                <label className="block text-sm font-medium text-m3-on-surface">المعاينة الحالية</label>
+                                <div className="h-20 rounded-lg border border-m3-outline-variant/60 bg-[#0f1725] flex items-center px-4">
                                     {displayLogo ? (
                                         <NextImage
                                             src={displayLogo}
@@ -510,26 +510,26 @@ export default function AdminSettingsPage() {
                                             unoptimized
                                         />
                                     ) : (
-                                        <span className="text-xs text-gray-400">لا يوجد شعار محفوظ حالياً</span>
+                                        <span className="text-xs text-m3-outline">لا يوجد شعار محفوظ حالياً</span>
                                     )}
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">رفع شعار جديد</label>
+                                <label className="block text-sm font-medium text-m3-on-surface">رفع شعار جديد</label>
                                 <input
                                     type="file"
                                     accept="image/*"
                                     onChange={handleFileChange}
-                                    className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-3 file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                                    className="block w-full text-sm text-m3-on-surface file:mr-4 file:py-2 file:px-3 file:rounded file:border-0 file:bg-blue-600 file:text-m3-on-surface hover:file:bg-blue-700"
                                 />
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-m3-on-surface-variant">
                                     عند اختيار صورة ثم الضغط على حفظ، سيتم رفعها واعتمادها مباشرة في التطبيق.
                                 </p>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">أو ضع رابط شعار مباشر</label>
+                                <label className="block text-sm font-medium text-m3-on-surface">أو ضع رابط شعار مباشر</label>
                                 <input
                                     type="text"
                                     value={homeLogoUrl}
@@ -557,15 +557,15 @@ export default function AdminSettingsPage() {
 
                         <div className="space-y-4">
                             <div>
-                                <h4 className="text-base font-semibold text-gray-800">إعدادات بوابة الدفع الخارجية</h4>
-                                <p className="text-xs text-gray-500 mt-1">
+                                <h4 className="text-base font-semibold text-m3-on-surface">إعدادات بوابة الدفع الخارجية</h4>
+                                <p className="text-xs text-m3-on-surface-variant mt-1">
                                     أكمل هذه الحقول لاحقاً عندما تحصل على بيانات المزود الخارجي.
                                 </p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700">اسم المزود</label>
+                                    <label className="block text-sm font-medium text-m3-on-surface">اسم المزود</label>
                                     <input
                                         type="text"
                                         value={paymentProviderName}
@@ -580,7 +580,7 @@ export default function AdminSettingsPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700">رابط الـ API</label>
+                                    <label className="block text-sm font-medium text-m3-on-surface">رابط الـ API</label>
                                     <input
                                         type="text"
                                         value={paymentApiBaseUrl}
@@ -597,7 +597,7 @@ export default function AdminSettingsPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">مفتاح الـ API</label>
+                                <label className="block text-sm font-medium text-m3-on-surface">مفتاح الـ API</label>
                                 <input
                                     type="password"
                                     value={paymentApiKey}
@@ -611,7 +611,7 @@ export default function AdminSettingsPage() {
                                     dir="ltr"
                                     autoComplete="new-password"
                                 />
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-m3-on-surface-variant">
                                     {paymentApiKeyConfigured
                                         ? 'المفتاح محفوظ حالياً بشكل آمن. اترك الحقل فارغاً للإبقاء عليه.'
                                         : 'لا يوجد مفتاح محفوظ حالياً.'}
@@ -641,7 +641,7 @@ export default function AdminSettingsPage() {
                                             type="button"
                                             onClick={handleTestGatewayAuth}
                                             disabled={isSaving || isLoading || isTestingGateway}
-                                            className="text-xs rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+                                            className="text-xs rounded-md border border-m3-outline-variant/60 bg-m3-background px-2.5 py-1.5 text-m3-on-surface hover:bg-m3-surface-container-lowest disabled:opacity-50"
                                         >
                                             {isTestingGateway ? 'جاري الاختبار...' : 'اختبار مفتاح بوابة الدفع'}
                                         </button>
@@ -650,7 +650,7 @@ export default function AdminSettingsPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">Webhook Secret</label>
+                                <label className="block text-sm font-medium text-m3-on-surface">Webhook Secret</label>
                                 <input
                                     type="password"
                                     value={paymentWebhookSecret}
@@ -664,7 +664,7 @@ export default function AdminSettingsPage() {
                                     dir="ltr"
                                     autoComplete="new-password"
                                 />
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-m3-on-surface-variant">
                                     {paymentWebhookSecretConfigured
                                         ? 'Webhook secret محفوظ حالياً. اترك الحقل فارغاً للإبقاء عليه.'
                                         : 'لا يوجد webhook secret محفوظ حالياً.'}
@@ -693,7 +693,7 @@ export default function AdminSettingsPage() {
                                         type="button"
                                         onClick={handleResetWebhookSecretField}
                                         disabled={isSaving || isLoading}
-                                        className="text-xs text-gray-600 hover:underline disabled:opacity-50"
+                                        className="text-xs text-m3-on-surface-variant hover:underline disabled:opacity-50"
                                     >
                                         إعادة تعيين الحقل
                                     </button>
@@ -712,22 +712,22 @@ export default function AdminSettingsPage() {
                                 </div>
                             </div>
 
-                            <div className="space-y-2 rounded-lg border border-gray-200 bg-gray-50 p-3">
-                                <label className="block text-sm font-medium text-gray-700">Webhook URL (ضعه في بوابة الدفع)</label>
+                            <div className="space-y-2 rounded-lg border border-m3-outline-variant/60 bg-m3-background p-3">
+                                <label className="block text-sm font-medium text-m3-on-surface">Webhook URL (ضعه في بوابة الدفع)</label>
                                 <input
                                     type="text"
                                     value={webhookUrl}
                                     readOnly
-                                    className="w-full rounded-md border border-gray-200 bg-white p-2 text-left text-sm text-gray-700"
+                                    className="w-full rounded-md border border-m3-outline-variant/60 bg-surface-card p-2 text-left text-sm text-m3-on-surface"
                                     dir="ltr"
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-3 border-t border-gray-100 pt-6">
+                        <div className="space-y-3 border-t border-m3-surface-container-low pt-6">
                             <div>
-                                <h4 className="text-base font-semibold text-gray-800">رفع APK</h4>
-                                <p className="text-xs text-gray-500 mt-1">
+                                <h4 className="text-base font-semibold text-m3-on-surface">رفع APK</h4>
+                                <p className="text-xs text-m3-on-surface-variant mt-1">
                                     ارفع ملف APK وسيتم حفظه تلقائياً داخل /public/downloads باسم sawrly-XX.apk ليتاح لزملائك تحميل آخر نسخة.
                                 </p>
                             </div>
@@ -743,7 +743,7 @@ export default function AdminSettingsPage() {
                                     type="button"
                                     onClick={handleUploadApk}
                                     disabled={isLoading || isSaving || isUploadingApk || !apkFile}
-                                    className="text-sm rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-purple-700 hover:bg-purple-100 disabled:opacity-50"
+                                    className="text-sm rounded-lg border border-accent/30 bg-accent/10 px-4 py-2 text-m3-primary hover:bg-accent/15 disabled:opacity-50"
                                 >
                                     {isUploadingApk ? 'جاري الرفع...' : 'رفع APK'}
                                 </button>
@@ -758,7 +758,7 @@ export default function AdminSettingsPage() {
                                         }
                                     }}
                                     disabled={isLoading || isSaving}
-                                    className="text-sm rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+                                    className="text-sm rounded-lg border border-m3-outline-variant/60 bg-m3-background px-4 py-2 text-m3-on-surface hover:bg-m3-surface-container-lowest disabled:opacity-50"
                                 >
                                     تحديث الحالة
                                 </button>
@@ -777,14 +777,14 @@ export default function AdminSettingsPage() {
                             ) : null}
 
                             {apkStatus?.nextFile ? (
-                                <div className="text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-md px-3 py-2 break-all">
+                                <div className="text-sm text-m3-on-surface bg-m3-background border border-m3-outline-variant/60 rounded-md px-3 py-2 break-all">
                                     <div className="font-semibold">الملف التالي</div>
                                     <div dir="ltr">{apkStatus.nextFile}</div>
                                 </div>
                             ) : null}
 
                             {apkStatus?.latestUrl ? (
-                                <div className="text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-md px-3 py-2 break-all">
+                                <div className="text-sm text-m3-on-surface bg-m3-background border border-m3-outline-variant/60 rounded-md px-3 py-2 break-all">
                                     <div className="font-semibold">آخر APK</div>
                                     <a className="text-blue-600 hover:underline" href={apkStatus.latestUrl}>
                                         {apkStatus.latestUrl}
@@ -808,7 +808,7 @@ export default function AdminSettingsPage() {
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving || isLoading}
-                                className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                className="bg-blue-600 text-m3-on-surface px-5 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
                             >
                                 {isSaving ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
                             </button>

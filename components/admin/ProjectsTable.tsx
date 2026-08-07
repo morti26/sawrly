@@ -94,42 +94,42 @@ export default function ProjectsTable() {
 
     return (
         <div dir="rtl" className="space-y-4">
-            <div className="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
-                <table className="min-w-full bg-white text-sm">
+            <div className="overflow-x-auto rounded-lg border border-m3-outline-variant/60 shadow-sm">
+                <table className="min-w-full bg-surface-card text-sm">
                     <thead>
-                        <tr className="bg-slate-50 border-b border-slate-200">
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">العرض</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">المبدع</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">العميل</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">الحالة</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">الدفعات المؤكدة</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">آخر تسليم</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">البداية</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">الانتهاء</th>
-                            <th className="py-4 px-4 text-center font-semibold text-slate-600">الإجراءات</th>
+                        <tr className="bg-m3-background border-b border-m3-outline-variant/60">
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">العرض</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">المبدع</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">العميل</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">الحالة</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">الدفعات المؤكدة</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">آخر تسليم</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">البداية</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">الانتهاء</th>
+                            <th className="py-4 px-4 text-center font-semibold text-m3-on-surface-variant">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                         {projects.map((project) => (
-                            <tr key={project.id} className="hover:bg-slate-50 transition-colors">
+                            <tr key={project.id} className="hover:bg-m3-background transition-colors">
                                 <td className="py-4 px-4 text-right">
-                                    <div className="font-medium text-slate-800">{project.offer_title || 'بدون عنوان'}</div>
-                                    <div className="text-xs text-slate-400 font-mono" dir="ltr">{project.quote_id}</div>
+                                    <div className="font-medium text-m3-on-surface">{project.offer_title || 'بدون عنوان'}</div>
+                                    <div className="text-xs text-m3-outline font-mono" dir="ltr">{project.quote_id}</div>
                                 </td>
-                                <td className="py-4 px-4 text-right text-slate-700">{project.creator_name || '-'}</td>
-                                <td className="py-4 px-4 text-right text-slate-700">{project.client_name || '-'}</td>
+                                <td className="py-4 px-4 text-right text-m3-on-surface">{project.creator_name || '-'}</td>
+                                <td className="py-4 px-4 text-right text-m3-on-surface">{project.client_name || '-'}</td>
                                 <td className="py-4 px-4 text-right">
                                     <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${statusClassMap[project.status]}`}>
                                         {project.status}
                                     </span>
                                 </td>
-                                <td className="py-4 px-4 text-right font-semibold text-slate-700">
+                                <td className="py-4 px-4 text-right font-semibold text-m3-on-surface">
                                     {Number(project.confirmed_payment_count || 0)}
                                 </td>
                                 <td className="py-4 px-4 text-right">
                                     {project.latest_delivery_status ? (
                                         <div>
-                                            <div className="font-medium text-slate-700">{project.latest_delivery_status}</div>
+                                            <div className="font-medium text-m3-on-surface">{project.latest_delivery_status}</div>
                                             {project.latest_delivery_url && (
                                                 <a
                                                     href={project.latest_delivery_url}
@@ -142,13 +142,13 @@ export default function ProjectsTable() {
                                             )}
                                         </div>
                                     ) : (
-                                        <span className="text-slate-400">لا يوجد</span>
+                                        <span className="text-m3-outline">لا يوجد</span>
                                     )}
                                 </td>
-                                <td className="py-4 px-4 text-right text-slate-500">
+                                <td className="py-4 px-4 text-right text-m3-on-surface-variant">
                                     {new Date(project.started_at).toLocaleDateString('ar-IQ')}
                                 </td>
-                                <td className="py-4 px-4 text-right text-slate-500">
+                                <td className="py-4 px-4 text-right text-m3-on-surface-variant">
                                     {project.completed_at
                                         ? new Date(project.completed_at).toLocaleDateString('ar-IQ')
                                         : '-'}
@@ -159,7 +159,7 @@ export default function ProjectsTable() {
                                             <button
                                                 onClick={() => updateProjectStatus(project.id, 'completed')}
                                                 disabled={actionId === project.id}
-                                                className="rounded-md bg-green-600 px-3 py-1.5 text-white hover:bg-green-700 disabled:opacity-50"
+                                                className="rounded-md bg-green-600 px-3 py-1.5 text-m3-on-surface hover:bg-green-700 disabled:opacity-50"
                                             >
                                                 إنهاء
                                             </button>
@@ -172,14 +172,14 @@ export default function ProjectsTable() {
                                             </button>
                                         </div>
                                     ) : (
-                                        <span className="text-slate-400">لا يوجد</span>
+                                        <span className="text-m3-outline">لا يوجد</span>
                                     )}
                                 </td>
                             </tr>
                         ))}
                         {projects.length === 0 && (
                             <tr>
-                                <td colSpan={9} className="py-12 text-center text-slate-500 font-medium">
+                                <td colSpan={9} className="py-12 text-center text-m3-on-surface-variant font-medium">
                                     لا توجد مشاريع حالياً.
                                 </td>
                             </tr>

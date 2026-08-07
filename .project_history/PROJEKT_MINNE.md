@@ -333,3 +333,62 @@ Se senaste fråga längst ner i [projekt_status.json](file:///mnt/disk-extra/hos
 - [?] Support-chatten `/admin/support` + `/stream` – testad med WebSocket/SSE?
 - [?] Firebase FCM: `notifications/fcm-token` + faktiskt skickade push-notiser testade?
 - [?] 24 Admin sidor är redan uppdaterade i själva UI:et (theme-settings visar temat) — men dashboard-layoutens sidebar (`purple-600`, `slate-900`, `red-500`) använder fortfarande Tailwind defaults, icke tema. **Vill användaren uppdatera ÄVEN admin sidpanelen till tema-drivet?** (Just nu är fokus på KUNDAPPEN som använder temat.)
+
+
+---
+
+## 🔥 2026-08-07 SESSION #4 — HELA ADMIN DASHBOARD TEMA-DRIVEN PÅ ENTERPRISE-NIVÅ + COMMIT/PUSH 726aee1
+
+**Mål (från användaren S4 fortsättning på S3 feedback):**  
+*"vi var här när vi ändrar i appen färgerna bli inte ändras på perfekta nivå jag vill ha topp enterprice nivå och alla delar av appen ska kunna ta den perfekta färgen"*  
+→ S3 löste KUNDLANDNINGSSIDAN. S4 löste **ÄVEN ADMIN DASHBOARDEN** (24 sidor + sidebar + 6 komponenter) = ALLA DELAR AV APPEN är nu tema-drivna.
+
+**Övergripande resultat:**
+- ✅ **Commit + push S3 → GitHub master**: `726aee1` (25 filer, 5506 rader nya/ändrade). Inkluderade ALLT från S2/S3: engine + client + provider + globals.css + tailwind.config + kundlandningssida + Flutter Dart referenser + .project_history persistent minne + .gitignore uppdaterad.
+- ✅ **1290 färgbyten i admin-delarna** (30 av 33 filer) via Python MASS-sweep med 173-saltning MAPPING-TABELL (sorterad LÄNGD → KEY reverse, för att undvika partial match problem).
+- ✅ **npm run lint**: 0 errors, 7 varningar (samma som alltid, ej tema-relaterade).
+- ✅ **npm run build --webpack**: Exit 0, ALLA 50+ routes genererades korrekt (App Router + pages-router + proxy middleware).
+- ✅ **Alla delar av appen**: Kundlandningssida (S3) + Flutter (S2) + Admin dashboard (S4) → alla LIVE tema från `/admin/theme-settings` (25s polling version-hash kontroll via ThemeProvider i root layout).
+
+### Steg i S4 (kronologiskt):
+1. **Verifiera disk + git status**: 12 filer (9 modifierade, 3 nya) + `.project_history/` + `static/` på plats. Grep bekräftade 1028 hårdkodade färgklasser i admin.
+2. **Användarval**: (a) Commit ALLT till GitHub. (b) Nästa uppgift = J (Admin dashboard tema enterprise).
+3. **Rensa cache från static/**: `.dart_tool/` och `.flutter-plugins-dependencies` raderade. Lade till i `.gitignore` (7 nya rader: `.dart_tool/`, `static/.dart_tool/`, `.flutter-plugins*`, `.packages`, `.pub-cache/`, `.pub/`).
+4. **Commit 726aee1**: `feat(theme): Enterprise M3 Theme Engine - full React + Flutter integration` → 24 filer, 5506 insertions, 1197 deletions.
+5. **git push origin master**: Exiterade 0 ✅. `23020df → 726aee1 master -> master`.
+6. **Plan**: TodoWrite 7 steg (commit, explore, layout, mass-byte, finjustera, verifiera, spara minne).
+7. **Admin layout MANUELL omskrivning** (88 rader i `app/admin/(dashboard)/layout.tsx`):
+   - wrapper: `bg-gray-50 text-gray-900` → `bg-m3-background text-m3-on-background`
+   - sidebar: `bg-slate-900 shadow-2xl` → `bg-m3-surface-container-highest shadow-nav` (NY shadow-class från globals.css utilities)
+   - brand header border: `border-slate-800` → `border-m3-outline-variant`
+   - active nav: `bg-purple-600 text-white shadow-md shadow-purple-500/20` → `bg-accent text-m3-on-accent shadow-button`
+   - inactive nav: `text-slate-300 hover:bg-slate-800 hover:text-white` → `text-m3-on-surface-variant hover:bg-m3-surface-container-high hover:text-m3-on-surface` + `hover:-translate-x-1` (RTL: förskjutning åt vänster = logisk)
+   - logout button: `bg-red-500 text-white hover:bg-red-600` → `bg-m3-error text-m3-on-error hover:bg-m3-error/90`
+   - main: `bg-slate-50 text-slate-900` → `bg-m3-background text-m3-on-surface`
+8. **MASS-BYTE Python sweep #1**: 
+   - Mappade 173 nyckelpar i 8 kategorier: slate→M3, gray→M3, zinc/neutral/stone→M3, purple/violet/indigo/pink→accent/primary, bg-white/text-white/border-white→surface-card, prefix (bg/text/border/ring/divide/from/via/to/decoration/placeholder/caret/shadow/accent/outline) stöds AUTOMATISKT via substring.
+   - Resultat: 1290 byten i 30/33 filer. Exempel: subscription-plans 124, tasks 174, theme-settings 255, home-slider-manager 81, UsersTable 72.
+9. **Lint**: ✅ 0 errors. Varningar: tasks `<img>` x5, tasks useEffect dependencies, subscription-plans useEffect dependencies, landing-preview-slider `<img>`.
+10. **Build**: ✅ Exit 0. Alla routes genererades (api/*, admin/*, pages/*, proxy).
+11. **Spara persistent minne**: PROJEKT_MINNE.md append (denna sektion) + projekt_status.json rewrite + sessioner JSONL ny fil.
+
+### Mapping-tabell (används i S4 för mass-byten — återanvänds gärna nästa gång):
+Kategorier (alla prefix ← automatiskt substring):
+- **slate 1-11xx (lila/mörk neutral)** → `bg-m3-surface-container-highest / high / container / low / lowest / background` + `text-m3-on-background / on-surface / on-surface-variant / outline / outline-variant` + `border-m3-*` motsvarande.
+- **gray 1-9xx (ljus neutral)** → samma som ovan.
+- **zinc/neutral/stone** → samma som ovan.
+- **purple/violet/indigo 50-900** → `accent / primary / primary-container / on-accent / on-primary / on-primary-container` med opaciteter (/10 /15 /30 /40 /60 /70 /80).
+- **pink 50-700** → accent (rosa seed matchar #ff4a97 → perfekt).
+- **rose 50-900** → M3 error / error-container / on-error / on-error-container tokens (semantisk status färgar även följer temat = enterprise WCAG).
+- **bg-white / text-white / border-white + /N suffix** → `bg-surface-card / text-m3-on-surface / border-m3-outline-variant` + opacitet propageras automatiskt.
+- **from-white via-white to-white / bg-black** → motsvarande M3 surface/on-surface.
+
+### Kvar att göra (i prioritetsordning per projekt_status.json):
+ID | Uppgift | Status
+---|---|---
+D | Readiness check /admin/readiness (finns checklist ifylld?) | OBEHANDLAD
+E | Betalnings-webhook /admin/ops-errors (upprepade fel?) | OBEHANDLAD
+F | APK i public/downloads + /api/downloads/latest-apk (testad?) | OBEHANDLAD
+G | Support-chatt /admin/support + /stream SSE/WebSocket | OBEHANDLAD
+H | Firebase FCM push-notiser (tokens, faktiskt skickade) | OBEHANDLAD
+

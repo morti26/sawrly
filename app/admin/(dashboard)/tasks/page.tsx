@@ -29,7 +29,7 @@ type User = { id: string; email: string; name: string | null; role: string };
 type Toast = { kind: "ok" | "err"; msg: string } | null;
 
 const STATUS_META: Record<TaskStatus, { label_ar: string; cls: string; dot: string }> = {
-    TODO:        { label_ar: "للقيام",   cls: "bg-slate-100 text-slate-700 ring-1 ring-slate-300",    dot: "bg-slate-400" },
+    TODO:        { label_ar: "للقيام",   cls: "bg-m3-surface-container-lowest text-m3-on-surface ring-1 ring-m3-outline-variant",    dot: "bg-m3-outline-variant" },
     IN_PROGRESS: { label_ar: "قيد التنفيذ", cls: "bg-amber-100 text-amber-800 ring-1 ring-amber-300",  dot: "bg-amber-500" },
     REVIEW:      { label_ar: "مراجعة",   cls: "bg-sky-100 text-sky-800 ring-1 ring-sky-300",          dot: "bg-sky-500" },
     DONE:        { label_ar: "مكتمل ✅",  cls: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-300", dot: "bg-emerald-500" },
@@ -37,13 +37,13 @@ const STATUS_META: Record<TaskStatus, { label_ar: string; cls: string; dot: stri
 };
 const TYPE_META: Record<TaskType, { label_ar: string; cls: string }> = {
     BUG:        { label_ar: "خلل 🐛",       cls: "bg-rose-50 text-rose-700 ring-1 ring-rose-200" },
-    FEATURE:    { label_ar: "ميزة جديدة ✨", cls: "bg-violet-50 text-violet-700 ring-1 ring-violet-200" },
-    TODO:       { label_ar: "مهمة 📝",      cls: "bg-slate-50 text-slate-700 ring-1 ring-slate-200" },
+    FEATURE:    { label_ar: "ميزة جديدة ✨", cls: "bg-accent/10 text-m3-primary ring-1 ring-violet-200" },
+    TODO:       { label_ar: "مهمة 📝",      cls: "bg-m3-background text-m3-on-surface ring-1 ring-m3-outline-variant/60" },
     REFACTOR:   { label_ar: "صيانة 🔧",     cls: "bg-orange-50 text-orange-700 ring-1 ring-orange-200" },
     DISCUSSION: { label_ar: "مناقشة 💬",    cls: "bg-teal-50 text-teal-700 ring-1 ring-teal-200" },
 };
 const PRIO_META: Record<TaskPriority, { label_ar: string; cls: string; order: number }> = {
-    LOW:  { label_ar: "منخفضة",    cls: "bg-slate-100 text-slate-600", order: 4 },
+    LOW:  { label_ar: "منخفضة",    cls: "bg-m3-surface-container-lowest text-m3-on-surface-variant", order: 4 },
     MED:  { label_ar: "متوسطة",    cls: "bg-sky-100 text-sky-700",     order: 3 },
     HIGH: { label_ar: "عالية",     cls: "bg-amber-100 text-amber-800", order: 2 },
     CRIT: { label_ar: "حرجة 🔥",    cls: "bg-rose-100 text-rose-800",   order: 1 },
@@ -126,25 +126,25 @@ function AttachmentLightbox({ src, onClose }: { src: string | null; onClose: () 
     }, [onClose]);
     if (!src) return null;
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm" onClick={onClose}>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-m3-on-surface/85 p-4 backdrop-blur-sm" onClick={onClose}>
             <div className="relative max-h-full max-w-[95vw]" onClick={e => e.stopPropagation()}>
                 <button onClick={onClose}
-                        className="absolute -left-4 -top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white text-lg font-bold text-slate-800 shadow-lg hover:bg-slate-100">
+                        className="absolute -left-4 -top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-surface-card text-lg font-bold text-m3-on-surface shadow-lg hover:bg-m3-surface-container-lowest">
                     ✕
                 </button>
                 {isImg ? (
                     <img ref={imgRef} src={src} alt="" className="max-h-[88vh] max-w-[95vw] rounded-xl object-contain shadow-2xl" />
                 ) : (
-                    <div className="min-w-[420px] max-w-[900px] rounded-2xl bg-white p-6 shadow-2xl">
+                    <div className="min-w-[420px] max-w-[900px] rounded-2xl bg-surface-card p-6 shadow-2xl">
                         <div className="mb-3 flex items-center gap-3">
-                            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-slate-100 text-3xl">📄</div>
+                            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-m3-surface-container-lowest text-3xl">📄</div>
                             <div>
-                                <p className="font-bold text-slate-800">مرفق</p>
-                                <p className="truncate text-xs text-slate-500">{src}</p>
+                                <p className="font-bold text-m3-on-surface">مرفق</p>
+                                <p className="truncate text-xs text-m3-on-surface-variant">{src}</p>
                             </div>
                         </div>
                         <a href={src} target="_blank" rel="noreferrer"
-                           className="mt-3 inline-block rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
+                           className="mt-3 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-m3-on-surface hover:bg-primary-container">
                             فتح / تحميل ↗
                         </a>
                     </div>
@@ -369,7 +369,7 @@ export default function TasksPage() {
     return (
         <div className="flex flex-col gap-6 p-6">
             {toast && (
-                <div className={`fixed left-6 top-6 z-50 rounded-xl px-4 py-3 text-sm font-medium text-white shadow-xl ${
+                <div className={`fixed left-6 top-6 z-50 rounded-xl px-4 py-3 text-sm font-medium text-m3-on-surface shadow-xl ${
                     toast.kind === "ok" ? "bg-emerald-600" : "bg-rose-600"
                 }`}>
                     {toast.msg}
@@ -379,18 +379,18 @@ export default function TasksPage() {
             {/* Header + count chips */}
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800">المهام والمناقشات</h1>
-                    <p className="mt-1 text-sm text-slate-500">
+                    <h1 className="text-2xl font-bold text-m3-on-surface">المهام والمناقشات</h1>
+                    <p className="mt-1 text-sm text-m3-on-surface-variant">
                         تابع الأخطاء والميزات القادمة، وعلق مع فريق العمل. كل الحالات تُحفظ فوراً.
                     </p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                        <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
+                        <span className="rounded-full bg-m3-surface-container-highest px-3 py-1 text-xs font-semibold text-m3-on-surface">
                             الكل {counts.total}
                         </span>
                         {STATUSES.map(st => (
                             <span key={st}
                                   onClick={() => setFStatus(fStatus === st ? "ALL" : st)}
-                                  className={`cursor-pointer rounded-full px-3 py-1 text-xs font-semibold ${STATUS_META[st].cls} ${fStatus === st ? "ring-2 ring-offset-1 ring-slate-900" : ""}`}>
+                                  className={`cursor-pointer rounded-full px-3 py-1 text-xs font-semibold ${STATUS_META[st].cls} ${fStatus === st ? "ring-2 ring-offset-1 ring-m3-outline" : ""}`}>
                                 {STATUS_META[st].label_ar} {counts[st] ?? 0}
                             </span>
                         ))}
@@ -399,47 +399,47 @@ export default function TasksPage() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={load}
-                        className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                        className="rounded-lg border border-m3-outline-variant bg-surface-card px-4 py-2 text-sm font-medium text-m3-on-surface hover:bg-m3-background">
                         تحديث ↻
                     </button>
                     <button
                         onClick={openNew}
-                        className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-purple-700">
+                        className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-m3-on-surface shadow-md transition hover:bg-primary-container">
                         + مهمة جديدة
                     </button>
                 </div>
             </div>
 
             {/* Filter bar */}
-            <div className="grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-2 lg:grid-cols-6">
+            <div className="grid grid-cols-1 gap-3 rounded-2xl border border-m3-outline-variant/60 bg-surface-card p-4 shadow-sm md:grid-cols-2 lg:grid-cols-6">
                 <div className="flex flex-col gap-1 lg:col-span-2">
-                    <label className="text-xs font-semibold text-slate-600">🔎 بحث في العناوين والوصف</label>
+                    <label className="text-xs font-semibold text-m3-on-surface-variant">🔎 بحث في العناوين والوصف</label>
                     <input className="input" placeholder="مثال: خطأ في تسجيل الدخول" value={q}
                            onChange={e => setQ(e.target.value)} />
                 </div>
                 <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold text-slate-600">الحالة</label>
+                    <label className="text-xs font-semibold text-m3-on-surface-variant">الحالة</label>
                     <select className="input" value={fStatus} onChange={e => setFStatus(e.target.value as any)}>
                         <option value="ALL">الكل</option>
                         {STATUSES.map(s => <option key={s} value={s}>{STATUS_META[s].label_ar}</option>)}
                     </select>
                 </div>
                 <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold text-slate-600">النوع</label>
+                    <label className="text-xs font-semibold text-m3-on-surface-variant">النوع</label>
                     <select className="input" value={fType} onChange={e => setFType(e.target.value as any)}>
                         <option value="ALL">الكل</option>
                         {TYPES.map(s => <option key={s} value={s}>{TYPE_META[s].label_ar}</option>)}
                     </select>
                 </div>
                 <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold text-slate-600">الأولوية</label>
+                    <label className="text-xs font-semibold text-m3-on-surface-variant">الأولوية</label>
                     <select className="input" value={fPrio} onChange={e => setFPrio(e.target.value as any)}>
                         <option value="ALL">الكل</option>
                         {PRIOS.map(s => <option key={s} value={s}>{PRIO_META[s].label_ar}</option>)}
                     </select>
                 </div>
                 <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold text-slate-600">المُعين / المكلّف</label>
+                    <label className="text-xs font-semibold text-m3-on-surface-variant">المُعين / المكلّف</label>
                     <select className="input" value={fAssigned} onChange={e => setFAssigned(e.target.value)}>
                         <option value="">الكل</option>
                         {users.map(u => <option key={u.id} value={u.id}>
@@ -448,14 +448,14 @@ export default function TasksPage() {
                     </select>
                 </div>
                 <div className="flex flex-col gap-1 lg:col-span-2 lg:flex-row lg:items-end lg:justify-between">
-                    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-m3-on-surface">
                         <input type="checkbox" checked={fMine} onChange={e => setFMine(e.target.checked)}
-                               className="h-4 w-4 rounded border-slate-300 text-purple-600" />
+                               className="h-4 w-4 rounded border-m3-outline-variant text-accent" />
                         مهامي فقط (أنا أنشأتها أو تم تخصيصها لي)
                     </label>
                     <button
                         onClick={load}
-                        className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700">
+                        className="rounded-lg bg-m3-surface-container-highest px-3 py-1.5 text-xs font-semibold text-m3-on-surface hover:bg-m3-surface-container-high">
                         تطبيق التصفية
                     </button>
                 </div>
@@ -463,18 +463,18 @@ export default function TasksPage() {
 
             {/* Task cards / loading */}
             {loading ? (
-                <div className="rounded-xl border border-slate-200 bg-white p-10 text-center text-slate-500">
+                <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-10 text-center text-m3-on-surface-variant">
                     جاري التحميل...
                 </div>
             ) : tasks.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+                <div className="rounded-2xl border border-dashed border-m3-outline-variant bg-surface-card px-6 py-16 text-center">
                     <div className="text-5xl">📝</div>
-                    <p className="mt-4 text-lg font-semibold text-slate-700">لا توجد مهام بعد.</p>
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-4 text-lg font-semibold text-m3-on-surface">لا توجد مهام بعد.</p>
+                    <p className="mt-1 text-sm text-m3-on-surface-variant">
                         ابدأ بإنشاء أول مهمة أو خلل لتعقبه مع الفريق.
                     </p>
                     <button onClick={openNew}
-                            className="mt-5 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700">
+                            className="mt-5 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-m3-on-surface hover:bg-primary-container">
                         + مهمة جديدة
                     </button>
                 </div>
@@ -487,11 +487,11 @@ export default function TasksPage() {
                         return (
                             <article key={t.id}
                                      onClick={() => openTask(t)}
-                                     className={`group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-lg ${
-                                         t.status === "DONE" ? "border-emerald-200 opacity-85" : "border-slate-200 hover:-translate-y-0.5"
+                                     className={`group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-surface-card p-5 shadow-sm transition hover:shadow-lg ${
+                                         t.status === "DONE" ? "border-emerald-200 opacity-85" : "border-m3-outline-variant/60 hover:-translate-y-0.5"
                                      }`}>
                                 <div className="mb-2 flex flex-wrap items-center gap-2">
-                                    <span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-mono font-bold text-white">
+                                    <span className="rounded-full bg-m3-surface-container-highest px-2 py-0.5 text-[10px] font-mono font-bold text-m3-on-surface">
                                         {t.code}
                                     </span>
                                     <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${pm.cls}`}>
@@ -501,16 +501,16 @@ export default function TasksPage() {
                                         {tm.label_ar}
                                     </span>
                                 </div>
-                                <h3 className={`text-base font-bold leading-6 text-slate-800 ${
+                                <h3 className={`text-base font-bold leading-6 text-m3-on-surface ${
                                     t.status === "DONE" ? "line-through decoration-slate-400/60" : ""
                                 }`}>
                                     {t.title_ar}
                                     {t.title_en && (
-                                        <span className="block text-[11px] font-normal text-slate-500">{t.title_en}</span>
+                                        <span className="block text-[11px] font-normal text-m3-on-surface-variant">{t.title_en}</span>
                                     )}
                                 </h3>
-                                <p className="mt-1 line-clamp-2 text-xs text-slate-600">
-                                    {t.description_ar || t.description_en || <em className="text-slate-400">(بدون وصف)</em>}
+                                <p className="mt-1 line-clamp-2 text-xs text-m3-on-surface-variant">
+                                    {t.description_ar || t.description_en || <em className="text-m3-outline">(بدون وصف)</em>}
                                 </p>
 
                                 <div className="mt-3 flex flex-wrap gap-1.5">
@@ -520,8 +520,8 @@ export default function TasksPage() {
                                             onClick={(ev) => { ev.stopPropagation(); quickStatus(t, st); }}
                                             className={`rounded-full px-2 py-0.5 text-[10px] font-semibold transition ${
                                                 t.status === st
-                                                    ? STATUS_META[st].cls + " ring-2 ring-offset-1 ring-slate-900"
-                                                    : "bg-white text-slate-500 ring-1 ring-slate-200 hover:bg-slate-50"
+                                                    ? STATUS_META[st].cls + " ring-2 ring-offset-1 ring-m3-outline"
+                                                    : "bg-surface-card text-m3-on-surface-variant ring-1 ring-m3-outline-variant/60 hover:bg-m3-background"
                                             }`}>
                                             {STATUS_META[st].label_ar}
                                         </button>
@@ -531,29 +531,29 @@ export default function TasksPage() {
                                 {t.tags?.length ? (
                                     <div className="mt-3 flex flex-wrap gap-1">
                                         {t.tags.slice(0,6).map(tag => (
-                                            <span key={tag} className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600">
+                                            <span key={tag} className="rounded bg-m3-surface-container-lowest px-2 py-0.5 text-[10px] font-medium text-m3-on-surface-variant">
                                                 #{tag}
                                             </span>
                                         ))}
                                     </div>
                                 ) : null}
 
-                                <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+                                <div className="mt-4 flex items-center justify-between border-t border-m3-surface-container-low pt-3">
                                     <div className="flex -space-x-2">
                                         <div title={`أنشأ: ${nameOfUser(t,"cb")}`}
-                                             className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white ring-2 ring-white">
+                                             className="flex h-7 w-7 items-center justify-center rounded-full bg-m3-surface-container-highest text-[10px] font-bold text-m3-on-surface ring-2 ring-m3-outline-variant">
                                             {initials(t.created_by_name ?? null, t.created_by_email ?? "??")}
                                         </div>
                                         {t.assigned_to_id && (
                                             <div title={`مُعين: ${nameOfUser(t,"as")}`}
-                                                 className="flex h-7 w-7 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white ring-2 ring-white">
+                                                 className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-m3-on-surface ring-2 ring-m3-outline-variant">
                                                 {initials(t.assigned_to_name ?? null, t.assigned_to_email ?? "??")}
                                             </div>
                                         )}
                                     </div>
-                                    <div className="flex items-center gap-3 text-[10px] text-slate-500">
+                                    <div className="flex items-center gap-3 text-[10px] text-m3-on-surface-variant">
                                         {t.attachments?.length ? (
-                                            <span className="flex items-center gap-1 font-semibold text-indigo-600" title={`${t.attachments.length} مرفقات`}>
+                                            <span className="flex items-center gap-1 font-semibold text-primary" title={`${t.attachments.length} مرفقات`}>
                                                 📎 {t.attachments.length}
                                             </span>
                                         ) : null}
@@ -578,20 +578,20 @@ export default function TasksPage() {
 
             {/* Dialog: new / edit / show */}
             {open && (
-                <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/50 p-4">
-                    <div className="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-2xl bg-white shadow-2xl" dir="rtl">
-                        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white/90 px-6 py-4 backdrop-blur">
+                <div className="fixed inset-0 z-40 flex items-center justify-center bg-m3-surface-container-highest/50 p-4">
+                    <div className="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-2xl bg-surface-card shadow-2xl" dir="rtl">
+                        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-m3-surface-container-low bg-surface-card/90 px-6 py-4 backdrop-blur">
                             <div>
-                                <h2 className="text-lg font-bold text-slate-800">
+                                <h2 className="text-lg font-bold text-m3-on-surface">
                                     {edit.id ? `المهمة ${edit.code}` : "مهمة جديدة"}
                                 </h2>
                                 {edit.id && (
-                                    <p className="text-xs text-slate-500">
+                                    <p className="text-xs text-m3-on-surface-variant">
                                         آخر تحديث: {new Date(edit.updated_at).toLocaleString()}
                                     </p>
                                 )}
                             </div>
-                            <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-700">✕</button>
+                            <button onClick={() => setOpen(false)} className="text-m3-outline hover:text-m3-on-surface">✕</button>
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 p-6 lg:grid-cols-3">
@@ -631,18 +631,18 @@ export default function TasksPage() {
                                 </Field>
 
                                 {/* Attachments upload zone – OMRÅDET I RÖD CIRKELN */}
-                                <div className="rounded-2xl border border-dashed border-indigo-300 bg-gradient-to-br from-indigo-50/50 to-white p-4 shadow-sm">
+                                <div className="rounded-2xl border border-dashed border-indigo-300 bg-gradient-to-br from-indigo-50/50 to-surface-card p-4 shadow-sm">
                                     <div className="mb-3 flex items-center justify-between">
                                         <div>
-                                            <h3 className="text-sm font-bold text-slate-800">📎 المرفقات والصور</h3>
-                                            <p className="text-[10.5px] text-slate-500">
+                                            <h3 className="text-sm font-bold text-m3-on-surface">📎 المرفقات والصور</h3>
+                                            <p className="text-[10.5px] text-m3-on-surface-variant">
                                                 ارفع صوراً أو ملفات لتوضيح الخطأ أو المطلوب (JPG / PNG / WEBP / GIF حتى ١٥٠ ميجا)
                                             </p>
                                         </div>
                                         <label className={`cursor-pointer rounded-lg border px-3 py-1.5 text-[11px] font-semibold shadow-sm transition ${
                                             attachBusy
-                                                ? "border-slate-200 bg-slate-100 text-slate-400"
-                                                : "border-indigo-200 bg-indigo-600 text-white hover:bg-indigo-700"
+                                                ? "border-m3-outline-variant/60 bg-m3-surface-container-lowest text-m3-outline"
+                                                : "border-indigo-200 bg-primary text-m3-on-surface hover:bg-primary-container"
                                         }`}>
                                             {attachBusy ? "جاري الرفع…" : "+ إرفاق ملفات"}
                                             <input type="file" multiple accept="image/*,video/*" className="hidden" disabled={attachBusy}
@@ -656,15 +656,15 @@ export default function TasksPage() {
                                     </div>
                                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                                         {(edit.attachments || []).length === 0 && (
-                                            <div className="col-span-full flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-white/60 px-4 py-8 text-center">
+                                            <div className="col-span-full flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-m3-outline-variant/60 bg-surface-card/60 px-4 py-8 text-center">
                                                 <div className="text-3xl">🖼️</div>
-                                                <p className="mt-1 text-[11px] text-slate-500">
+                                                <p className="mt-1 text-[11px] text-m3-on-surface-variant">
                                                     لا توجد مرفقات بعد — اسحب هنا أو اضغط + إرفاق ملفات
                                                 </p>
                                             </div>
                                         )}
                                         {(edit.attachments || []).map((url, idx) => (
-                                            <div key={url + idx} className="group relative aspect-square overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-sm">
+                                            <div key={url + idx} className="group relative aspect-square overflow-hidden rounded-xl border border-m3-outline-variant/60 bg-m3-background shadow-sm">
                                                 {isImageUrl(url) ? (
                                                     <img onClick={() => setLightbox(nUrl(url))}
                                                          src={nUrl(url)}
@@ -678,13 +678,13 @@ export default function TasksPage() {
                                                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
                                                 <button type="button"
                                                         onClick={() => isImageUrl(url) ? setLightbox(nUrl(url)) : window.open(nUrl(url), "_blank", "noopener,noreferrer")}
-                                                        className="pointer-events-none absolute bottom-1.5 right-1.5 rounded-md bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-slate-700 shadow opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100">
+                                                        className="pointer-events-none absolute bottom-1.5 right-1.5 rounded-md bg-surface-card/90 px-2 py-0.5 text-[10px] font-semibold text-m3-on-surface shadow opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100">
                                                     {isImageUrl(url) ? "🔍 معاينة" : "فتح ↗"}
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => removeAttachment("task", url)}
-                                                    className="pointer-events-none absolute left-1.5 top-1.5 rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-rose-600">
+                                                    className="pointer-events-none absolute left-1.5 top-1.5 rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-m3-on-surface shadow opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-rose-600">
                                                     ✕ حذف
                                                 </button>
                                             </div>
@@ -694,12 +694,12 @@ export default function TasksPage() {
 
                                 {/* Comments */}
                                 {edit.id && (
-                                    <div className="rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-4">
+                                    <div className="rounded-2xl border border-m3-outline-variant/60 bg-gradient-to-b from-slate-50 to-surface-card p-4">
                                         <div className="mb-3 flex items-center justify-between">
-                                            <h3 className="text-sm font-bold text-slate-800">💬 التعليقات والمناقشة</h3>
-                                            <span className="text-[10px] text-slate-500">{comments.length} تعليق</span>
+                                            <h3 className="text-sm font-bold text-m3-on-surface">💬 التعليقات والمناقشة</h3>
+                                            <span className="text-[10px] text-m3-on-surface-variant">{comments.length} تعليق</span>
                                         </div>
-                                        <div className="mb-3 flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm">
+                                        <div className="mb-3 flex flex-col gap-2 rounded-xl border border-m3-outline-variant/60 bg-surface-card p-2 shadow-sm">
                                             <textarea
                                                 className="input min-h-[72px] border-0 shadow-none focus:ring-0"
                                                 placeholder="اكتب تعليقاً… (يمكن للفريق كله رؤيته) Ctrl+Enter = إرسال"
@@ -710,9 +710,9 @@ export default function TasksPage() {
                                                 }} />
                                             {/* attachments for comment */}
                                             {commentAttachments.length > 0 && (
-                                                <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-2">
+                                                <div className="flex flex-wrap items-center gap-2 border-t border-m3-surface-container-low pt-2">
                                                     {commentAttachments.map((url, idx) => (
-                                                        <div key={"ca-"+idx} className="group relative h-14 w-14 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 shadow-sm">
+                                                        <div key={"ca-"+idx} className="group relative h-14 w-14 overflow-hidden rounded-lg border border-m3-outline-variant/60 bg-m3-background shadow-sm">
                                                             {isImageUrl(url) ? (
                                                                 <img onClick={() => setLightbox(nUrl(url))}
                                                                      src={nUrl(url)}
@@ -724,18 +724,18 @@ export default function TasksPage() {
                                                             )}
                                                             <button type="button"
                                                                     onClick={() => removeAttachment("comment", url)}
-                                                                    className="absolute left-0 top-0 h-4 w-4 rounded-br-lg bg-rose-500 text-[9px] font-bold text-white hover:bg-rose-600">
+                                                                    className="absolute left-0 top-0 h-4 w-4 rounded-br-lg bg-rose-500 text-[9px] font-bold text-m3-on-surface hover:bg-rose-600">
                                                                 ✕
                                                             </button>
                                                         </div>
                                                     ))}
                                                 </div>
                                             )}
-                                            <div className="flex items-center justify-between border-t border-slate-100 pt-2">
+                                            <div className="flex items-center justify-between border-t border-m3-surface-container-low pt-2">
                                                 <label className={`cursor-pointer rounded-md px-2 py-1 text-[10.5px] font-semibold transition ${
                                                     attachBusy
-                                                        ? "text-slate-400"
-                                                        : "text-slate-600 hover:bg-slate-100"
+                                                        ? "text-m3-outline"
+                                                        : "text-m3-on-surface-variant hover:bg-m3-surface-container-lowest"
                                                 }`}>
                                                     📎 إرفاق صورة/ملف
                                                     <input type="file" multiple accept="image/*,video/*" className="hidden" disabled={attachBusy}
@@ -748,30 +748,30 @@ export default function TasksPage() {
                                                 </label>
                                                 <button onClick={addComment}
                                                         disabled={!newComment.trim() && !commentAttachments.length}
-                                                        className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-50">
+                                                        className="rounded-lg bg-m3-surface-container-highest px-3 py-1.5 text-xs font-semibold text-m3-on-surface hover:bg-m3-surface-container-high disabled:opacity-50">
                                                     إرسال
                                                 </button>
                                             </div>
                                         </div>
                                         <div className="flex flex-col gap-3">
                                             {loadComments && !comments.length && (
-                                                <p className="py-3 text-center text-xs text-slate-400">جاري تحميل التعليقات…</p>
+                                                <p className="py-3 text-center text-xs text-m3-outline">جاري تحميل التعليقات…</p>
                                             )}
                                             {!loadComments && !comments.length && (
-                                                <p className="py-3 text-center text-xs text-slate-400">لا توجد تعليقات بعد. كن أول من يعلق 👆</p>
+                                                <p className="py-3 text-center text-xs text-m3-outline">لا توجد تعليقات بعد. كن أول من يعلق 👆</p>
                                             )}
                                             {comments.map(c => (
-                                                <div key={c.id} className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                                                <div key={c.id} className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-3 shadow-sm">
                                                     <div className="flex items-start justify-between gap-3">
                                                         <div className="flex items-center gap-2">
-                                                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-600 text-[11px] font-bold text-white">
+                                                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-m3-on-surface">
                                                                 {initials(c.user_name ?? null, c.user_email ?? "??")}
                                                             </div>
                                                             <div>
-                                                                <p className="text-sm font-semibold text-slate-800">
+                                                                <p className="text-sm font-semibold text-m3-on-surface">
                                                                     {c.user_name?.trim() || c.user_email}
                                                                 </p>
-                                                                <p className="text-[10px] text-slate-500">
+                                                                <p className="text-[10px] text-m3-on-surface-variant">
                                                                     {fmtAgo(c.created_at)} · {new Date(c.created_at).toLocaleString()}
                                                                 </p>
                                                             </div>
@@ -782,7 +782,7 @@ export default function TasksPage() {
                                                         </button>
                                                     </div>
                                                     {c.body && (
-                                                        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">
+                                                        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-m3-on-surface">
                                                             {c.body}
                                                         </p>
                                                     )}
@@ -792,14 +792,14 @@ export default function TasksPage() {
                                                                 isImageUrl(url) ? (
                                                                     <button key={i} type="button"
                                                                             onClick={() => setLightbox(nUrl(url))}
-                                                                            className="group block aspect-square overflow-hidden rounded-lg border border-slate-200 bg-slate-50 shadow-sm hover:ring-2 hover:ring-purple-400">
+                                                                            className="group block aspect-square overflow-hidden rounded-lg border border-m3-outline-variant/60 bg-m3-background shadow-sm hover:ring-2 hover:ring-primary/70">
                                                                         <img src={nUrl(url)} alt="" className="h-full w-full cursor-zoom-in object-contain transition group-hover:scale-[1.02]" loading="lazy" />
                                                                     </button>
                                                                 ) : (
                                                                     <a key={i} href={nUrl(url)} target="_blank" rel="noreferrer"
-                                                                       className="group flex aspect-square flex-col items-center justify-center rounded-lg border border-slate-200 bg-slate-50 shadow-sm hover:ring-2 hover:ring-purple-400">
+                                                                       className="group flex aspect-square flex-col items-center justify-center rounded-lg border border-m3-outline-variant/60 bg-m3-background shadow-sm hover:ring-2 hover:ring-primary/70">
                                                                         <div className="text-3xl">📄</div>
-                                                                        <div className="mt-1 text-[9px] text-slate-500">انقر للفتح</div>
+                                                                        <div className="mt-1 text-[9px] text-m3-on-surface-variant">انقر للفتح</div>
                                                                     </a>
                                                                 )
                                                             ))}
@@ -813,7 +813,7 @@ export default function TasksPage() {
                             </div>
 
                             {/* Right column: meta */}
-                            <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 shadow-sm self-start lg:sticky lg:top-24">
+                            <div className="space-y-3 rounded-2xl border border-m3-outline-variant/60 bg-m3-background/60 p-4 shadow-sm self-start lg:sticky lg:top-24">
                                 <Field label="الحالة">
                                     <div className="grid grid-cols-2 gap-1.5">
                                         {STATUSES.map(st => (
@@ -821,8 +821,8 @@ export default function TasksPage() {
                                                     onClick={() => patch("status", st)}
                                                     className={`rounded-lg px-2 py-1.5 text-[11px] font-semibold ${
                                                         edit.status === st
-                                                            ? STATUS_META[st].cls + " ring-2 ring-offset-1 ring-slate-900"
-                                                            : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-100"
+                                                            ? STATUS_META[st].cls + " ring-2 ring-offset-1 ring-m3-outline"
+                                                            : "bg-surface-card text-m3-on-surface-variant ring-1 ring-m3-outline-variant/60 hover:bg-m3-surface-container-lowest"
                                                     }`}>
                                                 <span className={`mr-1 inline-block h-2 w-2 rounded-full align-middle ${STATUS_META[st].dot}`} />
                                                 {STATUS_META[st].label_ar}
@@ -860,13 +860,13 @@ export default function TasksPage() {
                                 {edit.id && (
                                     <>
                                         <Field label="المنشئ">
-                                            <div className="rounded-lg bg-white px-3 py-2 text-xs ring-1 ring-slate-200">
+                                            <div className="rounded-lg bg-surface-card px-3 py-2 text-xs ring-1 ring-m3-outline-variant/60">
                                                 {edit.created_by_name?.trim() || edit.created_by_email || "—"}
-                                                <span className="mr-2 text-slate-400">{edit.created_by_email ? `(${edit.created_by_email})` : ""}</span>
+                                                <span className="mr-2 text-m3-outline">{edit.created_by_email ? `(${edit.created_by_email})` : ""}</span>
                                             </div>
                                         </Field>
                                         <Field label="تاريخ الإنشاء">
-                                            <div className="rounded-lg bg-white px-3 py-2 text-xs ring-1 ring-slate-200">
+                                            <div className="rounded-lg bg-surface-card px-3 py-2 text-xs ring-1 ring-m3-outline-variant/60">
                                                 {new Date(edit.created_at).toLocaleString()}
                                             </div>
                                         </Field>
@@ -875,11 +875,11 @@ export default function TasksPage() {
 
                                 <div className="mt-3 flex flex-col gap-2">
                                     <button onClick={save} disabled={saving}
-                                            className="rounded-lg bg-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-purple-700 disabled:opacity-60">
+                                            className="rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-m3-on-surface shadow-md transition hover:bg-primary-container disabled:opacity-60">
                                         {saving ? "جاري الحفظ..." : (edit.id ? "حفظ التغييرات" : "إنشاء المهمة")}
                                     </button>
                                     <button onClick={() => setOpen(false)}
-                                            className="rounded-lg border border-slate-300 bg-white px-6 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                                            className="rounded-lg border border-m3-outline-variant bg-surface-card px-6 py-2 text-sm font-semibold text-m3-on-surface hover:bg-m3-background">
                                         إغلاق
                                     </button>
                                 </div>
@@ -900,9 +900,9 @@ function Field({ label, labelEn, full, children }: {
 }) {
     return (
         <div className={full ? "flex flex-col gap-1" : "flex flex-col gap-1"}>
-            <label className="text-xs font-semibold text-slate-600">
+            <label className="text-xs font-semibold text-m3-on-surface-variant">
                 {label}
-                {labelEn && <span className="mr-2 text-[10px] font-normal text-slate-400">({labelEn})</span>}
+                {labelEn && <span className="mr-2 text-[10px] font-normal text-m3-outline">({labelEn})</span>}
             </label>
             {children}
         </div>

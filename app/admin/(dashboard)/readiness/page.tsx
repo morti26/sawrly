@@ -77,15 +77,15 @@ export default function ReadinessPage() {
         <div dir="rtl" className="space-y-6">
             <div className="flex items-start justify-between gap-3">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">جاهزية الإنتاج</h1>
-                    <p className="mt-1 text-sm text-slate-500">
+                    <h1 className="text-2xl font-bold text-m3-on-background">جاهزية الإنتاج</h1>
+                    <p className="mt-1 text-sm text-m3-on-surface-variant">
                         فحص تلقائي لما تبقى قبل الإطلاق. يمكنك التحديث في أي وقت.
                     </p>
                 </div>
                 <button
                     type="button"
                     onClick={() => void load()}
-                    className="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                    className="rounded-lg bg-m3-on-surface px-4 py-2 text-sm font-semibold text-m3-on-surface hover:bg-m3-surface-container-high"
                 >
                     تحديث الفحص
                 </button>
@@ -98,27 +98,27 @@ export default function ReadinessPage() {
             )}
 
             {loading ? (
-                <div className="rounded-xl border border-slate-200 bg-white p-8 text-center text-slate-500">
+                <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-8 text-center text-m3-on-surface-variant">
                     جاري تشغيل فحص الجاهزية...
                 </div>
             ) : report ? (
                 <>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                            <p className="text-xs text-slate-500">جاهزية الدفع اليدوي</p>
+                        <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-4 shadow-sm">
+                            <p className="text-xs text-m3-on-surface-variant">جاهزية الدفع اليدوي</p>
                             <p className={`mt-2 text-lg font-bold ${report.readyForManualPayments ? 'text-emerald-700' : 'text-rose-700'}`}>
                                 {report.readyForManualPayments ? 'جاهز' : 'غير جاهز'}
                             </p>
                         </div>
-                        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                            <p className="text-xs text-slate-500">جاهزية الدفع الإلكتروني</p>
+                        <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-4 shadow-sm">
+                            <p className="text-xs text-m3-on-surface-variant">جاهزية الدفع الإلكتروني</p>
                             <p className={`mt-2 text-lg font-bold ${report.readyForOnlinePayments ? 'text-emerald-700' : 'text-amber-700'}`}>
                                 {report.readyForOnlinePayments ? 'جاهز' : 'بانتظار الإعداد'}
                             </p>
                         </div>
-                        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                            <p className="text-xs text-slate-500">آخر تحديث</p>
-                            <p className="mt-2 text-sm font-semibold text-slate-700">
+                        <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-4 shadow-sm">
+                            <p className="text-xs text-m3-on-surface-variant">آخر تحديث</p>
+                            <p className="mt-2 text-sm font-semibold text-m3-on-surface">
                                 {new Date(report.generatedAt).toLocaleString('ar-IQ')}
                             </p>
                         </div>
@@ -138,16 +138,16 @@ export default function ReadinessPage() {
 
                     <div className="space-y-3">
                         {report.checks.map((check) => (
-                            <div key={check.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                            <div key={check.id} className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-4 shadow-sm">
                                 <div className="flex items-center justify-between gap-2">
-                                    <h2 className="text-sm font-semibold text-slate-900">{check.title}</h2>
+                                    <h2 className="text-sm font-semibold text-m3-on-background">{check.title}</h2>
                                     <span className={`rounded-full border px-2.5 py-0.5 text-xs font-bold ${statusStyles[check.status]}`}>
                                         {statusLabels[check.status]}
                                     </span>
                                 </div>
-                                <p className="mt-2 text-sm text-slate-700">{check.details}</p>
+                                <p className="mt-2 text-sm text-m3-on-surface">{check.details}</p>
                                 {check.action && (
-                                    <p className="mt-2 text-xs font-medium text-slate-500">
+                                    <p className="mt-2 text-xs font-medium text-m3-on-surface-variant">
                                         الإجراء: {check.action}
                                     </p>
                                 )}

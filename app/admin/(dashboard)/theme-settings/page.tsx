@@ -703,7 +703,7 @@ function WcagTag({ rating }: { rating: WcagBadge }) {
     if (rating.aaaNormal) {
         return (
             <span
-                className="mr-2 rounded-md bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm"
+                className="mr-2 rounded-md bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-m3-on-surface shadow-sm"
                 title={`WCAG AAA — ${rating.ratio.toFixed(2)}:1`}
             >
                 ⭐ AAA {rating.ratio.toFixed(1)}
@@ -713,7 +713,7 @@ function WcagTag({ rating }: { rating: WcagBadge }) {
     if (rating.aaNormal) {
         return (
             <span
-                className="mr-2 rounded-md bg-green-600 px-2 py-0.5 text-[10px] font-bold text-white"
+                className="mr-2 rounded-md bg-green-600 px-2 py-0.5 text-[10px] font-bold text-m3-on-surface"
                 title={`WCAG AA — ${rating.ratio.toFixed(2)}:1`}
             >
                 ✅ AA {rating.ratio.toFixed(1)}
@@ -722,7 +722,7 @@ function WcagTag({ rating }: { rating: WcagBadge }) {
     }
     return (
         <span
-            className="mr-2 rounded-md bg-rose-600 px-2 py-0.5 text-[10px] font-bold text-white"
+            className="mr-2 rounded-md bg-rose-600 px-2 py-0.5 text-[10px] font-bold text-m3-on-surface"
             title={`Failed WCAG AA — ${rating.ratio.toFixed(2)}:1 (requires 4.5)`}
         >
             ❌ {rating.ratio.toFixed(1)}
@@ -1168,20 +1168,20 @@ export default function AdminThemeSettingsPage() {
         <div dir="rtl" className="space-y-6">
             <div className="flex flex-col gap-2">
                 <h2 className="text-right text-2xl font-bold">إعدادات مظهر التطبيق (Enterprise Theme Engine)</h2>
-                <p className="text-right text-sm text-slate-600">
+                <p className="text-right text-sm text-m3-on-surface-variant">
                     نظام الألوان الآن على مستوى Enterprise — Material 3 + 85 لوناً + 5 ألواح لونية نغمية (Tonal
                     Palettes) + WCAG 2.2 AA/AAA لكل نص. استخدم <strong>Smart Palette</strong> (البذرة) لتوليد
                     النظام بأكمله بضغطة زر — ثم عدّل التفاصيل إن أردت.
                 </p>
                 {enterpriseTheme?.version ? (
                     <div className="flex items-center justify-end gap-2 text-[11px]">
-                        <span className="rounded-md bg-slate-900 px-2 py-1 font-mono text-amber-300">
+                        <span className="rounded-md bg-m3-surface-container-highest px-2 py-1 font-mono text-amber-300">
                             themeVersion: {enterpriseTheme.version}
                         </span>
                         <span className="rounded-md bg-emerald-900/20 px-2 py-1 font-mono text-emerald-700">
                             M3 ColorScheme: 61 tokens
                         </span>
-                        <span className="rounded-md bg-violet-900/20 px-2 py-1 font-mono text-violet-700">
+                        <span className="rounded-md bg-primary-container/20 px-2 py-1 font-mono text-m3-primary">
                             Semantic: 25 tokens
                         </span>
                     </div>
@@ -1202,17 +1202,17 @@ export default function AdminThemeSettingsPage() {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
                 <div className="lg:col-span-2">
                     <div className="sticky top-6 space-y-4">
-                        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                             <div className="flex items-center justify-between gap-3">
                                 <div className="text-right">
-                                    <h3 className="font-bold text-slate-900">معاينة التطبيق</h3>
-                                    <p className="mt-1 text-sm text-slate-500">
+                                    <h3 className="font-bold text-m3-on-background">معاينة التطبيق</h3>
+                                    <p className="mt-1 text-sm text-m3-on-surface-variant">
                                         معاينة المباشرة تعكس التدرج البطولي (Hero)، الحاويات الزجاجية، الحدود، وشريط التنقل بالكامل.
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="mt-6 mx-auto w-[320px] overflow-hidden rounded-[36px] border border-slate-300 bg-black p-2 shadow-xl">
+                            <div className="mt-6 mx-auto w-[320px] overflow-hidden rounded-[36px] border border-m3-outline-variant bg-m3-on-surface p-2 shadow-xl">
                                 <div className="flex h-[620px] flex-col overflow-hidden rounded-[28px]" style={previewStyle}>
                                     <div className="flex items-center justify-between px-4 pt-4 pb-3 text-xs"
                                          style={{ color: hexToCss(c.textPrimary, DEFAULT_COLORS.textPrimary!), opacity: 0.85 }}>
@@ -1350,19 +1350,19 @@ export default function AdminThemeSettingsPage() {
                                 </div>
                             </div>
 
-                            <div className="mt-4 text-right text-xs text-slate-500">
+                            <div className="mt-4 text-right text-xs text-m3-on-surface-variant">
                                 أي لون تركه فارغاً يستخدم القيمة المشتقة من <strong>Smart Palette</strong>. الألوان الأساسية لـ M3 مضمونة بدرجة WCAG AA كحد أدنى.
                             </div>
                         </div>
 
-                        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <button type="button" onClick={() => void loadSettings()}
-                                        className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                                        className="rounded-lg border border-m3-outline-variant/60 px-4 py-2 text-sm font-medium text-m3-on-surface transition hover:bg-m3-background">
                                     إعادة التحميل
                                 </button>
                                 <button type="button" onClick={() => void handleSave()} disabled={saving || loading}
-                                        className="rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-purple-300">
+                                        className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-m3-on-surface transition hover:bg-primary-container disabled:cursor-not-allowed disabled:bg-accent/60">
                                     {saving ? "جارٍ الحفظ..." : "حفظ المظهر والأيقونات"}
                                 </button>
                             </div>
@@ -1372,16 +1372,16 @@ export default function AdminThemeSettingsPage() {
 
                 <div className="space-y-6 lg:col-span-3">
                     {/* Smart Palette */}
-                    <div className="rounded-xl border-2 border-violet-300 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 p-5 shadow-sm">
+                    <div className="rounded-xl border-2 border-primary/40 bg-gradient-to-br from-violet-50 via-surface-card to-fuchsia-50 p-5 shadow-sm">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div className="text-right">
-                                <h3 className="flex items-center justify-end gap-2 font-bold text-slate-900">
-                                    <span className="rounded-md bg-violet-600 px-2 py-0.5 text-[11px] font-bold text-white shadow">
+                                <h3 className="flex items-center justify-end gap-2 font-bold text-m3-on-background">
+                                    <span className="rounded-md bg-accent px-2 py-0.5 text-[11px] font-bold text-m3-on-surface shadow">
                                         Enterprise
                                     </span>
                                     لوحة الألوان الذكية (Material Color Utilities)
                                 </h3>
-                                <p className="mt-1 text-sm text-slate-600">
+                                <p className="mt-1 text-sm text-m3-on-surface-variant">
                                     اختر لوناً واحداً (البذرة) ليتم توليد 5 ألواح نغمية (Primary / Secondary / Tertiary / Neutral /
                                     NeutralVariant) + 85 لوناً + 10 تأثيرات تلقائياً مع ضمان WCAG AA لكل نص.
                                 </p>
@@ -1389,38 +1389,38 @@ export default function AdminThemeSettingsPage() {
                         </div>
                         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-12">
                             <div className="sm:col-span-4">
-                                <label className="mb-2 block text-right text-xs font-semibold text-slate-700">
+                                <label className="mb-2 block text-right text-xs font-semibold text-m3-on-surface">
                                     لون البذرة (Seed Primary)
                                 </label>
-                                <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-slate-300 bg-white focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-100">
-                                    <label className="relative block shrink-0 cursor-pointer border-r border-slate-200 bg-slate-50 px-3 py-2">
+                                <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-m3-outline-variant bg-surface-card focus-within:border-primary/70 focus-within:ring-2 focus-within:ring-violet-100">
+                                    <label className="relative block shrink-0 cursor-pointer border-r border-m3-outline-variant/60 bg-m3-background px-3 py-2">
                                         <input type="color" value={colorToSixDigitHex(smartSeed)}
                                                onChange={(e) => setSmartSeed(e.target.value)}
                                                className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
-                                        <div className="h-8 w-8 rounded-md border border-slate-300 shadow-inner"
+                                        <div className="h-8 w-8 rounded-md border border-m3-outline-variant shadow-inner"
                                              style={{ background: colorToSixDigitHex(smartSeed) }} />
                                     </label>
                                     <input type="text" dir="ltr" inputMode="text" placeholder="#9B4DFF" value={smartSeed}
                                            onChange={(e) => setSmartSeed(e.target.value)}
-                                           className="min-w-0 flex-1 bg-transparent px-3 py-2 text-left text-sm font-mono text-slate-900 outline-none placeholder:text-slate-400" />
+                                           className="min-w-0 flex-1 bg-transparent px-3 py-2 text-left text-sm font-mono text-m3-on-background outline-none placeholder:text-m3-outline" />
                                 </div>
                             </div>
                             <div className="sm:col-span-3">
-                                <label className="mb-2 block text-right text-xs font-semibold text-slate-700">
+                                <label className="mb-2 block text-right text-xs font-semibold text-m3-on-surface">
                                     الوضع (Mode)
                                 </label>
-                                <div className="flex rounded-lg border border-slate-300 bg-white p-1">
+                                <div className="flex rounded-lg border border-m3-outline-variant bg-surface-card p-1">
                                     <button type="button" onClick={() => setSmartMode("dark")}
                                             className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition ${
                                                 smartMode === "dark"
-                                                    ? "bg-slate-900 text-white shadow-inner"
-                                                    : "text-slate-600 hover:bg-slate-50"
+                                                    ? "bg-m3-surface-container-highest text-m3-on-surface shadow-inner"
+                                                    : "text-m3-on-surface-variant hover:bg-m3-background"
                                             }`}>🌙 داكن</button>
                                     <button type="button" onClick={() => setSmartMode("light")}
                                             className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition ${
                                                 smartMode === "light"
                                                     ? "bg-amber-100 text-amber-900 shadow-inner"
-                                                    : "text-slate-600 hover:bg-slate-50"
+                                                    : "text-m3-on-surface-variant hover:bg-m3-background"
                                             }`}>☀️ فاتح</button>
                                 </div>
                             </div>
@@ -1428,16 +1428,16 @@ export default function AdminThemeSettingsPage() {
                                 <div className="flex flex-wrap gap-2">
                                     <button type="button" disabled={smartGenerating}
                                             onClick={() => void handleGenerateSmartPalette(false)}
-                                            className="flex-1 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-violet-700 disabled:opacity-60">
+                                            className="flex-1 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-m3-on-surface shadow transition hover:bg-primary-container disabled:opacity-60">
                                         {smartGenerating ? "جارٍ التوليد..." : "⚡ معاينة فقط"}
                                     </button>
                                     <button type="button" disabled={smartGenerating}
                                             onClick={() => void handleGenerateSmartPalette(true)}
-                                            className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-emerald-700 disabled:opacity-60">
+                                            className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-m3-on-surface shadow transition hover:bg-emerald-700 disabled:opacity-60">
                                         💾 تطبيق وحفظ مباشر
                                     </button>
                                 </div>
-                                <p className="text-[11px] text-right text-slate-500">
+                                <p className="text-[11px] text-right text-m3-on-surface-variant">
                                     💡 تلميح: ابدأ بـ <span className="font-mono">#9B4DFF</span> (Purple Dream) أو{" "}
                                     <span className="font-mono">#10B981</span> (Ocean) ثم عدّل التفاصيل إن أردت.
                                 </p>
@@ -1446,10 +1446,10 @@ export default function AdminThemeSettingsPage() {
                     </div>
 
                     {/* Presets */}
-                    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                         <div className="text-right">
-                            <h3 className="font-bold text-slate-900">قوالب جاهزة (Presets)</h3>
-                            <p className="mt-1 text-sm text-slate-500">
+                            <h3 className="font-bold text-m3-on-background">قوالب جاهزة (Presets)</h3>
+                            <p className="mt-1 text-sm text-m3-on-surface-variant">
                                 اضغط على أي قالب ليتم تعبئة البذرة والألوان الأساسية — ثم استخدم Smart Palette للتوسيع إلى 85 لون.
                             </p>
                         </div>
@@ -1461,17 +1461,17 @@ export default function AdminThemeSettingsPage() {
                                             onClick={() => handleApplyPreset(preset)}
                                             className={`group flex flex-col items-center gap-2 rounded-xl border p-2 text-right transition ${
                                                 isActive
-                                                    ? "border-purple-500 bg-purple-50/70 shadow"
-                                                    : "border-slate-200 bg-slate-50/60 hover:border-purple-300 hover:bg-white"
+                                                    ? "border-primary bg-accent/10/70 shadow"
+                                                    : "border-m3-outline-variant/60 bg-m3-background/60 hover:border-primary/40 hover:bg-surface-card"
                                             }`}>
-                                        <div className="grid h-16 w-full grid-cols-4 overflow-hidden rounded-lg border border-slate-200"
+                                        <div className="grid h-16 w-full grid-cols-4 overflow-hidden rounded-lg border border-m3-outline-variant/60"
                                              style={{ background: preset.colors.background ?? undefined }}>
                                             <div style={{ background: preset.colors.primary ?? undefined }} />
                                             <div style={{ background: preset.colors.primaryDark ?? undefined }} />
                                             <div style={{ background: preset.colors.surface ?? undefined }} />
                                             <div style={{ background: preset.colors.accentPink ?? undefined }} />
                                         </div>
-                                        <div className="w-full text-right text-[12px] font-semibold text-slate-900">{preset.label}</div>
+                                        <div className="w-full text-right text-[12px] font-semibold text-m3-on-background">{preset.label}</div>
                                     </button>
                                 );
                             })}
@@ -1479,11 +1479,11 @@ export default function AdminThemeSettingsPage() {
                     </div>
 
                     {/* Legacy Quick Colors */}
-                    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                         <div className="flex items-start justify-between gap-3">
                             <div className="text-right">
-                                <h3 className="font-bold text-slate-900">ألوان سريعة (الإصدار القديم — متوافق)</h3>
-                                <p className="mt-1 text-sm text-slate-500">
+                                <h3 className="font-bold text-m3-on-background">ألوان سريعة (الإصدار القديم — متوافق)</h3>
+                                <p className="mt-1 text-sm text-m3-on-surface-variant">
                                     17 لوناً أساسياً للتوافق مع الإصدارات القديمة من التطبيق. استخدم المجموعات M3 أدناه للتحكم الدقيق.
                                 </p>
                             </div>
@@ -1495,46 +1495,46 @@ export default function AdminThemeSettingsPage() {
                                 const isOverriding = current.length > 0 || settings.colors[field.key];
                                 const pickerValue = colorToSixDigitHex(effective);
                                 return (
-                                    <div key={field.key} className="flex flex-col gap-3 overflow-hidden rounded-xl border border-slate-200 bg-slate-50/60 p-4 text-right">
+                                    <div key={field.key} className="flex flex-col gap-3 overflow-hidden rounded-xl border border-m3-outline-variant/60 bg-m3-background/60 p-4 text-right">
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="min-w-0 flex-1">
-                                                <div className="text-sm font-semibold text-slate-900">{field.label}</div>
-                                                <div className="mt-1 text-[11px] text-slate-500">{field.desc}</div>
+                                                <div className="text-sm font-semibold text-m3-on-background">{field.label}</div>
+                                                <div className="mt-1 text-[11px] text-m3-on-surface-variant">{field.desc}</div>
                                             </div>
                                             <label className="relative block shrink-0 cursor-pointer">
                                                 <input type="color" value={pickerValue}
                                                        onChange={(e) => handleColorChange(field.key, e.target.value)}
                                                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
-                                                <div className="h-16 w-28 overflow-hidden rounded-xl border border-slate-200 shadow-inner transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                                                <div className="h-16 w-28 overflow-hidden rounded-xl border border-m3-outline-variant/60 shadow-inner transition-transform hover:scale-[1.02] active:scale-[0.98]"
                                                      style={{
                                                          background: isOverriding
                                                              ? `linear-gradient(135deg, ${effective}, ${mixOnBackground(effective, 0.18)})`
                                                              : effective,
                                                      }} title="اختر اللون">
                                                     <div className="flex h-full items-end justify-start p-1.5">
-                                                        <span className="rounded-md bg-black/40 px-2 py-0.5 text-[10px] font-mono tracking-wide text-white">
+                                                        <span className="rounded-md bg-m3-on-surface/40 px-2 py-0.5 text-[10px] font-mono tracking-wide text-m3-on-surface">
                                                             {pickerValue}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </label>
                                         </div>
-                                        <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-purple-400 focus-within:ring-2 focus-within:ring-purple-100">
-                                            <label className="relative block shrink-0 cursor-pointer border-r border-slate-200 bg-slate-50/70 px-2.5 py-2">
+                                        <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-m3-outline-variant/60 bg-surface-card focus-within:border-primary/70 focus-within:ring-2 focus-within:ring-purple-100">
+                                            <label className="relative block shrink-0 cursor-pointer border-r border-m3-outline-variant/60 bg-m3-background/70 px-2.5 py-2">
                                                 <input type="color" value={pickerValue}
                                                        onChange={(e) => handleColorChange(field.key, e.target.value)}
                                                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
                                                 <div className="flex items-center gap-2">
-                                                    <div className="h-8 w-8 rounded-md border border-slate-300 shadow-inner" style={{ background: pickerValue }} />
-                                                    <span className="hidden text-[10px] font-medium text-slate-500 sm:inline">اختر</span>
+                                                    <div className="h-8 w-8 rounded-md border border-m3-outline-variant shadow-inner" style={{ background: pickerValue }} />
+                                                    <span className="hidden text-[10px] font-medium text-m3-on-surface-variant sm:inline">اختر</span>
                                                 </div>
                                             </label>
                                             <input type="text" inputMode="text" dir="ltr" placeholder="#9B4DFF" value={current}
                                                    onChange={(e) => handleColorChange(field.key, e.target.value)}
-                                                   className="min-w-0 flex-1 bg-transparent px-3 py-2 text-left text-sm font-mono text-slate-900 outline-none placeholder:text-slate-400" />
+                                                   className="min-w-0 flex-1 bg-transparent px-3 py-2 text-left text-sm font-mono text-m3-on-background outline-none placeholder:text-m3-outline" />
                                         </div>
                                         <button type="button" onClick={() => handleRemoveColor(field.key)}
-                                                className="self-start rounded-md border border-slate-200 bg-white px-3 py-1 text-[11px] text-slate-600 transition hover:bg-slate-100">
+                                                className="self-start rounded-md border border-m3-outline-variant/60 bg-surface-card px-3 py-1 text-[11px] text-m3-on-surface-variant transition hover:bg-m3-surface-container-lowest">
                                             إرجاع للافتراضي
                                         </button>
                                     </div>
@@ -1544,23 +1544,23 @@ export default function AdminThemeSettingsPage() {
                     </div>
 
                     {/* M3 Color Groups Tabs */}
-                    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                         <div className="text-right">
-                            <h3 className="font-bold text-slate-900">مجموعات Material 3 (85 لوناً + واجهة WCAG)</h3>
-                            <p className="mt-1 text-sm text-slate-500">
+                            <h3 className="font-bold text-m3-on-background">مجموعات Material 3 (85 لوناً + واجهة WCAG)</h3>
+                            <p className="mt-1 text-sm text-m3-on-surface-variant">
                                 اختر المجموعة لتصفح الألوان الدقيقة. كل لون نص يُظهر علامة WCAG ⭐ (AAA) / ✅ (AA) / ❌ (أقل من AA).
                             </p>
                         </div>
-                        <div className="mt-4 flex flex-wrap gap-2 border-b border-slate-200 pb-3">
+                        <div className="mt-4 flex flex-wrap gap-2 border-b border-m3-outline-variant/60 pb-3">
                             {M3_COLOR_GROUPS.map((grp) => (
                                 <button key={grp.id} type="button" onClick={() => setActiveGroup(activeGroup === grp.id ? null : grp.id)}
                                         className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
                                             activeGroup === grp.id
-                                                ? "border-violet-500 bg-violet-600 text-white shadow-sm"
-                                                : "border-slate-200 bg-white text-slate-700 hover:border-violet-300 hover:bg-violet-50"
+                                                ? "border-primary bg-accent text-m3-on-surface shadow-sm"
+                                                : "border-m3-outline-variant/60 bg-surface-card text-m3-on-surface hover:border-primary/40 hover:bg-accent/10"
                                         }`}>
                                     {grp.title}
-                                    <span className="mr-1 rounded bg-black/10 px-1.5 py-0.5 text-[10px] opacity-70">
+                                    <span className="mr-1 rounded bg-m3-on-surface/10 px-1.5 py-0.5 text-[10px] opacity-70">
                                         {grp.fields.length}
                                     </span>
                                 </button>
@@ -1571,9 +1571,9 @@ export default function AdminThemeSettingsPage() {
                             if (activeGroup !== grp.id) return null;
                             return (
                                 <div key={grp.id} className="mt-4">
-                                    <div className="mb-3 rounded-lg border border-violet-200 bg-violet-50/60 px-4 py-3 text-right">
-                                        <div className="font-semibold text-violet-900">{grp.title}</div>
-                                        <div className="mt-1 text-[12px] text-violet-800/80">{grp.desc}</div>
+                                    <div className="mb-3 rounded-lg border border-violet-200 bg-accent/10/60 px-4 py-3 text-right">
+                                        <div className="font-semibold text-m3-on-primary-container">{grp.title}</div>
+                                        <div className="mt-1 text-[12px] text-m3-on-primary-container/80">{grp.desc}</div>
                                     </div>
                                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                                         {grp.fields.map((field) => {
@@ -1583,20 +1583,20 @@ export default function AdminThemeSettingsPage() {
                                             const wcagKey = `${field.key}__${field.fgOf}`;
                                             const rating = field.fgOf ? computedWcag[wcagKey] : null;
                                             return (
-                                                <div key={field.key} className="flex flex-col gap-3 overflow-hidden rounded-xl border border-slate-200 bg-slate-50/60 p-4 text-right">
+                                                <div key={field.key} className="flex flex-col gap-3 overflow-hidden rounded-xl border border-m3-outline-variant/60 bg-m3-background/60 p-4 text-right">
                                                     <div className="flex items-start justify-between gap-3">
                                                         <div className="min-w-0 flex-1">
                                                             <div className="flex flex-wrap items-center justify-end gap-1">
                                                                 {rating ? <WcagTag rating={rating} /> : null}
-                                                                <div className="text-sm font-semibold text-slate-900">{field.label}</div>
+                                                                <div className="text-sm font-semibold text-m3-on-background">{field.label}</div>
                                                             </div>
                                                             {field.desc ? (
-                                                                <div className="mt-1 text-[11px] text-slate-500">{field.desc}</div>
+                                                                <div className="mt-1 text-[11px] text-m3-on-surface-variant">{field.desc}</div>
                                                             ) : null}
                                                             {field.fgOf ? (
-                                                                <div className="mt-1 flex items-center justify-end gap-2 text-[10px] text-slate-400">
+                                                                <div className="mt-1 flex items-center justify-end gap-2 text-[10px] text-m3-outline">
                                                                     <span>نص فوق:</span>
-                                                                    <span dir="ltr" className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-white/80">
+                                                                    <span dir="ltr" className="rounded bg-m3-surface-container-high px-1.5 py-0.5 font-mono text-m3-on-surface/80">
                                                                         {field.fgOf}
                                                                     </span>
                                                                 </div>
@@ -1606,29 +1606,29 @@ export default function AdminThemeSettingsPage() {
                                                             <input type="color" value={pickerValue}
                                                                    onChange={(e) => handleColorChange(field.key, e.target.value)}
                                                                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
-                                                            <div className="h-14 w-24 overflow-hidden rounded-xl border border-slate-200 shadow-inner transition-transform hover:scale-[1.02]"
+                                                            <div className="h-14 w-24 overflow-hidden rounded-xl border border-m3-outline-variant/60 shadow-inner transition-transform hover:scale-[1.02]"
                                                                  style={{ background: effective }}>
                                                                 <div className="flex h-full items-end justify-start p-1">
-                                                                    <span className="rounded bg-black/50 px-1.5 py-0.5 text-[9px] font-mono text-white">
+                                                                    <span className="rounded bg-m3-on-surface/50 px-1.5 py-0.5 text-[9px] font-mono text-m3-on-surface">
                                                                         {pickerValue}
                                                                     </span>
                                                                 </div>
                                                             </div>
                                                         </label>
                                                     </div>
-                                                    <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-100">
-                                                        <label className="relative block shrink-0 cursor-pointer border-r border-slate-200 bg-slate-50/70 px-2.5 py-2">
+                                                    <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-m3-outline-variant/60 bg-surface-card focus-within:border-primary/70 focus-within:ring-2 focus-within:ring-violet-100">
+                                                        <label className="relative block shrink-0 cursor-pointer border-r border-m3-outline-variant/60 bg-m3-background/70 px-2.5 py-2">
                                                             <input type="color" value={pickerValue}
                                                                    onChange={(e) => handleColorChange(field.key, e.target.value)}
                                                                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
-                                                            <div className="h-8 w-8 rounded-md border border-slate-300 shadow-inner" style={{ background: pickerValue }} />
+                                                            <div className="h-8 w-8 rounded-md border border-m3-outline-variant shadow-inner" style={{ background: pickerValue }} />
                                                         </label>
                                                         <input type="text" inputMode="text" dir="ltr" placeholder="#9B4DFF" value={current}
                                                                onChange={(e) => handleColorChange(field.key, e.target.value)}
-                                                               className="min-w-0 flex-1 bg-transparent px-3 py-2 text-left text-sm font-mono text-slate-900 outline-none placeholder:text-slate-400" />
+                                                               className="min-w-0 flex-1 bg-transparent px-3 py-2 text-left text-sm font-mono text-m3-on-background outline-none placeholder:text-m3-outline" />
                                                     </div>
                                                     <button type="button" onClick={() => handleRemoveColor(field.key)}
-                                                            className="self-start rounded-md border border-slate-200 bg-white px-3 py-1 text-[11px] text-slate-600 transition hover:bg-slate-100">
+                                                            className="self-start rounded-md border border-m3-outline-variant/60 bg-surface-card px-3 py-1 text-[11px] text-m3-on-surface-variant transition hover:bg-m3-surface-container-lowest">
                                                         إرجاع للافتراضي (Smart Palette)
                                                     </button>
                                                 </div>
@@ -1641,10 +1641,10 @@ export default function AdminThemeSettingsPage() {
                     </div>
 
                     {/* Effects */}
-                    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                         <div className="text-right">
-                            <h3 className="font-bold text-slate-900">تأثيرات وتفاصيل التصميم</h3>
-                            <p className="mt-1 text-sm text-slate-500">
+                            <h3 className="font-bold text-m3-on-background">تأثيرات وتفاصيل التصميم</h3>
+                            <p className="mt-1 text-sm text-m3-on-surface-variant">
                                 حرّك المؤشرات لتجربة التدرجات، حواف البطاقات، ظلال الأزرار، وتوهج القسم المفعّل.
                             </p>
                         </div>
@@ -1661,19 +1661,19 @@ export default function AdminThemeSettingsPage() {
                                         : undefined;
                                 const isOverriding = typeof raw === "number" && Number.isFinite(raw);
                                 return (
-                                    <div key={field.key} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 text-right">
+                                    <div key={field.key} className="rounded-xl border border-m3-outline-variant/60 bg-m3-background/60 p-4 text-right">
                                         <div className="flex items-start justify-between gap-3">
                                             <div>
-                                                <div className="text-sm font-semibold text-slate-900">{field.label}</div>
-                                                <div className="mt-1 text-[11px] text-slate-500">{field.desc}</div>
+                                                <div className="text-sm font-semibold text-m3-on-background">{field.label}</div>
+                                                <div className="mt-1 text-[11px] text-m3-on-surface-variant">{field.desc}</div>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <div className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-left text-xs font-mono text-slate-900" dir="ltr">
+                                                <div className="rounded-lg border border-m3-outline-variant/60 bg-surface-card px-3 py-1.5 text-left text-xs font-mono text-m3-on-background" dir="ltr">
                                                     {field.key.includes("Opacity") ? value.toFixed(2) : value}
                                                     {field.suffix ?? ""}
                                                 </div>
                                                 {preview ? (
-                                                    <div className="h-10 w-10 rounded-lg border border-slate-200" style={{ background: preview }} />
+                                                    <div className="h-10 w-10 rounded-lg border border-m3-outline-variant/60" style={{ background: preview }} />
                                                 ) : null}
                                             </div>
                                         </div>
@@ -1684,7 +1684,7 @@ export default function AdminThemeSettingsPage() {
                                                    className="h-2 flex-1 cursor-pointer accent-purple-600" />
                                             <button type="button" onClick={() => handleResetEffect(field.key)}
                                                     disabled={!isOverriding}
-                                                    className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50">
+                                                    className="rounded-md border border-m3-outline-variant/60 bg-surface-card px-2.5 py-1 text-[11px] text-m3-on-surface-variant transition hover:bg-m3-surface-container-lowest disabled:cursor-not-allowed disabled:opacity-50">
                                                 افتراضي
                                             </button>
                                         </div>
@@ -1695,10 +1695,10 @@ export default function AdminThemeSettingsPage() {
                     </div>
 
                     {/* Nav Icons */}
-                    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                         <div className="text-right">
-                            <h3 className="font-bold text-slate-900">أيقونات شريط التنقل السفلي</h3>
-                            <p className="mt-1 text-sm text-slate-500">
+                            <h3 className="font-bold text-m3-on-background">أيقونات شريط التنقل السفلي</h3>
+                            <p className="mt-1 text-sm text-m3-on-surface-variant">
                                 لكل زر حالتان: عادية ومفعّلة. اختر من مكتبة Phosphor (78 أيقونة × 6 أنماط) أو ارفع صورة مخصصة.
                             </p>
                         </div>
@@ -1717,26 +1717,26 @@ export default function AdminThemeSettingsPage() {
                                 const InIconComp = inParsed ? iconComponent(inParsed.name, inParsed.weight) : null;
                                 const ActiveIconComp = activeParsed ? iconComponent(activeParsed.name, activeParsed.weight) : null;
                                 return (
-                                    <div key={pair.inKey} className="space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                                    <div key={pair.inKey} className="space-y-4 rounded-xl border border-m3-outline-variant/60 bg-m3-background/60 p-4">
                                         <div className="text-right">
-                                            <div className="text-base font-bold text-slate-900">{pair.label}</div>
-                                            <div className="text-[11px] text-slate-500">{inactive.desc}</div>
+                                            <div className="text-base font-bold text-m3-on-background">{pair.label}</div>
+                                            <div className="text-[11px] text-m3-on-surface-variant">{inactive.desc}</div>
                                         </div>
                                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                             <div className="space-y-3 text-right">
-                                                <div className="text-sm font-semibold text-slate-900">حالة عادية (غير محدّدة)</div>
+                                                <div className="text-sm font-semibold text-m3-on-background">حالة عادية (غير محدّدة)</div>
                                                 <div className="grid grid-cols-2 gap-2">
                                                     <button type="button" onClick={() => setIconPickerField(inIdKey)}
-                                                            className="rounded-lg bg-slate-900 px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-slate-800">
+                                                            className="rounded-lg bg-m3-surface-container-highest px-3 py-2 text-center text-sm font-medium text-m3-on-surface transition hover:bg-m3-surface-container-high">
                                                         اختر من المكتبة
                                                     </button>
                                                     <button type="button" onClick={() => handleClearIconId(inIdKey)} disabled={!inactiveId}
-                                                            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50">
+                                                            className="rounded-lg border border-m3-outline-variant/60 bg-surface-card px-3 py-2 text-sm text-m3-on-surface transition hover:bg-m3-surface-container-lowest disabled:cursor-not-allowed disabled:opacity-50">
                                                         إزالة الأيقونة
                                                     </button>
                                                 </div>
                                                 <div className="flex justify-center">
-                                                    <div className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed border-slate-300"
+                                                    <div className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed border-m3-outline-variant"
                                                          style={{ background: hexToCss(c.menuBackground, DEFAULT_COLORS.menuBackground!) }}>
                                                         {InIconComp ? (
                                                             <InIconComp size={48} weight={inParsed?.weight ?? "regular"}
@@ -1745,37 +1745,37 @@ export default function AdminThemeSettingsPage() {
                                                             <Image src={inactiveUrl} alt={inactive.label} width={64} height={64}
                                                                    className="h-16 w-16 object-contain" unoptimized />
                                                         ) : (
-                                                            <span className="text-center text-[11px] text-slate-300">لا توجد أيقونة</span>
+                                                            <span className="text-center text-[11px] text-m3-outline-variant">لا توجد أيقونة</span>
                                                         )}
                                                     </div>
                                                 </div>
                                                 {inParsed ? (
-                                                    <div dir="ltr" className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-center font-mono text-[11px] text-slate-600">
+                                                    <div dir="ltr" className="rounded-lg border border-m3-outline-variant/60 bg-surface-card px-2 py-1 text-center font-mono text-[11px] text-m3-on-surface-variant">
                                                         {buildIconId(inParsed.name, inParsed.weight)}
                                                     </div>
                                                 ) : null}
-                                                <div className="space-y-2 border-t border-dashed border-slate-300 pt-3">
-                                                    <div className="text-[11px] font-medium text-slate-600">أو صورة مخصصة (PNG/WEBP):</div>
-                                                    <label className="block cursor-pointer rounded-lg border border-slate-300 bg-white px-3 py-2 text-center text-xs font-medium text-slate-700 transition hover:bg-slate-100">
+                                                <div className="space-y-2 border-t border-dashed border-m3-outline-variant pt-3">
+                                                    <div className="text-[11px] font-medium text-m3-on-surface-variant">أو صورة مخصصة (PNG/WEBP):</div>
+                                                    <label className="block cursor-pointer rounded-lg border border-m3-outline-variant bg-surface-card px-3 py-2 text-center text-xs font-medium text-m3-on-surface transition hover:bg-m3-surface-container-lowest">
                                                         اختيار ملف
                                                         <input type="file" accept="image/png,image/webp,image/jpeg" className="hidden"
                                                                onChange={(event) => handleFileChange(pair.inKey, event)} />
                                                     </label>
                                                     <button type="button" onClick={() => handleRemoveIcon(pair.inKey)}
-                                                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-700 transition hover:bg-slate-100">
+                                                            className="w-full rounded-lg border border-m3-outline-variant/60 bg-surface-card px-3 py-1.5 text-[11px] text-m3-on-surface transition hover:bg-m3-surface-container-lowest">
                                                         إزالة الصورة
                                                     </button>
                                                 </div>
                                             </div>
                                             <div className="space-y-3 text-right">
-                                                <div className="text-sm font-semibold text-slate-900">حالة مفعّلة (عند فتح القسم)</div>
+                                                <div className="text-sm font-semibold text-m3-on-background">حالة مفعّلة (عند فتح القسم)</div>
                                                 <div className="grid grid-cols-2 gap-2">
                                                     <button type="button" onClick={() => setIconPickerField(activeIdKey)}
-                                                            className="rounded-lg bg-purple-600 px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-purple-700">
+                                                            className="rounded-lg bg-accent px-3 py-2 text-center text-sm font-medium text-m3-on-surface transition hover:bg-primary-container">
                                                         اختر من المكتبة
                                                     </button>
                                                     <button type="button" onClick={() => handleClearIconId(activeIdKey)} disabled={!activeId}
-                                                            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50">
+                                                            className="rounded-lg border border-m3-outline-variant/60 bg-surface-card px-3 py-2 text-sm text-m3-on-surface transition hover:bg-m3-surface-container-lowest disabled:cursor-not-allowed disabled:opacity-50">
                                                         إزالة الأيقونة
                                                     </button>
                                                 </div>
@@ -1791,24 +1791,24 @@ export default function AdminThemeSettingsPage() {
                                                             <Image src={activeUrl} alt={active.label} width={64} height={64}
                                                                    className="h-16 w-16 object-contain" unoptimized />
                                                         ) : (
-                                                            <span className="text-center text-[11px] text-slate-300">لا توجد أيقونة مفعّلة</span>
+                                                            <span className="text-center text-[11px] text-m3-outline-variant">لا توجد أيقونة مفعّلة</span>
                                                         )}
                                                     </div>
                                                 </div>
                                                 {activeParsed ? (
-                                                    <div dir="ltr" className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-center font-mono text-[11px] text-slate-600">
+                                                    <div dir="ltr" className="rounded-lg border border-m3-outline-variant/60 bg-surface-card px-2 py-1 text-center font-mono text-[11px] text-m3-on-surface-variant">
                                                         {buildIconId(activeParsed.name, activeParsed.weight)}
                                                     </div>
                                                 ) : null}
-                                                <div className="space-y-2 border-t border-dashed border-slate-300 pt-3">
-                                                    <div className="text-[11px] font-medium text-slate-600">أو صورة مخصصة (PNG/WEBP):</div>
-                                                    <label className="block cursor-pointer rounded-lg border border-purple-300 bg-purple-50 px-3 py-2 text-center text-xs font-medium text-purple-700 transition hover:bg-purple-100">
+                                                <div className="space-y-2 border-t border-dashed border-m3-outline-variant pt-3">
+                                                    <div className="text-[11px] font-medium text-m3-on-surface-variant">أو صورة مخصصة (PNG/WEBP):</div>
+                                                    <label className="block cursor-pointer rounded-lg border border-primary/40 bg-accent/10 px-3 py-2 text-center text-xs font-medium text-m3-primary transition hover:bg-accent/15">
                                                         اختيار ملف
                                                         <input type="file" accept="image/png,image/webp,image/jpeg" className="hidden"
                                                                onChange={(event) => handleFileChange(pair.activeKey, event)} />
                                                     </label>
                                                     <button type="button" onClick={() => handleRemoveIcon(pair.activeKey)}
-                                                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-700 transition hover:bg-slate-100">
+                                                            className="w-full rounded-lg border border-m3-outline-variant/60 bg-surface-card px-3 py-1.5 text-[11px] text-m3-on-surface transition hover:bg-m3-surface-container-lowest">
                                                         إزالة الصورة
                                                     </button>
                                                 </div>
@@ -1835,7 +1835,7 @@ export default function AdminThemeSettingsPage() {
             </div>
 
             {loading ? (
-                <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-500 shadow-sm">
+                <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card px-4 py-6 text-center text-sm text-m3-on-surface-variant shadow-sm">
                     جارٍ تحميل إعدادات المظهر...
                 </div>
             ) : null}
@@ -1861,12 +1861,12 @@ function IconPickerModal(props: {
     }, [query]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-            <div className="flex h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-                <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-5 py-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-m3-on-surface/60 p-4 backdrop-blur-sm">
+            <div className="flex h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-m3-outline-variant/60 bg-surface-card shadow-2xl">
+                <div className="flex items-center justify-between gap-3 border-b border-m3-outline-variant/60 bg-m3-background px-5 py-3">
                     <div className="text-right">
-                        <div className="font-bold text-slate-900">اختيار أيقونة — Phosphor Icons</div>
-                        <div className="text-[11px] text-slate-500">
+                        <div className="font-bold text-m3-on-background">اختيار أيقونة — Phosphor Icons</div>
+                        <div className="text-[11px] text-m3-on-surface-variant">
                             اختر الأيقونة ثمّ النمط (الوزن) الملائم. النمط المقترح:{" "}
                             <span className="font-semibold">
                                 {weight === "fill" ? "مملوء (الحالة المفعّلة)" : "عادي (الحالة العادية)"}
@@ -1874,12 +1874,12 @@ function IconPickerModal(props: {
                         </div>
                     </div>
                     <button type="button" onClick={props.onClose}
-                            className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100">
+                            className="rounded-lg border border-m3-outline-variant/60 bg-surface-card px-3 py-1.5 text-sm text-m3-on-surface transition hover:bg-m3-surface-container-lowest">
                         إغلاق
                     </button>
                 </div>
 
-                <div className="space-y-3 border-b border-slate-200 px-5 py-3">
+                <div className="space-y-3 border-b border-m3-outline-variant/60 px-5 py-3">
                     <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex flex-wrap items-center gap-1.5">
                             {PHOSPHOR_WEIGHTS.map((w) => {
@@ -1889,8 +1889,8 @@ function IconPickerModal(props: {
                                     <button key={w.key} type="button" onClick={() => setWeight(w.key)}
                                             className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
                                                 active
-                                                    ? "border-purple-500 bg-purple-50 text-purple-700 shadow-sm"
-                                                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                                                    ? "border-primary bg-accent/10 text-m3-primary shadow-sm"
+                                                    : "border-m3-outline-variant/60 bg-surface-card text-m3-on-surface hover:bg-m3-background"
                                             }`}>
                                         {Comp ? <Comp size={16} /> : null}
                                         {w.label}
@@ -1898,18 +1898,18 @@ function IconPickerModal(props: {
                                 );
                             })}
                         </div>
-                        <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-purple-400 focus-within:ring-2 focus-within:ring-purple-100">
-                            <Pi.MagnifyingGlass size={16} className="ml-2 shrink-0 text-slate-400" weight="bold" />
+                        <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-m3-outline-variant/60 bg-surface-card focus-within:border-primary/70 focus-within:ring-2 focus-within:ring-purple-100">
+                            <Pi.MagnifyingGlass size={16} className="ml-2 shrink-0 text-m3-outline" weight="bold" />
                             <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
                                    placeholder="ابحث باسم الأيقونة (home, search, gem, heart...)"
-                                   className="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-sm text-slate-900 outline-none placeholder:text-slate-400" />
+                                   className="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-sm text-m3-on-background outline-none placeholder:text-m3-outline" />
                         </div>
                     </div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-5 py-4">
                     {filtered.length === 0 ? (
-                        <div className="rounded-xl border border-dashed border-slate-300 py-12 text-center text-sm text-slate-500">
+                        <div className="rounded-xl border border-dashed border-m3-outline-variant py-12 text-center text-sm text-m3-on-surface-variant">
                             لا توجد أيقونات مطابقة للبحث.
                         </div>
                     ) : (
@@ -1921,9 +1921,9 @@ function IconPickerModal(props: {
                                     <button key={item.name} type="button"
                                             title={`${item.label} — ${item.name} (${weight})`}
                                             onClick={() => props.onPick(item.name, weight)}
-                                            className="group flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border border-slate-200 bg-slate-50/50 p-1.5 text-center transition hover:-translate-y-0.5 hover:border-purple-400 hover:bg-purple-50 hover:shadow-md active:translate-y-0">
-                                        <Comp size={24} className="text-slate-700 group-hover:text-purple-600" />
-                                        <span className="truncate text-[9px] font-medium text-slate-500 group-hover:text-purple-700">
+                                            className="group flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border border-m3-outline-variant/60 bg-m3-background/50 p-1.5 text-center transition hover:-translate-y-0.5 hover:border-primary/70 hover:bg-accent/10 hover:shadow-md active:translate-y-0">
+                                        <Comp size={24} className="text-m3-on-surface group-hover:text-accent" />
+                                        <span className="truncate text-[9px] font-medium text-m3-on-surface-variant group-hover:text-m3-primary">
                                             {item.label}
                                         </span>
                                     </button>
@@ -1933,7 +1933,7 @@ function IconPickerModal(props: {
                     )}
                 </div>
 
-                <div className="flex items-center justify-between gap-2 border-t border-slate-200 bg-slate-50 px-5 py-2.5 text-[11px] text-slate-500">
+                <div className="flex items-center justify-between gap-2 border-t border-m3-outline-variant/60 bg-m3-background px-5 py-2.5 text-[11px] text-m3-on-surface-variant">
                     <span>
                         المكتبة تحتوي على 78 أيقونة × 6 أنماط (Phosphor Icons) — يتطابق مع Flutter مباشرةً.
                     </span>

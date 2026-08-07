@@ -217,11 +217,11 @@ export function HomeSliderManager({ heading, description }: HomeSliderManagerPro
 
     return (
         <div className="space-y-6" dir="rtl">
-            <div className="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-4 rounded-3xl border border-m3-outline-variant/60 bg-surface-card p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
                 <div className="space-y-2">
-                    <h1 className="text-2xl font-bold text-slate-900">{heading}</h1>
-                    {description ? <p className="max-w-3xl text-sm leading-6 text-slate-600">{description}</p> : null}
-                    <div className="inline-flex items-center gap-2 rounded-full bg-pink-50 px-3 py-1 text-xs font-semibold text-pink-700">
+                    <h1 className="text-2xl font-bold text-m3-on-background">{heading}</h1>
+                    {description ? <p className="max-w-3xl text-sm leading-6 text-m3-on-surface-variant">{description}</p> : null}
+                    <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
                         <ImageIcon size={14} />
                         هذه الصور تظهر داخل أول نافذة في الصفحة الرئيسية وتتحرك كسلايدر تلقائي
                     </div>
@@ -232,7 +232,7 @@ export function HomeSliderManager({ heading, description }: HomeSliderManagerPro
                         setShowForm(!showForm);
                         if (showForm) resetForm();
                     }}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-pink-600 px-5 py-3 text-sm font-bold text-white shadow-[0_14px_35px_rgba(219,39,119,0.28)] transition hover:bg-pink-700"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-accent px-5 py-3 text-sm font-bold text-m3-on-surface shadow-[0_14px_35px_rgba(219,39,119,0.28)] transition hover:bg-accent"
                 >
                     <Plus size={18} />
                     إضافة صور للسلايدر
@@ -240,24 +240,24 @@ export function HomeSliderManager({ heading, description }: HomeSliderManagerPro
             </div>
 
             <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-                <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <section className="rounded-3xl border border-m3-outline-variant/60 bg-surface-card p-6 shadow-sm">
                     <div className="mb-4 flex items-center justify-between gap-3">
                         <div>
-                            <h2 className="text-lg font-bold text-slate-900">معاينة سلايدر الصفحة الرئيسية</h2>
-                            <p className="text-sm text-slate-500">هذه هي الصور النشطة التي ستظهر الآن في واجهة الموقع.</p>
+                            <h2 className="text-lg font-bold text-m3-on-background">معاينة سلايدر الصفحة الرئيسية</h2>
+                            <p className="text-sm text-m3-on-surface-variant">هذه هي الصور النشطة التي ستظهر الآن في واجهة الموقع.</p>
                         </div>
-                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                        <span className="rounded-full bg-m3-surface-container-lowest px-3 py-1 text-xs font-semibold text-m3-on-surface-variant">
                             {homepageSlides.length} صورة نشطة
                         </span>
                     </div>
 
-                    <div className="grid aspect-[4/3] overflow-hidden rounded-[2rem] border border-slate-200 bg-[#151923] shadow-[0_18px_65px_rgba(255,86,170,0.12)]">
+                    <div className="grid aspect-[4/3] overflow-hidden rounded-[2rem] border border-m3-outline-variant/60 bg-[#151923] shadow-[0_18px_65px_rgba(255,86,170,0.12)]">
                         {homepageSlides.length > 0 ? (
                             <div className="grid h-full grid-rows-3">
                                 {[0, 1, 2].map((row) => {
                                     const slide = homepageSlides[row % homepageSlides.length];
                                     return (
-                                        <div key={`${slide.url}-${row}`} className="relative border-white/10 [&:not(:first-child)]:border-t">
+                                        <div key={`${slide.url}-${row}`} className="relative border-m3-outline-variant/10 [&:not(:first-child)]:border-t">
                                             <NextImage
                                                 src={slide.url}
                                                 alt={slide.bannerTitle}
@@ -271,16 +271,16 @@ export function HomeSliderManager({ heading, description }: HomeSliderManagerPro
                                 })}
                             </div>
                         ) : (
-                            <div className="grid place-items-center px-6 text-center text-sm text-white/65">
+                            <div className="grid place-items-center px-6 text-center text-sm text-m3-on-surface/65">
                                 لا توجد صور نشطة الآن. أضف صوراً جديدة وفعّلها ليظهر السلايدر في الصفحة الرئيسية.
                             </div>
                         )}
                     </div>
                 </section>
 
-                <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <h2 className="text-lg font-bold text-slate-900">ملاحظات مهمة</h2>
-                    <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-600">
+                <section className="rounded-3xl border border-m3-outline-variant/60 bg-surface-card p-6 shadow-sm">
+                    <h2 className="text-lg font-bold text-m3-on-background">ملاحظات مهمة</h2>
+                    <ul className="mt-4 space-y-3 text-sm leading-6 text-m3-on-surface-variant">
                         <li>الصور النشطة فقط هي التي تظهر في أول نافذة داخل الصفحة الرئيسية.</li>
                         <li>يمكنك رفع عدة صور داخل نفس السلايدر، وسيتم تدويرها تلقائياً.</li>
                         <li>الفيديو مدعوم داخل الإدارة، لكن واجهة الصفحة الرئيسية تعرض الصور فقط حالياً.</li>
@@ -290,46 +290,46 @@ export function HomeSliderManager({ heading, description }: HomeSliderManagerPro
             </div>
 
             {showForm ? (
-                <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <h2 className="mb-2 text-lg font-bold text-slate-900">إضافة سلايدر جديد للواجهة الرئيسية</h2>
-                    <p className="mb-6 text-sm text-slate-500">ارفع الصور بالترتيب الذي تريده. أول الصور المرفوعة ستكون أول ما يظهر للمستخدم.</p>
+                <div className="rounded-3xl border border-m3-outline-variant/60 bg-surface-card p-6 shadow-sm">
+                    <h2 className="mb-2 text-lg font-bold text-m3-on-background">إضافة سلايدر جديد للواجهة الرئيسية</h2>
+                    <p className="mb-6 text-sm text-m3-on-surface-variant">ارفع الصور بالترتيب الذي تريده. أول الصور المرفوعة ستكون أول ما يظهر للمستخدم.</p>
 
                     <form onSubmit={handleCreateBanner} className="space-y-5">
                         <div>
-                            <label className="mb-1 block text-sm font-medium text-slate-700">عنوان داخلي</label>
+                            <label className="mb-1 block text-sm font-medium text-m3-on-surface">عنوان داخلي</label>
                             <input
                                 type="text"
                                 required
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-pink-400"
+                                className="w-full rounded-xl border border-m3-outline-variant/60 px-4 py-3 outline-none transition focus:border-primary/70"
                                 placeholder="مثال: صور الواجهة الرئيسية لشهر مايو"
                             />
                         </div>
 
                         <div>
-                            <label className="mb-1 block text-sm font-medium text-slate-700">رابط اختياري</label>
+                            <label className="mb-1 block text-sm font-medium text-m3-on-surface">رابط اختياري</label>
                             <input
                                 type="url"
                                 value={linkUrl}
                                 onChange={(e) => setLinkUrl(e.target.value)}
-                                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-left outline-none transition focus:border-pink-400"
+                                className="w-full rounded-xl border border-m3-outline-variant/60 px-4 py-3 text-left outline-none transition focus:border-primary/70"
                                 dir="ltr"
                                 placeholder="https://example.com"
                             />
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-slate-700">
+                            <label className="mb-2 block text-sm font-medium text-m3-on-surface">
                                 ملفات السلايدر - حتى {MAX_MEDIA_ITEMS} عناصر
                             </label>
 
                             {mediaItems.length > 0 ? (
                                 <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
                                     {mediaItems.map((item, index) => (
-                                        <div key={`${item._previewUrl ?? item.url}-${index}`} className="relative aspect-video overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                                        <div key={`${item._previewUrl ?? item.url}-${index}`} className="relative aspect-video overflow-hidden rounded-2xl border border-m3-outline-variant/60 bg-m3-background">
                                             {item.type === 'video' ? (
-                                                <div className="flex h-full flex-col items-center justify-center gap-2 text-slate-500">
+                                                <div className="flex h-full flex-col items-center justify-center gap-2 text-m3-on-surface-variant">
                                                     <Film size={28} />
                                                     <span className="text-xs font-semibold">فيديو</span>
                                                 </div>
@@ -343,13 +343,13 @@ export function HomeSliderManager({ heading, description }: HomeSliderManagerPro
                                                 />
                                             )}
 
-                                            <span className="absolute right-2 top-2 rounded-full bg-black/65 px-2 py-1 text-xs font-bold text-white">
+                                            <span className="absolute right-2 top-2 rounded-full bg-m3-on-surface/65 px-2 py-1 text-xs font-bold text-m3-on-surface">
                                                 {index + 1}
                                             </span>
                                             <button
                                                 type="button"
                                                 onClick={() => removeMediaItem(index)}
-                                                className="absolute left-2 top-2 rounded-full bg-red-500 p-1 text-white transition hover:bg-red-600"
+                                                className="absolute left-2 top-2 rounded-full bg-red-500 p-1 text-m3-on-surface transition hover:bg-red-600"
                                             >
                                                 <XCircle size={16} />
                                             </button>
@@ -361,12 +361,12 @@ export function HomeSliderManager({ heading, description }: HomeSliderManagerPro
                             {mediaItems.length < MAX_MEDIA_ITEMS ? (
                                 <div
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="cursor-pointer rounded-3xl border-2 border-dashed border-pink-300 bg-pink-50 p-8 text-center transition hover:bg-pink-100"
+                                    className="cursor-pointer rounded-3xl border-2 border-dashed border-primary/40 bg-accent/10 p-8 text-center transition hover:bg-accent/15"
                                 >
                                     <div className="flex flex-col items-center gap-2">
-                                        <Upload className="text-pink-600" size={28} />
-                                        <div className="text-sm font-bold text-pink-700">اضغط هنا لرفع صور السلايدر</div>
-                                        <div className="text-xs text-slate-500">JPG, PNG, WEBP أو فيديوهات قصيرة إذا احتجتها لاحقاً</div>
+                                        <Upload className="text-accent" size={28} />
+                                        <div className="text-sm font-bold text-accent">اضغط هنا لرفع صور السلايدر</div>
+                                        <div className="text-xs text-m3-on-surface-variant">JPG, PNG, WEBP أو فيديوهات قصيرة إذا احتجتها لاحقاً</div>
                                     </div>
                                     <input
                                         ref={fileInputRef}
@@ -380,31 +380,31 @@ export function HomeSliderManager({ heading, description }: HomeSliderManagerPro
                             ) : null}
                         </div>
 
-                        <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
+                        <div className="flex items-center gap-3 rounded-2xl bg-m3-background px-4 py-3">
                             <input
                                 id="is-active"
                                 type="checkbox"
                                 checked={isActive}
                                 onChange={(e) => setIsActive(e.target.checked)}
-                                className="h-5 w-5 rounded border-slate-300 text-pink-600"
+                                className="h-5 w-5 rounded border-m3-outline-variant text-accent"
                             />
-                            <label htmlFor="is-active" className="cursor-pointer text-sm font-medium text-slate-700">
+                            <label htmlFor="is-active" className="cursor-pointer text-sm font-medium text-m3-on-surface">
                                 تفعيل السلايدر مباشرة بعد الحفظ
                             </label>
                         </div>
 
-                        <div className="flex items-center gap-3 border-t border-slate-100 pt-4">
+                        <div className="flex items-center gap-3 border-t border-m3-surface-container-low pt-4">
                             <button
                                 type="submit"
                                 disabled={isSubmitting || !title || mediaItems.length === 0}
-                                className="rounded-2xl bg-emerald-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="rounded-2xl bg-emerald-600 px-6 py-3 text-sm font-bold text-m3-on-surface transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {isSubmitting ? 'جاري الحفظ...' : 'حفظ السلايدر'}
                             </button>
                             <button
                                 type="button"
                                 onClick={resetForm}
-                                className="rounded-2xl border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                                className="rounded-2xl border border-m3-outline-variant/60 px-6 py-3 text-sm font-semibold text-m3-on-surface-variant transition hover:bg-m3-background"
                             >
                                 إلغاء
                             </button>
@@ -413,24 +413,24 @@ export function HomeSliderManager({ heading, description }: HomeSliderManagerPro
                 </div>
             ) : null}
 
-            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                <div className="border-b border-slate-100 px-6 py-4">
-                    <h3 className="text-lg font-bold text-slate-900">كل السلايدرات المحفوظة</h3>
+            <div className="overflow-hidden rounded-3xl border border-m3-outline-variant/60 bg-surface-card shadow-sm">
+                <div className="border-b border-m3-surface-container-low px-6 py-4">
+                    <h3 className="text-lg font-bold text-m3-on-background">كل السلايدرات المحفوظة</h3>
                 </div>
 
                 {isLoading ? (
-                    <div className="p-8 text-center text-slate-500">جاري التحميل...</div>
+                    <div className="p-8 text-center text-m3-on-surface-variant">جاري التحميل...</div>
                 ) : banners.length === 0 ? (
-                    <div className="p-8 text-center text-slate-500">لا توجد أي صور أو سلايدرات محفوظة حالياً.</div>
+                    <div className="p-8 text-center text-m3-on-surface-variant">لا توجد أي صور أو سلايدرات محفوظة حالياً.</div>
                 ) : (
                     <div className="divide-y divide-slate-100">
                         {banners.map((banner) => (
-                            <div key={banner.id} className={`flex flex-col gap-4 p-5 lg:flex-row ${banner.is_active ? 'bg-pink-50/40' : ''}`}>
+                            <div key={banner.id} className={`flex flex-col gap-4 p-5 lg:flex-row ${banner.is_active ? 'bg-accent/10/40' : ''}`}>
                                 <div className="flex gap-2">
                                     {(banner.media_items ?? []).slice(0, 3).map((item, index) => (
-                                        <div key={`${item.url}-${index}`} className="relative h-16 w-24 overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+                                        <div key={`${item.url}-${index}`} className="relative h-16 w-24 overflow-hidden rounded-xl border border-m3-outline-variant/60 bg-m3-surface-container-lowest">
                                             {item.type === 'video' ? (
-                                                <div className="flex h-full flex-col items-center justify-center text-slate-400">
+                                                <div className="flex h-full flex-col items-center justify-center text-m3-outline">
                                                     <Film size={18} />
                                                     <span className="text-[10px]">فيديو</span>
                                                 </div>
@@ -449,22 +449,22 @@ export function HomeSliderManager({ heading, description }: HomeSliderManagerPro
 
                                 <div className="min-w-0 flex-1">
                                     <div className="flex flex-wrap items-center gap-2">
-                                        <h4 className="text-base font-bold text-slate-900">{banner.title}</h4>
+                                        <h4 className="text-base font-bold text-m3-on-background">{banner.title}</h4>
                                         {banner.is_active ? (
                                             <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700">
                                                 نشط على الصفحة الرئيسية
                                             </span>
                                         ) : (
-                                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-500">
+                                            <span className="rounded-full bg-m3-surface-container-lowest px-2.5 py-1 text-xs font-bold text-m3-on-surface-variant">
                                                 غير نشط
                                             </span>
                                         )}
                                     </div>
-                                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
-                                        <span className="rounded-full bg-slate-100 px-2.5 py-1">
+                                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-m3-on-surface-variant">
+                                        <span className="rounded-full bg-m3-surface-container-lowest px-2.5 py-1">
                                             {(banner.media_items ?? []).length} عنصر
                                         </span>
-                                        <span className="rounded-full bg-slate-100 px-2.5 py-1">
+                                        <span className="rounded-full bg-m3-surface-container-lowest px-2.5 py-1">
                                             {new Date(banner.created_at).toLocaleDateString('ar-IQ')}
                                         </span>
                                     </div>
@@ -486,7 +486,7 @@ export function HomeSliderManager({ heading, description }: HomeSliderManagerPro
                                         onClick={() => toggleActiveStatus(banner.id, banner.is_active)}
                                         className={`inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-xs font-bold transition ${banner.is_active
                                             ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            : 'bg-m3-surface-container-lowest text-m3-on-surface-variant hover:bg-m3-surface-container-low'
                                             }`}
                                     >
                                         <CheckCircle2 size={16} />

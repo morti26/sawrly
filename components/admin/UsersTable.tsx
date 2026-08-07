@@ -283,7 +283,7 @@ export default function UsersTable({ role }: UsersTableProps) {
     };
 
     const getRoleBadgeClass = (userRole: string) => {
-        if (userRole === 'creator') return 'bg-purple-100 text-purple-700';
+        if (userRole === 'creator') return 'bg-accent/15 text-m3-primary';
         if (userRole === 'admin') return 'bg-red-100 text-red-700';
         if (userRole === 'moderator') return 'bg-amber-100 text-amber-700';
         return 'bg-blue-100 text-blue-700';
@@ -311,7 +311,7 @@ export default function UsersTable({ role }: UsersTableProps) {
                 {canManageUsers ? (
                     <button
                         onClick={handleAddClick}
-                        className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow-sm shadow-blue-500/30 transition-all hover:bg-blue-700"
+                        className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-m3-on-surface shadow-sm shadow-blue-500/30 transition-all hover:bg-blue-700"
                     >
                         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -319,27 +319,27 @@ export default function UsersTable({ role }: UsersTableProps) {
                         إضافة {getAddLabel()}
                     </button>
                 ) : (
-                    <div className="text-sm font-medium text-slate-500">عرض فقط للمراقب</div>
+                    <div className="text-sm font-medium text-m3-on-surface-variant">عرض فقط للمراقب</div>
                 )}
             </div>
 
-            <div className="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
-                <table className="min-w-full bg-white text-sm">
+            <div className="overflow-x-auto rounded-lg border border-m3-outline-variant/60 shadow-sm">
+                <table className="min-w-full bg-surface-card text-sm">
                     <thead>
-                        <tr className="border-b border-slate-200 bg-slate-50">
-                            <th className="px-6 py-4 text-right font-semibold text-slate-600">الاسم</th>
-                            <th className="px-6 py-4 text-right font-semibold text-slate-600">البريد</th>
-                            <th className="px-6 py-4 text-right font-semibold text-slate-600">الدور</th>
-                            <th className="px-6 py-4 text-right font-semibold text-slate-600">المشاريع</th>
-                            <th className="px-6 py-4 text-right font-semibold text-slate-600">تاريخ الانضمام</th>
-                            <th className="px-6 py-4 text-center font-semibold text-slate-600">الإجراءات</th>
+                        <tr className="border-b border-m3-outline-variant/60 bg-m3-background">
+                            <th className="px-6 py-4 text-right font-semibold text-m3-on-surface-variant">الاسم</th>
+                            <th className="px-6 py-4 text-right font-semibold text-m3-on-surface-variant">البريد</th>
+                            <th className="px-6 py-4 text-right font-semibold text-m3-on-surface-variant">الدور</th>
+                            <th className="px-6 py-4 text-right font-semibold text-m3-on-surface-variant">المشاريع</th>
+                            <th className="px-6 py-4 text-right font-semibold text-m3-on-surface-variant">تاريخ الانضمام</th>
+                            <th className="px-6 py-4 text-center font-semibold text-m3-on-surface-variant">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                         {users.map((user) => (
-                            <tr key={user.id} className="transition-colors hover:bg-slate-50">
-                                <td className="px-6 py-4 text-right font-medium text-slate-800">{user.name}</td>
-                                <td className="px-6 py-4 text-right font-mono text-xs text-slate-500" dir="ltr">{user.email}</td>
+                            <tr key={user.id} className="transition-colors hover:bg-m3-background">
+                                <td className="px-6 py-4 text-right font-medium text-m3-on-surface">{user.name}</td>
+                                <td className="px-6 py-4 text-right font-mono text-xs text-m3-on-surface-variant" dir="ltr">{user.email}</td>
                                 <td className="px-6 py-4 text-right">
                                     <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ${getRoleBadgeClass(user.role)}`}>
                                         {getRoleLabel(user.role)}
@@ -352,8 +352,8 @@ export default function UsersTable({ role }: UsersTableProps) {
                                         </div>
                                     )}
                                 </td>
-                                <td className="px-6 py-4 text-right font-medium text-slate-600">{user.project_count}</td>
-                                <td className="px-6 py-4 text-right text-slate-500">
+                                <td className="px-6 py-4 text-right font-medium text-m3-on-surface-variant">{user.project_count}</td>
+                                <td className="px-6 py-4 text-right text-m3-on-surface-variant">
                                     {new Date(user.created_at).toLocaleDateString('ar-IQ')}
                                 </td>
                                 <td className="px-6 py-4 text-center">
@@ -390,14 +390,14 @@ export default function UsersTable({ role }: UsersTableProps) {
                                             </button>
                                         </div>
                                     ) : (
-                                        <span className="text-slate-400">لا يوجد</span>
+                                        <span className="text-m3-outline">لا يوجد</span>
                                     )}
                                 </td>
                             </tr>
                         ))}
                         {users.length === 0 && (
                             <tr>
-                                <td colSpan={6} className="py-12 text-center font-medium text-slate-500">
+                                <td colSpan={6} className="py-12 text-center font-medium text-m3-on-surface-variant">
                                     لا يوجد مستخدمين.
                                 </td>
                             </tr>
@@ -407,15 +407,15 @@ export default function UsersTable({ role }: UsersTableProps) {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-                    <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl">
-                        <div className="flex items-center justify-between border-b border-slate-100 p-6">
-                            <h3 className="text-xl font-bold text-slate-800">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-m3-surface-container-highest/50 p-4 backdrop-blur-sm">
+                    <div className="w-full max-w-md overflow-hidden rounded-2xl bg-surface-card shadow-xl">
+                        <div className="flex items-center justify-between border-b border-m3-surface-container-low p-6">
+                            <h3 className="text-xl font-bold text-m3-on-surface">
                                 {isEditing ? 'تعديل المستخدم' : `إضافة ${getAddLabel()} جديد`}
                             </h3>
                             <button
                                 onClick={() => setIsModalOpen(false)}
-                                className="text-slate-400 transition-colors hover:text-slate-600"
+                                className="text-m3-outline transition-colors hover:text-m3-on-surface-variant"
                             >
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -425,13 +425,13 @@ export default function UsersTable({ role }: UsersTableProps) {
                         <div className="p-6">
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label className="mb-1 block text-sm font-medium text-slate-700">الاسم الكامل</label>
+                                    <label className="mb-1 block text-sm font-medium text-m3-on-surface">الاسم الكامل</label>
                                     <input
                                         type="text"
                                         required
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        className="w-full rounded-lg border-2 border-slate-200 p-2.5 transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
+                                        className="w-full rounded-lg border-2 border-m3-outline-variant/60 p-2.5 transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
                                     />
                                 </div>
 
@@ -439,11 +439,11 @@ export default function UsersTable({ role }: UsersTableProps) {
                                     <>
                                             {!role && (
                                             <div>
-                                                <label className="mb-1 block text-sm font-medium text-slate-700">الدور</label>
+                                                <label className="mb-1 block text-sm font-medium text-m3-on-surface">الدور</label>
                                                 <select
                                                     value={selectedRole}
                                                     onChange={(e) => setSelectedRole(e.target.value as ManagedRole)}
-                                                    className="w-full rounded-lg border-2 border-slate-200 p-2.5 transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
+                                                    className="w-full rounded-lg border-2 border-m3-outline-variant/60 p-2.5 transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
                                                 >
                                                     <option value="client">عميل</option>
                                                     <option value="creator">مبدع</option>
@@ -457,13 +457,13 @@ export default function UsersTable({ role }: UsersTableProps) {
                                             </div>
                                         )}
                                         <div>
-                                            <label className="mb-1 block text-sm font-medium text-slate-700">البريد الإلكتروني</label>
+                                            <label className="mb-1 block text-sm font-medium text-m3-on-surface">البريد الإلكتروني</label>
                                             <input
                                                 type="email"
                                                 required
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
-                                                className="w-full rounded-lg border-2 border-slate-200 p-2.5 text-left transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
+                                                className="w-full rounded-lg border-2 border-m3-outline-variant/60 p-2.5 text-left transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
                                                 dir="ltr"
                                             />
                                         </div>
@@ -471,7 +471,7 @@ export default function UsersTable({ role }: UsersTableProps) {
                                 )}
 
                                 <div>
-                                    <label className="mb-1 block text-sm font-medium text-slate-700">
+                                    <label className="mb-1 block text-sm font-medium text-m3-on-surface">
                                         {isEditing ? 'كلمة المرور الجديدة (اختياري)' : 'كلمة المرور'}
                                     </label>
                                     <input
@@ -479,37 +479,37 @@ export default function UsersTable({ role }: UsersTableProps) {
                                         required={!isEditing}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full rounded-lg border-2 border-slate-200 p-2.5 text-left transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
+                                        className="w-full rounded-lg border-2 border-m3-outline-variant/60 p-2.5 text-left transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
                                         dir="ltr"
                                         placeholder={isEditing ? 'اتركها فارغة بدون تغيير' : ''}
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="mb-1 block text-sm font-medium text-slate-700">رقم الهاتف (اختياري)</label>
+                                    <label className="mb-1 block text-sm font-medium text-m3-on-surface">رقم الهاتف (اختياري)</label>
                                     <input
                                         type="tel"
                                         value={phone}
                                         onChange={(e) => setPhone(e.target.value)}
-                                        className="w-full rounded-lg border-2 border-slate-200 p-2.5 text-left transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
+                                        className="w-full rounded-lg border-2 border-m3-outline-variant/60 p-2.5 text-left transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
                                         dir="ltr"
                                     />
                                 </div>
 
                                   {isEditing && isCurrentUserSuperAdmin && !role && (
                                       <div>
-                                          <label className="mb-1 block text-sm font-medium text-slate-700">الصلاحية الإدارية</label>
+                                          <label className="mb-1 block text-sm font-medium text-m3-on-surface">الصلاحية الإدارية</label>
                                           <select
                                               value={selectedRole}
                                               onChange={(e) => setSelectedRole(e.target.value as ManagedRole)}
-                                              className="w-full rounded-lg border-2 border-slate-200 p-2.5 transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
+                                              className="w-full rounded-lg border-2 border-m3-outline-variant/60 p-2.5 transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
                                           >
                                               <option value="client">عميل</option>
                                               <option value="creator">مبدع</option>
                                               <option value="moderator">مراقب</option>
                                               <option value="admin">مدير</option>
                                           </select>
-                                          <p className="mt-2 text-xs text-slate-500">
+                                          <p className="mt-2 text-xs text-m3-on-surface-variant">
                                               هذا الخيار ظاهر فقط للسوبر أدمن لتغيير صلاحيات المديرين والمراقبين.
                                           </p>
                                       </div>
@@ -524,14 +524,14 @@ export default function UsersTable({ role }: UsersTableProps) {
                                 <div className="mt-8 flex gap-3">
                                     <button
                                         type="submit"
-                                        className="flex-1 rounded-lg bg-blue-600 py-3 font-bold text-white shadow-md shadow-blue-500/20 transition-all hover:bg-blue-700"
+                                        className="flex-1 rounded-lg bg-blue-600 py-3 font-bold text-m3-on-surface shadow-md shadow-blue-500/20 transition-all hover:bg-blue-700"
                                     >
                                         حفظ البيانات
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setIsModalOpen(false)}
-                                        className="flex-1 rounded-lg bg-slate-100 py-3 font-bold text-slate-700 transition-all hover:bg-slate-200"
+                                        className="flex-1 rounded-lg bg-m3-surface-container-lowest py-3 font-bold text-m3-on-surface transition-all hover:bg-m3-surface-container-low"
                                     >
                                         إلغاء
                                     </button>
@@ -543,13 +543,13 @@ export default function UsersTable({ role }: UsersTableProps) {
             )}
 
             {freezeDialog && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-                    <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl">
-                        <div className="border-b border-slate-100 p-6">
-                            <h3 className="text-xl font-bold text-slate-800">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-m3-surface-container-highest/50 p-4 backdrop-blur-sm">
+                    <div className="w-full max-w-md overflow-hidden rounded-2xl bg-surface-card shadow-xl">
+                        <div className="border-b border-m3-surface-container-low p-6">
+                            <h3 className="text-xl font-bold text-m3-on-surface">
                                 {freezeDialog.mode === 'freeze' ? 'تجميد المبدع' : 'إلغاء تجميد المبدع'}
                             </h3>
-                            <p className="mt-1 text-sm text-slate-500">
+                            <p className="mt-1 text-sm text-m3-on-surface-variant">
                                 {freezeDialog.user.name}
                             </p>
                         </div>
@@ -557,7 +557,7 @@ export default function UsersTable({ role }: UsersTableProps) {
                         <form onSubmit={submitFreezeAction} className="space-y-4 p-6">
                             {freezeDialog.mode === 'freeze' ? (
                                 <div>
-                                    <label className="mb-1 block text-sm font-medium text-slate-700">
+                                    <label className="mb-1 block text-sm font-medium text-m3-on-surface">
                                         كم عدد الأيام لتجميد هذا المبدع؟
                                     </label>
                                     <input
@@ -566,11 +566,11 @@ export default function UsersTable({ role }: UsersTableProps) {
                                         max={365}
                                         value={freezeDaysInput}
                                         onChange={(e) => setFreezeDaysInput(e.target.value)}
-                                        className="w-full rounded-lg border-2 border-slate-200 p-2.5 transition-all focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-500/10"
+                                        className="w-full rounded-lg border-2 border-m3-outline-variant/60 p-2.5 transition-all focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-500/10"
                                     />
                                 </div>
                             ) : (
-                                <p className="text-sm text-slate-700">
+                                <p className="text-sm text-m3-on-surface">
                                     هل تريد إلغاء تجميد هذا المبدع الآن؟
                                 </p>
                             )}
@@ -585,7 +585,7 @@ export default function UsersTable({ role }: UsersTableProps) {
                                 <button
                                     type="submit"
                                     disabled={isFreezeActionLoading}
-                                    className={`flex-1 rounded-lg py-3 font-bold text-white shadow-md transition-all ${freezeDialog.mode === 'freeze'
+                                    className={`flex-1 rounded-lg py-3 font-bold text-m3-on-surface shadow-md transition-all ${freezeDialog.mode === 'freeze'
                                         ? 'bg-amber-600 shadow-amber-500/20 hover:bg-amber-700'
                                         : 'bg-emerald-600 shadow-emerald-500/20 hover:bg-emerald-700'
                                         } disabled:cursor-not-allowed disabled:opacity-60`}
@@ -598,7 +598,7 @@ export default function UsersTable({ role }: UsersTableProps) {
                                     type="button"
                                     onClick={closeFreezeDialog}
                                     disabled={isFreezeActionLoading}
-                                    className="flex-1 rounded-lg bg-slate-100 py-3 font-bold text-slate-700 transition-all hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="flex-1 rounded-lg bg-m3-surface-container-lowest py-3 font-bold text-m3-on-surface transition-all hover:bg-m3-surface-container-low disabled:cursor-not-allowed disabled:opacity-60"
                                 >
                                     إلغاء
                                 </button>
@@ -609,15 +609,15 @@ export default function UsersTable({ role }: UsersTableProps) {
             )}
 
             {deleteDialogUser && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-                    <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl">
-                        <div className="border-b border-slate-100 p-6">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-m3-surface-container-highest/50 p-4 backdrop-blur-sm">
+                    <div className="w-full max-w-md overflow-hidden rounded-2xl bg-surface-card shadow-xl">
+                        <div className="border-b border-m3-surface-container-low p-6">
                             <h3 className="text-xl font-bold text-red-700">تأكيد حذف المستخدم</h3>
-                            <p className="mt-1 text-sm text-slate-500">{deleteDialogUser.name}</p>
+                            <p className="mt-1 text-sm text-m3-on-surface-variant">{deleteDialogUser.name}</p>
                         </div>
 
                         <form onSubmit={submitDeleteAction} className="space-y-4 p-6">
-                            <p className="text-sm text-slate-700">
+                            <p className="text-sm text-m3-on-surface">
                                 هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع عن هذه العملية.
                             </p>
 
@@ -631,7 +631,7 @@ export default function UsersTable({ role }: UsersTableProps) {
                                 <button
                                     type="submit"
                                     disabled={isDeleteActionLoading}
-                                    className="flex-1 rounded-lg bg-red-600 py-3 font-bold text-white shadow-md shadow-red-500/20 transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="flex-1 rounded-lg bg-red-600 py-3 font-bold text-m3-on-surface shadow-md shadow-red-500/20 transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
                                 >
                                     {isDeleteActionLoading ? 'جاري الحذف...' : 'تأكيد الحذف'}
                                 </button>
@@ -639,7 +639,7 @@ export default function UsersTable({ role }: UsersTableProps) {
                                     type="button"
                                     onClick={closeDeleteDialog}
                                     disabled={isDeleteActionLoading}
-                                    className="flex-1 rounded-lg bg-slate-100 py-3 font-bold text-slate-700 transition-all hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="flex-1 rounded-lg bg-m3-surface-container-lowest py-3 font-bold text-m3-on-surface transition-all hover:bg-m3-surface-container-low disabled:cursor-not-allowed disabled:opacity-60"
                                 >
                                     إلغاء
                                 </button>

@@ -26,7 +26,7 @@ interface OfferRow {
 const statusClassMap: Record<OfferStatus, string> = {
     active: 'bg-green-100 text-green-700',
     inactive: 'bg-amber-100 text-amber-700',
-    archived: 'bg-slate-200 text-slate-700',
+    archived: 'bg-m3-surface-container-low text-m3-on-surface',
 };
 
 const statusLabels: Record<OfferStatus, string> = {
@@ -166,16 +166,16 @@ export default function OffersTable() {
             >
                 <button
                     type="submit"
-                    className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-m3-on-surface hover:bg-blue-700"
                 >
                     بحث
                 </button>
                 <div className="min-w-[180px]">
-                    <label className="mb-1 block text-sm font-medium text-slate-700">الحالة</label>
+                    <label className="mb-1 block text-sm font-medium text-m3-on-surface">الحالة</label>
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value as 'all' | OfferStatus)}
-                        className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                        className="w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2"
                     >
                         <option value="all">الكل</option>
                         <option value="active">نشط</option>
@@ -184,13 +184,13 @@ export default function OffersTable() {
                     </select>
                 </div>
                 <div className="min-w-[240px]">
-                    <label className="mb-1 block text-sm font-medium text-slate-700">بحث</label>
+                    <label className="mb-1 block text-sm font-medium text-m3-on-surface">بحث</label>
                     <input
                         type="text"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         placeholder="ابحث بالعنوان أو الوصف أو اسم المبدع"
-                        className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                        className="w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2"
                     />
                 </div>
             </form>
@@ -201,29 +201,29 @@ export default function OffersTable() {
                 </div>
             )}
 
-            <div className="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
-                <table className="min-w-full bg-white text-sm">
+            <div className="overflow-x-auto rounded-lg border border-m3-outline-variant/60 shadow-sm">
+                <table className="min-w-full bg-surface-card text-sm">
                     <thead>
-                        <tr className="border-b border-slate-200 bg-slate-50">
-                            <th className="px-4 py-4 text-center font-semibold text-slate-600">الإجراءات</th>
-                            <th className="px-4 py-4 text-right font-semibold text-slate-600">التاريخ</th>
-                            <th className="px-4 py-4 text-right font-semibold text-slate-600">الحالة</th>
-                            <th className="px-4 py-4 text-right font-semibold text-slate-600">الإحصائيات</th>
-                            <th className="px-4 py-4 text-right font-semibold text-slate-600">السعر</th>
-                            <th className="px-4 py-4 text-right font-semibold text-slate-600">المبدع</th>
-                            <th className="px-4 py-4 text-right font-semibold text-slate-600">العرض</th>
+                        <tr className="border-b border-m3-outline-variant/60 bg-m3-background">
+                            <th className="px-4 py-4 text-center font-semibold text-m3-on-surface-variant">الإجراءات</th>
+                            <th className="px-4 py-4 text-right font-semibold text-m3-on-surface-variant">التاريخ</th>
+                            <th className="px-4 py-4 text-right font-semibold text-m3-on-surface-variant">الحالة</th>
+                            <th className="px-4 py-4 text-right font-semibold text-m3-on-surface-variant">الإحصائيات</th>
+                            <th className="px-4 py-4 text-right font-semibold text-m3-on-surface-variant">السعر</th>
+                            <th className="px-4 py-4 text-right font-semibold text-m3-on-surface-variant">المبدع</th>
+                            <th className="px-4 py-4 text-right font-semibold text-m3-on-surface-variant">العرض</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                         {offers.map((offer) => (
-                            <tr key={offer.id} className="hover:bg-slate-50 transition-colors">
+                            <tr key={offer.id} className="hover:bg-m3-background transition-colors">
                                 <td className="px-4 py-4 text-center">
                                     <div className="flex flex-col items-center gap-2">
                                         <select
                                             value={offer.status}
                                             disabled={actionId === offer.id}
                                             onChange={(e) => handleStatusUpdate(offer.id, e.target.value as OfferStatus)}
-                                            className="rounded-md border border-slate-200 px-2 py-1 text-xs"
+                                            className="rounded-md border border-m3-outline-variant/60 px-2 py-1 text-xs"
                                         >
                                             <option value="active">نشط</option>
                                             <option value="inactive">غير نشط</option>
@@ -238,9 +238,9 @@ export default function OffersTable() {
                                         </button>
                                     </div>
                                 </td>
-                                <td className="px-4 py-4 text-right text-slate-500">
+                                <td className="px-4 py-4 text-right text-m3-on-surface-variant">
                                     <div>{new Date(offer.created_at).toLocaleDateString('ar-IQ')}</div>
-                                    <div className="mt-1 text-xs text-slate-400">
+                                    <div className="mt-1 text-xs text-m3-outline">
                                         تحديث: {new Date(offer.updated_at).toLocaleDateString('ar-IQ')}
                                     </div>
                                 </td>
@@ -251,13 +251,13 @@ export default function OffersTable() {
                                         {statusLabels[offer.status]}
                                     </span>
                                 </td>
-                                <td className="px-4 py-4 text-right text-xs text-slate-600">
+                                <td className="px-4 py-4 text-right text-xs text-m3-on-surface-variant">
                                     <div>الإعجابات: {offer.like_count}</div>
                                     <div>الطلبات: {offer.order_count}</div>
                                     <div>المشاهدات: {offer.view_count}</div>
                                 </td>
                                 <td className="px-4 py-4 text-right">
-                                    <div className="font-semibold text-slate-800" dir="ltr">
+                                    <div className="font-semibold text-m3-on-surface" dir="ltr">
                                         {Number(offer.price_iqd || 0).toLocaleString('en-US')} IQD
                                     </div>
                                     {offer.discount_percent > 0 && (
@@ -267,17 +267,17 @@ export default function OffersTable() {
                                     )}
                                 </td>
                                 <td className="px-4 py-4 text-right">
-                                    <div className="font-medium text-slate-700">{offer.creator_name}</div>
-                                    <div className="mt-1 text-[11px] font-mono text-slate-400" dir="ltr">
+                                    <div className="font-medium text-m3-on-surface">{offer.creator_name}</div>
+                                    <div className="mt-1 text-[11px] font-mono text-m3-outline" dir="ltr">
                                         {offer.creator_id}
                                     </div>
                                 </td>
                                 <td className="px-4 py-4 text-right">
                                     <div className="flex flex-row-reverse items-start gap-3">
-                                        <div className="h-16 w-16 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                                        <div className="h-16 w-16 overflow-hidden rounded-lg border border-m3-outline-variant/60 bg-m3-surface-container-lowest">
                                             {offer.image_url ? (
                                                 isVideoUrl(offer.image_url) ? (
-                                                    <div className="flex h-full items-center justify-center bg-slate-900 text-xs font-bold text-white">
+                                                    <div className="flex h-full items-center justify-center bg-m3-surface-container-highest text-xs font-bold text-m3-on-surface">
                                                         VIDEO
                                                     </div>
                                                 ) : (
@@ -291,17 +291,17 @@ export default function OffersTable() {
                                                     />
                                                 )
                                             ) : (
-                                                <div className="flex h-full items-center justify-center text-xs text-slate-400">
+                                                <div className="flex h-full items-center justify-center text-xs text-m3-outline">
                                                     No Media
                                                 </div>
                                             )}
                                         </div>
                                         <div className="min-w-[220px]">
-                                            <div className="font-semibold text-slate-800">{offer.title}</div>
-                                            <div className="mt-1 line-clamp-2 text-xs text-slate-500">
+                                            <div className="font-semibold text-m3-on-surface">{offer.title}</div>
+                                            <div className="mt-1 line-clamp-2 text-xs text-m3-on-surface-variant">
                                                 {offer.description}
                                             </div>
-                                            <div className="mt-2 text-[11px] font-mono text-slate-400" dir="ltr">
+                                            <div className="mt-2 text-[11px] font-mono text-m3-outline" dir="ltr">
                                                 {offer.id}
                                             </div>
                                         </div>
@@ -311,7 +311,7 @@ export default function OffersTable() {
                         ))}
                         {offers.length === 0 && (
                             <tr>
-                                <td colSpan={7} className="py-12 text-center font-medium text-slate-500">
+                                <td colSpan={7} className="py-12 text-center font-medium text-m3-on-surface-variant">
                                     لا توجد عروض مطابقة.
                                 </td>
                             </tr>

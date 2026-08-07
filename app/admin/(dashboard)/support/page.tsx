@@ -170,31 +170,31 @@ export default function SupportChatPage() {
     };
 
     return (
-        <div className="flex h-full bg-white rounded-lg shadow overflow-hidden">
-            <div className="w-1/3 border-l border-gray-200 flex flex-col">
-                <div className="p-4 border-b border-gray-200 bg-gray-50">
-                    <h2 className="text-lg font-semibold text-gray-800">المحادثات</h2>
+        <div className="flex h-full bg-surface-card rounded-lg shadow overflow-hidden">
+            <div className="w-1/3 border-l border-m3-outline-variant/60 flex flex-col">
+                <div className="p-4 border-b border-m3-outline-variant/60 bg-m3-background">
+                    <h2 className="text-lg font-semibold text-m3-on-surface">المحادثات</h2>
                 </div>
                 <div className="flex-1 overflow-y-auto">
                     {isLoadingUsers ? (
-                        <div className="p-4 text-center text-gray-500">جاري تحميل المحادثات...</div>
+                        <div className="p-4 text-center text-m3-on-surface-variant">جاري تحميل المحادثات...</div>
                     ) : users.length === 0 ? (
-                        <div className="p-4 text-center text-gray-500">لا توجد رسائل دعم حالياً</div>
+                        <div className="p-4 text-center text-m3-on-surface-variant">لا توجد رسائل دعم حالياً</div>
                     ) : (
                         users.map((user) => (
                             <button
                                 key={user.user_id}
                                 onClick={() => setSelectedUser(user)}
-                                className={`w-full text-right p-4 border-b border-gray-100 hover:bg-blue-50 transition-colors ${selectedUser?.user_id === user.user_id ? 'bg-blue-100 border-r-4 border-blue-600' : ''
+                                className={`w-full text-right p-4 border-b border-m3-surface-container-low hover:bg-blue-50 transition-colors ${selectedUser?.user_id === user.user_id ? 'bg-blue-100 border-r-4 border-blue-600' : ''
                                     }`}
                             >
-                                <div className="font-semibold text-gray-800">{user.user_name}</div>
-                                <div className="text-sm text-gray-500 mt-1">{user.user_phone || 'بدون رقم'}</div>
+                                <div className="font-semibold text-m3-on-surface">{user.user_name}</div>
+                                <div className="text-sm text-m3-on-surface-variant mt-1">{user.user_phone || 'بدون رقم'}</div>
                                 <div className="flex justify-between items-center mt-2">
-                                    <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                                    <span className="text-xs bg-m3-surface-container-low text-m3-on-surface px-2 py-1 rounded">
                                         {user.user_role === 'creator' ? 'مبدع' : 'عميل'}
                                     </span>
-                                    <span className="text-xs text-gray-400">
+                                    <span className="text-xs text-m3-outline">
                                         {new Date(user.last_message_time).toLocaleDateString('ar-IQ')}
                                     </span>
                                 </div>
@@ -204,7 +204,7 @@ export default function SupportChatPage() {
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-col bg-gray-50">
+            <div className="flex-1 flex flex-col bg-m3-background">
                 {error && (
                     <div className="mx-4 mt-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                         {error}
@@ -212,23 +212,23 @@ export default function SupportChatPage() {
                 )}
                 {selectedUser ? (
                     <>
-                        <div className="p-4 border-b border-gray-200 bg-white flex justify-between items-center">
-                            <h3 className="text-lg font-semibold text-gray-800">{selectedUser.user_name}</h3>
-                            <span className="text-sm text-gray-500 font-mono" dir="ltr">{selectedUser.user_phone || '-'}</span>
+                        <div className="p-4 border-b border-m3-outline-variant/60 bg-surface-card flex justify-between items-center">
+                            <h3 className="text-lg font-semibold text-m3-on-surface">{selectedUser.user_name}</h3>
+                            <span className="text-sm text-m3-on-surface-variant font-mono" dir="ltr">{selectedUser.user_phone || '-'}</span>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-4 space-y-4">
                             {isLoadingMessages && messages.length === 0 ? (
-                                <div className="text-center text-gray-500">جاري تحميل الرسائل...</div>
+                                <div className="text-center text-m3-on-surface-variant">جاري تحميل الرسائل...</div>
                             ) : (
                                 messages.map((msg) => {
                                     const isAdmin = msg.sender_type === 'admin';
                                     return (
                                         <div key={msg.id} className={`flex flex-col ${isAdmin ? 'items-end' : 'items-start'}`}>
-                                            <div className={`max-w-[70%] rounded-lg p-3 ${isAdmin ? 'bg-blue-600 text-white rounded-tl-none' : 'bg-white text-gray-800 rounded-tr-none shadow-sm'}`}>
+                                            <div className={`max-w-[70%] rounded-lg p-3 ${isAdmin ? 'bg-blue-600 text-m3-on-surface rounded-tl-none' : 'bg-surface-card text-m3-on-surface rounded-tr-none shadow-sm'}`}>
                                                 <p className="text-sm">{msg.content}</p>
                                             </div>
-                                            <span className="text-xs text-gray-400 mt-1">
+                                            <span className="text-xs text-m3-outline mt-1">
                                                 {new Date(msg.created_at).toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                         </div>
@@ -238,20 +238,20 @@ export default function SupportChatPage() {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        <div className="p-4 bg-white border-t border-gray-200">
+                        <div className="p-4 bg-surface-card border-t border-m3-outline-variant/60">
                             <form onSubmit={handleSendMessage} className="flex gap-2">
                                 <input
                                     type="text"
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
                                     placeholder="اكتب رسالة للمستخدم..."
-                                    className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                                    className="flex-1 p-3 border border-m3-outline-variant rounded-lg focus:outline-none focus:border-blue-500"
                                     dir="rtl"
                                 />
                                 <button
                                     type="submit"
                                     disabled={!newMessage.trim()}
-                                    className="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                    className="bg-blue-600 text-m3-on-surface p-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
                                 >
                                     <Send size={20} className="transform rotate-180" />
                                 </button>
@@ -259,8 +259,8 @@ export default function SupportChatPage() {
                         </div>
                     </>
                 ) : (
-                    <div className="flex-1 flex items-center justify-center text-gray-500 flex-col gap-4">
-                        <svg className="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="flex-1 flex items-center justify-center text-m3-on-surface-variant flex-col gap-4">
+                        <svg className="w-16 h-16 text-m3-outline-variant" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
                         <p className="text-lg">اختر محادثة لبدء الدردشة</p>

@@ -65,15 +65,15 @@ export default function AdminLogin() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900">
-            <div className="bg-white p-8 rounded shadow-md w-96">
-                <h1 className="text-2xl font-bold mb-6 text-center text-gray-900">تسجيل دخول صورلي</h1>
+        <div className="min-h-screen flex items-center justify-center bg-m3-surface-container-lowest text-m3-on-background">
+            <div className="bg-surface-card p-8 rounded shadow-md w-96">
+                <h1 className="text-2xl font-bold mb-6 text-center text-m3-on-background">تسجيل دخول صورلي</h1>
                 {error && <div className="bg-red-100 text-red-700 p-2 mb-4 rounded text-sm">{error}</div>}
                 <form onSubmit={handleLogin} method="post" className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">البريد الإلكتروني</label>
+                        <label className="block text-sm font-medium mb-1 text-m3-on-surface">البريد الإلكتروني</label>
                         <input
-                            className="w-full p-2 border border-gray-300 rounded text-right text-gray-900 bg-white"
+                            className="w-full p-2 border border-m3-outline-variant rounded text-right text-m3-on-background bg-surface-card"
                             type="email"
                             name="email"
                             autoComplete="email"
@@ -83,9 +83,9 @@ export default function AdminLogin() {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">كلمة المرور</label>
+                        <label className="block text-sm font-medium mb-1 text-m3-on-surface">كلمة المرور</label>
                         <input
-                            className="w-full p-2 border border-gray-300 rounded text-right text-gray-900 bg-white"
+                            className="w-full p-2 border border-m3-outline-variant rounded text-right text-m3-on-background bg-surface-card"
                             type="password"
                             name="password"
                             autoComplete="current-password"
@@ -96,7 +96,7 @@ export default function AdminLogin() {
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-black text-white p-2 rounded hover:bg-gray-800 transition shadow-sm"
+                        className="w-full bg-m3-on-surface text-m3-on-surface p-2 rounded hover:bg-m3-surface-container-high transition shadow-sm"
                     >
                         دخول
                     </button>

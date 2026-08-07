@@ -139,12 +139,12 @@ export default function AdminReportsPage() {
         <div className="space-y-6" dir="rtl">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">البلاغات</h1>
-                    <p className="text-gray-600">راجع بلاغات الوسائط والعروض والحسابات والقصص من هنا.</p>
+                    <h1 className="text-3xl font-bold text-m3-on-background">البلاغات</h1>
+                    <p className="text-m3-on-surface-variant">راجع بلاغات الوسائط والعروض والحسابات والقصص من هنا.</p>
                 </div>
                 <button
                     onClick={fetchReports}
-                    className="px-4 py-2 rounded bg-black text-white hover:bg-gray-800"
+                    className="px-4 py-2 rounded bg-m3-on-surface text-m3-on-surface hover:bg-m3-surface-container-high"
                 >
                     تحديث
                 </button>
@@ -153,7 +153,7 @@ export default function AdminReportsPage() {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                 <button
                     onClick={() => setFilter("all")}
-                    className={`rounded border px-3 py-2 text-sm ${filter === "all" ? "bg-black text-white border-black" : "bg-white text-gray-700 border-gray-300"}`}
+                    className={`rounded border px-3 py-2 text-sm ${filter === "all" ? "bg-m3-on-surface text-m3-on-surface border-m3-outline" : "bg-surface-card text-m3-on-surface border-m3-outline-variant"}`}
                 >
                     الكل ({counts.all})
                 </button>
@@ -161,7 +161,7 @@ export default function AdminReportsPage() {
                     <button
                         key={status}
                         onClick={() => setFilter(status)}
-                        className={`rounded border px-3 py-2 text-sm ${filter === status ? "bg-black text-white border-black" : "bg-white text-gray-700 border-gray-300"}`}
+                        className={`rounded border px-3 py-2 text-sm ${filter === status ? "bg-m3-on-surface text-m3-on-surface border-m3-outline" : "bg-surface-card text-m3-on-surface border-m3-outline-variant"}`}
                     >
                         {statusLabels[status]} ({counts[status]})
                     </button>
@@ -175,31 +175,31 @@ export default function AdminReportsPage() {
             )}
 
             {loading ? (
-                <div className="rounded border bg-white p-8 text-center text-gray-500">جاري تحميل البلاغات...</div>
+                <div className="rounded border bg-surface-card p-8 text-center text-m3-on-surface-variant">جاري تحميل البلاغات...</div>
             ) : reports.length === 0 ? (
-                <div className="rounded border bg-white p-8 text-center text-gray-500">لا توجد بلاغات حالياً.</div>
+                <div className="rounded border bg-surface-card p-8 text-center text-m3-on-surface-variant">لا توجد بلاغات حالياً.</div>
             ) : (
                 <div className="space-y-4">
                     {reports.map((report) => {
                         const isUpdating = updatingId === report.id;
                         return (
-                            <div key={report.id} className="rounded-lg border bg-white p-4 shadow-sm">
+                            <div key={report.id} className="rounded-lg border bg-surface-card p-4 shadow-sm">
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="flex items-center gap-3">
                                         <span className={`text-xs px-2 py-1 rounded border ${statusClasses[report.status]}`}>
                                             {statusLabels[report.status]}
                                         </span>
-                                        <span className="text-xs text-gray-500">
+                                        <span className="text-xs text-m3-on-surface-variant">
                                             {new Date(report.created_at).toLocaleString("ar-IQ")}
                                         </span>
                                     </div>
-                                    <span className="text-xs text-gray-400 font-mono" dir="ltr">{report.id}</span>
+                                    <span className="text-xs text-m3-outline font-mono" dir="ltr">{report.id}</span>
                                 </div>
 
                                 <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                    <div className="rounded border bg-gray-50 overflow-hidden min-h-[180px]">
+                                    <div className="rounded border bg-m3-background overflow-hidden min-h-[180px]">
                                         {!report.media_url ? (
-                                            <div className="h-full flex items-center justify-center text-sm text-gray-500 p-4">
+                                            <div className="h-full flex items-center justify-center text-sm text-m3-on-surface-variant p-4">
                                                 الوسائط غير متاحة حالياً
                                             </div>
                                         ) : report.media_type === "video" ? (
@@ -218,15 +218,15 @@ export default function AdminReportsPage() {
 
                                     <div className="lg:col-span-2 space-y-3">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                                            <div className="rounded border p-3 bg-gray-50">
-                                                <div className="text-gray-500 text-xs mb-1">المبلِّغ</div>
+                                            <div className="rounded border p-3 bg-m3-background">
+                                                <div className="text-m3-on-surface-variant text-xs mb-1">المبلِّغ</div>
                                                 <div className="font-semibold">{report.reporter_name}</div>
-                                                <div className="text-gray-600">{report.reporter_role}</div>
+                                                <div className="text-m3-on-surface-variant">{report.reporter_role}</div>
                                             </div>
-                                            <div className="rounded border p-3 bg-gray-50">
-                                                <div className="text-gray-500 text-xs mb-1">المبدع</div>
+                                            <div className="rounded border p-3 bg-m3-background">
+                                                <div className="text-m3-on-surface-variant text-xs mb-1">المبدع</div>
                                                 <div className="font-semibold">{report.creator_name || "غير معروف"}</div>
-                                                <div className="text-gray-600">
+                                                <div className="text-m3-on-surface-variant">
                                                     {targetLabels[report.target_type]}
                                                     {report.media_type === "video" ? " - فيديو" : report.media_type === "image" ? " - صورة" : ""}
                                                 </div>
@@ -234,18 +234,18 @@ export default function AdminReportsPage() {
                                         </div>
 
                                         <div className="rounded border p-3">
-                                            <div className="text-xs text-gray-500 mb-1">نوع البلاغ</div>
-                                            <div className="text-sm text-gray-700 mb-2">{targetLabels[report.target_type]}</div>
+                                            <div className="text-xs text-m3-on-surface-variant mb-1">نوع البلاغ</div>
+                                            <div className="text-sm text-m3-on-surface mb-2">{targetLabels[report.target_type]}</div>
                                             {report.target_label && (
                                                 <>
-                                                    <div className="text-xs text-gray-500 mb-1">العنصر المبلغ عنه</div>
-                                                    <div className="font-medium text-gray-900">{report.target_label}</div>
+                                                    <div className="text-xs text-m3-on-surface-variant mb-1">العنصر المبلغ عنه</div>
+                                                    <div className="font-medium text-m3-on-background">{report.target_label}</div>
                                                 </>
                                             )}
-                                            <div className="mt-3 text-xs text-gray-500 mb-1">سبب البلاغ</div>
-                                            <div className="font-medium text-gray-900">{report.reason}</div>
+                                            <div className="mt-3 text-xs text-m3-on-surface-variant mb-1">سبب البلاغ</div>
+                                            <div className="font-medium text-m3-on-background">{report.reason}</div>
                                             {report.details && (
-                                                <div className="mt-2 text-sm text-gray-700 whitespace-pre-wrap">{report.details}</div>
+                                                <div className="mt-2 text-sm text-m3-on-surface whitespace-pre-wrap">{report.details}</div>
                                             )}
                                         </div>
 
@@ -261,21 +261,21 @@ export default function AdminReportsPage() {
                                             <button
                                                 disabled={isUpdating}
                                                 onClick={() => updateStatus(report, "in_review")}
-                                                className="px-3 py-2 rounded bg-blue-600 text-white text-sm disabled:opacity-50"
+                                                className="px-3 py-2 rounded bg-blue-600 text-m3-on-surface text-sm disabled:opacity-50"
                                             >
                                                 قيد المراجعة
                                             </button>
                                             <button
                                                 disabled={isUpdating}
                                                 onClick={() => updateStatus(report, "resolved")}
-                                                className="px-3 py-2 rounded bg-green-600 text-white text-sm disabled:opacity-50"
+                                                className="px-3 py-2 rounded bg-green-600 text-m3-on-surface text-sm disabled:opacity-50"
                                             >
                                                 حل البلاغ
                                             </button>
                                             <button
                                                 disabled={isUpdating}
                                                 onClick={() => updateStatus(report, "rejected")}
-                                                className="px-3 py-2 rounded bg-gray-700 text-white text-sm disabled:opacity-50"
+                                                className="px-3 py-2 rounded bg-m3-surface-container-high text-m3-on-surface text-sm disabled:opacity-50"
                                             >
                                                 رفض البلاغ
                                             </button>
@@ -292,7 +292,7 @@ export default function AdminReportsPage() {
                                     void updateStatus(report, "resolved", true);
                                 }
                             }}
-                            className="px-3 py-2 rounded bg-red-600 text-white text-sm disabled:opacity-50"
+                            className="px-3 py-2 rounded bg-red-600 text-m3-on-surface text-sm disabled:opacity-50"
                         >
                             {report.target_type === "story" ? "حل + حذف القصة" : "حل + حذف الوسائط"}
                         </button>
@@ -300,7 +300,7 @@ export default function AdminReportsPage() {
                                         </div>
 
                                         {(report.handled_by_name || report.handled_at) && (
-                                            <div className="text-xs text-gray-500">
+                                            <div className="text-xs text-m3-on-surface-variant">
                                                 تمت المعالجة بواسطة {report.handled_by_name || "الإدارة"} بتاريخ{" "}
                                                 {report.handled_at ? new Date(report.handled_at).toLocaleString("ar-IQ") : "-"}
                                             </div>

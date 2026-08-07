@@ -59,7 +59,7 @@ export default function CreatorLevelsTable() {
     }, [fetchLevels]);
 
     if (loading) {
-        return <div className="text-right text-slate-600">جار التحميل...</div>;
+        return <div className="text-right text-m3-on-surface-variant">جار التحميل...</div>;
     }
 
     if (error) {
@@ -69,7 +69,7 @@ export default function CreatorLevelsTable() {
                 <div className="flex justify-end">
                     <button
                         onClick={() => void fetchLevels()}
-                        className="rounded-lg bg-slate-900 px-4 py-2 text-white"
+                        className="rounded-lg bg-m3-surface-container-highest px-4 py-2 text-m3-on-surface"
                     >
                         إعادة المحاولة
                     </button>
@@ -82,7 +82,7 @@ export default function CreatorLevelsTable() {
         <div className="overflow-x-auto">
             <table className="min-w-full text-right text-sm">
                 <thead>
-                    <tr className="border-b bg-slate-50">
+                    <tr className="border-b bg-m3-background">
                         <th className="px-4 py-3 font-semibold">المبدع</th>
                         <th className="px-4 py-3 font-semibold">المستوى</th>
                         <th className="px-4 py-3 font-semibold">مشاريع مكتملة (30d)</th>
@@ -94,13 +94,13 @@ export default function CreatorLevelsTable() {
                 </thead>
                 <tbody>
                     {rows.map((r) => (
-                        <tr key={r.id} className="border-b last:border-b-0 hover:bg-slate-50">
+                        <tr key={r.id} className="border-b last:border-b-0 hover:bg-m3-background">
                             <td className="px-4 py-3">
                                 <div className="font-semibold">{r.name}</div>
-                                <div className="text-xs text-slate-500">{r.email}</div>
+                                <div className="text-xs text-m3-on-surface-variant">{r.email}</div>
                             </td>
                             <td className="px-4 py-3">
-                                <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 font-semibold">
+                                <span className="inline-flex items-center gap-2 rounded-full border border-m3-outline-variant/60 bg-surface-card px-3 py-1 font-semibold">
                                     <span>{r.creator_level_icon}</span>
                                     <span>{r.creator_level_name}</span>
                                 </span>

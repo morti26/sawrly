@@ -174,35 +174,35 @@ export default function PaymentsTable() {
 
     return (
         <div dir="rtl" className="space-y-4">
-            <div className="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
-                <table className="min-w-full bg-white text-sm">
+            <div className="overflow-x-auto rounded-lg border border-m3-outline-variant/60 shadow-sm">
+                <table className="min-w-full bg-surface-card text-sm">
                     <thead>
-                        <tr className="bg-slate-50 border-b border-slate-200">
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">العرض</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">المبدع</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">العميل</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">المبلغ</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">الطريقة</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">إثبات الدفع</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">الحالة</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">المشروع</th>
-                            <th className="py-4 px-4 text-right font-semibold text-slate-600">التاريخ</th>
-                            <th className="py-4 px-4 text-center font-semibold text-slate-600">الإجراءات</th>
+                        <tr className="bg-m3-background border-b border-m3-outline-variant/60">
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">العرض</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">المبدع</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">العميل</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">المبلغ</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">الطريقة</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">إثبات الدفع</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">الحالة</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">المشروع</th>
+                            <th className="py-4 px-4 text-right font-semibold text-m3-on-surface-variant">التاريخ</th>
+                            <th className="py-4 px-4 text-center font-semibold text-m3-on-surface-variant">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                         {payments.map((payment) => (
-                            <tr key={payment.id} className="hover:bg-slate-50 transition-colors">
+                            <tr key={payment.id} className="hover:bg-m3-background transition-colors">
                                 <td className="py-4 px-4 text-right">
-                                    <div className="font-medium text-slate-800">{payment.offer_title || 'بدون عنوان'}</div>
-                                    <div className="text-xs text-slate-400 font-mono" dir="ltr">{payment.quote_id}</div>
+                                    <div className="font-medium text-m3-on-surface">{payment.offer_title || 'بدون عنوان'}</div>
+                                    <div className="text-xs text-m3-outline font-mono" dir="ltr">{payment.quote_id}</div>
                                 </td>
-                                <td className="py-4 px-4 text-right text-slate-700">{payment.creator_name || '-'}</td>
-                                <td className="py-4 px-4 text-right text-slate-700">{payment.client_name || '-'}</td>
-                                <td className="py-4 px-4 text-right font-semibold text-slate-800">
+                                <td className="py-4 px-4 text-right text-m3-on-surface">{payment.creator_name || '-'}</td>
+                                <td className="py-4 px-4 text-right text-m3-on-surface">{payment.client_name || '-'}</td>
+                                <td className="py-4 px-4 text-right font-semibold text-m3-on-surface">
                                     <span dir="ltr">{Number(payment.amount || 0).toLocaleString('en-US')} IQD</span>
                                 </td>
-                                <td className="py-4 px-4 text-right text-slate-600">{payment.method}</td>
+                                <td className="py-4 px-4 text-right text-m3-on-surface-variant">{payment.method}</td>
                                 <td className="py-4 px-4 text-right">
                                     {payment.proof_url ? (
                                         <a
@@ -214,7 +214,7 @@ export default function PaymentsTable() {
                                             فتح الإثبات
                                         </a>
                                     ) : (
-                                        <span className="text-slate-400">لا يوجد</span>
+                                        <span className="text-m3-outline">لا يوجد</span>
                                     )}
                                 </td>
                                 <td className="py-4 px-4 text-right">
@@ -222,7 +222,7 @@ export default function PaymentsTable() {
                                         {payment.status}
                                     </span>
                                     {payment.confirmed_by_name && (
-                                        <div className="mt-1 text-xs text-slate-400">
+                                        <div className="mt-1 text-xs text-m3-outline">
                                             بواسطة {payment.confirmed_by_name}
                                         </div>
                                     )}
@@ -230,14 +230,14 @@ export default function PaymentsTable() {
                                 <td className="py-4 px-4 text-right">
                                     {payment.linked_project_id ? (
                                         <div>
-                                            <div className="font-medium text-slate-700">{payment.project_status || 'linked'}</div>
-                                            <div className="text-xs text-slate-400 font-mono" dir="ltr">{payment.linked_project_id}</div>
+                                            <div className="font-medium text-m3-on-surface">{payment.project_status || 'linked'}</div>
+                                            <div className="text-xs text-m3-outline font-mono" dir="ltr">{payment.linked_project_id}</div>
                                         </div>
                                     ) : (
-                                        <span className="text-slate-400">غير مرتبط بعد</span>
+                                        <span className="text-m3-outline">غير مرتبط بعد</span>
                                     )}
                                 </td>
-                                <td className="py-4 px-4 text-right text-slate-500">
+                                <td className="py-4 px-4 text-right text-m3-on-surface-variant">
                                     {new Date(payment.created_at).toLocaleDateString('ar-IQ')}
                                 </td>
                                 <td className="py-4 px-4 text-center">
@@ -248,7 +248,7 @@ export default function PaymentsTable() {
                                                     <button
                                                         onClick={() => handleConfirm(payment.id)}
                                                         disabled={actionId === payment.id}
-                                                        className="rounded-md bg-green-600 px-3 py-1.5 text-white hover:bg-green-700 disabled:opacity-50"
+                                                        className="rounded-md bg-green-600 px-3 py-1.5 text-m3-on-surface hover:bg-green-700 disabled:opacity-50"
                                                     >
                                                         تأكيد
                                                     </button>
@@ -265,7 +265,7 @@ export default function PaymentsTable() {
                                                         <button
                                                             onClick={() => handleDelete(payment.id)}
                                                             disabled={actionId === payment.id}
-                                                            className="rounded-md bg-slate-700 px-3 py-1.5 text-white hover:bg-slate-800 disabled:opacity-50"
+                                                            className="rounded-md bg-m3-surface-container-high px-3 py-1.5 text-m3-on-surface hover:bg-m3-surface-container-high disabled:opacity-50"
                                                         >
                                                             حذف
                                                         </button>
@@ -273,17 +273,17 @@ export default function PaymentsTable() {
                                                 ) : null}
                                             </div>
                                         ) : (
-                                            <span className="text-slate-400">-</span>
+                                            <span className="text-m3-outline">-</span>
                                         )
                                     ) : (
-                                        <span className="text-slate-400">تمت المعالجة</span>
+                                        <span className="text-m3-outline">تمت المعالجة</span>
                                     )}
                                 </td>
                             </tr>
                         ))}
                         {payments.length === 0 && (
                             <tr>
-                                <td colSpan={10} className="py-12 text-center text-slate-500 font-medium">
+                                <td colSpan={10} className="py-12 text-center text-m3-on-surface-variant font-medium">
                                     لا توجد مدفوعات حالياً.
                                 </td>
                             </tr>

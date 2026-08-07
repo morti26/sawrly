@@ -49,11 +49,11 @@ export default function OpsErrorsPage() {
     return (
         <div dir="rtl" className="space-y-4">
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-slate-800">سجل أخطاء التشغيل</h1>
+                <h1 className="text-2xl font-bold text-m3-on-surface">سجل أخطاء التشغيل</h1>
                 <button
                     type="button"
                     onClick={() => void fetchItems()}
-                    className="rounded-lg bg-black px-4 py-2 text-white hover:bg-slate-800"
+                    className="rounded-lg bg-m3-on-surface px-4 py-2 text-m3-on-surface hover:bg-m3-surface-container-high"
                 >
                     تحديث
                 </button>
@@ -66,42 +66,42 @@ export default function OpsErrorsPage() {
             )}
 
             {loading ? (
-                <div className="rounded-lg border border-slate-200 bg-white p-8 text-center text-slate-500">
+                <div className="rounded-lg border border-m3-outline-variant/60 bg-surface-card p-8 text-center text-m3-on-surface-variant">
                     جاري تحميل السجل...
                 </div>
             ) : (
-                <div className="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
-                    <table className="min-w-full bg-white text-sm">
+                <div className="overflow-x-auto rounded-lg border border-m3-outline-variant/60 shadow-sm">
+                    <table className="min-w-full bg-surface-card text-sm">
                         <thead>
-                            <tr className="border-b border-slate-200 bg-slate-50">
-                                <th className="px-4 py-3 text-right font-semibold text-slate-600">المصدر</th>
-                                <th className="px-4 py-3 text-right font-semibold text-slate-600">المستوى</th>
-                                <th className="px-4 py-3 text-right font-semibold text-slate-600">الرسالة</th>
-                                <th className="px-4 py-3 text-right font-semibold text-slate-600">المسار</th>
-                                <th className="px-4 py-3 text-right font-semibold text-slate-600">الوقت</th>
+                            <tr className="border-b border-m3-outline-variant/60 bg-m3-background">
+                                <th className="px-4 py-3 text-right font-semibold text-m3-on-surface-variant">المصدر</th>
+                                <th className="px-4 py-3 text-right font-semibold text-m3-on-surface-variant">المستوى</th>
+                                <th className="px-4 py-3 text-right font-semibold text-m3-on-surface-variant">الرسالة</th>
+                                <th className="px-4 py-3 text-right font-semibold text-m3-on-surface-variant">المسار</th>
+                                <th className="px-4 py-3 text-right font-semibold text-m3-on-surface-variant">الوقت</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {items.map((item) => (
-                                <tr key={item.id} className="hover:bg-slate-50">
-                                    <td className="px-4 py-3 font-mono text-xs text-slate-700">{item.source}</td>
+                                <tr key={item.id} className="hover:bg-m3-background">
+                                    <td className="px-4 py-3 font-mono text-xs text-m3-on-surface">{item.source}</td>
                                     <td className="px-4 py-3">
                                         <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-bold ${levelStyle[item.level]}`}>
                                             {item.level === 'error' ? 'خطأ' : 'تحذير'}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3 text-slate-800">{item.message}</td>
-                                    <td className="px-4 py-3 font-mono text-xs text-slate-500" dir="ltr">
+                                    <td className="px-4 py-3 text-m3-on-surface">{item.message}</td>
+                                    <td className="px-4 py-3 font-mono text-xs text-m3-on-surface-variant" dir="ltr">
                                         {item.request_path || '-'}
                                     </td>
-                                    <td className="px-4 py-3 text-slate-500">
+                                    <td className="px-4 py-3 text-m3-on-surface-variant">
                                         {new Date(item.created_at).toLocaleString('ar-IQ')}
                                     </td>
                                 </tr>
                             ))}
                             {items.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="py-10 text-center text-slate-500">
+                                    <td colSpan={5} className="py-10 text-center text-m3-on-surface-variant">
                                         لا توجد أخطاء مسجلة حالياً.
                                     </td>
                                 </tr>

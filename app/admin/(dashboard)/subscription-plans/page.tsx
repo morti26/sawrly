@@ -271,7 +271,7 @@ export default function SubscriptionPlansPage() {
     return (
         <div className="flex flex-col gap-6 p-6">
             {toast && (
-                <div className={`fixed left-6 top-6 z-50 rounded-xl px-4 py-3 text-sm font-medium text-white shadow-xl ${
+                <div className={`fixed left-6 top-6 z-50 rounded-xl px-4 py-3 text-sm font-medium text-m3-on-surface shadow-xl ${
                     toast.kind === "ok" ? "bg-emerald-600" : "bg-rose-600"
                 }`}>
                     {toast.msg}
@@ -280,84 +280,84 @@ export default function SubscriptionPlansPage() {
 
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800">خطط الاشتراك</h1>
-                    <p className="mt-1 text-sm text-slate-500">
+                    <h1 className="text-2xl font-bold text-m3-on-surface">خطط الاشتراك</h1>
+                    <p className="mt-1 text-sm text-m3-on-surface-variant">
                         أنشئ خطط الأسعار والمميزات التي تظهر مباشرة في التطبيق (دون إعادة إصدار).
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
                         onClick={load}
-                        className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        className="rounded-lg border border-m3-outline-variant bg-surface-card px-4 py-2 text-sm font-medium text-m3-on-surface hover:bg-m3-background"
                     >
                         تحديث ↻
                     </button>
                     <button
                         onClick={openCreate}
-                        className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-purple-700"
+                        className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-m3-on-surface shadow-md transition hover:bg-primary-container"
                     >
                         + خطة جديدة
                     </button>
                 </div>
             </div>
 
-            <div className="rounded-2xl border border-indigo-200 bg-gradient-to-b from-indigo-50/60 to-white shadow-sm">
+            <div className="rounded-2xl border border-indigo-200 bg-gradient-to-b from-indigo-50/60 to-surface-card shadow-sm">
                 <button
                     onClick={() => setHelpOpen(o => !o)}
                     className="flex w-full items-center justify-between px-5 py-3 text-right"
                 >
                     <div className="flex items-center gap-2">
-                        <span className="text-indigo-600">
+                        <span className="text-primary">
                             {helpOpen ? "▾" : "▸"}
                         </span>
                         <div className="text-right">
                             <h2 className="text-base font-bold text-indigo-900">
                                 دليل التخطيط للمميزات (المرجع)
                             </h2>
-                            <p className="text-[11px] text-indigo-600/80">
+                            <p className="text-[11px] text-primary/80">
                                 ما تعنيه كل ميزة + القيم الافتراضية لكل خطة.
                             </p>
                         </div>
                     </div>
-                    <div className="rounded-full bg-indigo-600 px-3 py-1 text-[10px] font-bold text-white">
+                    <div className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold text-m3-on-surface">
                         {helpOpen ? "إخفاء" : "عرض"}
                     </div>
                 </button>
 
                 {helpOpen && (
                     <div className="border-t border-indigo-100 px-4 pb-5 pt-3">
-                        <div className="mb-3 rounded-xl bg-white/80 px-4 py-2 text-[11px] text-slate-600 ring-1 ring-slate-200">
+                        <div className="mb-3 rounded-xl bg-surface-card/80 px-4 py-2 text-[11px] text-m3-on-surface-variant ring-1 ring-m3-outline-variant/60">
                             💡 <b>ملاحظة:</b> الحقول <b>حد الإعلانات</b> و <b>أعضاء الفريق</b>
                             تعدّ من خلال حقول النص أعلى قائمة المميزات (ليست ضمن خانات الاختيار).
                             خطة Enterprise = <b>null / فارغ</b> = لا حدود.
                         </div>
-                        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-inner" dir="rtl">
+                        <div className="overflow-x-auto rounded-xl border border-m3-outline-variant/60 bg-surface-card shadow-inner" dir="rtl">
                             <table className="w-full border-collapse text-[11px]">
                                 <thead>
-                                    <tr className="bg-slate-100 text-slate-700">
-                                        <th className="border-b border-slate-200 px-3 py-2 text-right font-bold">اسم الميزة (يعرض في التطبيق)</th>
-                                        <th className="border-b border-slate-200 px-3 py-2 text-right font-bold">شرح الميزة</th>
-                                        <th className="border-b border-slate-200 px-2 py-2 text-center font-bold">تجربة مجانية</th>
-                                        <th className="border-b border-slate-200 px-2 py-2 text-center font-bold bg-purple-50 text-purple-700">الإبداعي</th>
-                                        <th className="border-b border-slate-200 px-2 py-2 text-center font-bold bg-sky-50 text-sky-700">الاستوديو</th>
-                                        <th className="border-b border-slate-200 px-2 py-2 text-center font-bold bg-slate-900 text-white">الشركات</th>
+                                    <tr className="bg-m3-surface-container-lowest text-m3-on-surface">
+                                        <th className="border-b border-m3-outline-variant/60 px-3 py-2 text-right font-bold">اسم الميزة (يعرض في التطبيق)</th>
+                                        <th className="border-b border-m3-outline-variant/60 px-3 py-2 text-right font-bold">شرح الميزة</th>
+                                        <th className="border-b border-m3-outline-variant/60 px-2 py-2 text-center font-bold">تجربة مجانية</th>
+                                        <th className="border-b border-m3-outline-variant/60 px-2 py-2 text-center font-bold bg-accent/10 text-m3-primary">الإبداعي</th>
+                                        <th className="border-b border-m3-outline-variant/60 px-2 py-2 text-center font-bold bg-sky-50 text-sky-700">الاستوديو</th>
+                                        <th className="border-b border-m3-outline-variant/60 px-2 py-2 text-center font-bold bg-m3-surface-container-highest text-m3-on-surface">الشركات</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {FEATURES.map((f, idx) => (
                                         <tr key={f.key}
-                                            className={idx % 2 === 0 ? "bg-white" : "bg-slate-50/60"}>
-                                            <td className="border-b border-slate-100 px-3 py-2 align-top">
-                                                <div className="font-semibold text-slate-800">{f.label_ar}</div>
-                                                <div className="text-[9px] text-slate-400 font-mono">key: {f.key}</div>
+                                            className={idx % 2 === 0 ? "bg-surface-card" : "bg-m3-background/60"}>
+                                            <td className="border-b border-m3-surface-container-low px-3 py-2 align-top">
+                                                <div className="font-semibold text-m3-on-surface">{f.label_ar}</div>
+                                                <div className="text-[9px] text-m3-outline font-mono">key: {f.key}</div>
                                             </td>
-                                            <td className="border-b border-slate-100 px-3 py-2 text-[10.5px] leading-relaxed text-slate-600 align-top max-w-[300px]">
+                                            <td className="border-b border-m3-surface-container-low px-3 py-2 text-[10.5px] leading-relaxed text-m3-on-surface-variant align-top max-w-[300px]">
                                                 {f.desc_ar}
                                             </td>
-                                            <td className="border-b border-slate-100 px-2 py-2 text-center text-[10px] align-top">{f.defaults.free}</td>
-                                            <td className="border-b border-slate-100 px-2 py-2 text-center text-[10px] align-top bg-purple-50/40">{f.defaults.pro}</td>
-                                            <td className="border-b border-slate-100 px-2 py-2 text-center text-[10px] align-top bg-sky-50/40">{f.defaults.studio}</td>
-                                            <td className="border-b border-slate-100 px-2 py-2 text-center text-[10px] align-top bg-slate-900/90 text-white rounded-sm">{f.defaults.enterprise}</td>
+                                            <td className="border-b border-m3-surface-container-low px-2 py-2 text-center text-[10px] align-top">{f.defaults.free}</td>
+                                            <td className="border-b border-m3-surface-container-low px-2 py-2 text-center text-[10px] align-top bg-accent/10/40">{f.defaults.pro}</td>
+                                            <td className="border-b border-m3-surface-container-low px-2 py-2 text-center text-[10px] align-top bg-sky-50/40">{f.defaults.studio}</td>
+                                            <td className="border-b border-m3-surface-container-low px-2 py-2 text-center text-[10px] align-top bg-m3-surface-container-highest/90 text-m3-on-surface rounded-sm">{f.defaults.enterprise}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -368,73 +368,73 @@ export default function SubscriptionPlansPage() {
             </div>
 
             {loading ? (
-                <div className="rounded-xl border border-slate-200 bg-white p-10 text-center text-slate-500">
+                <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-10 text-center text-m3-on-surface-variant">
                     جاري التحميل...
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
                     {sortedPlans.map(p => (
-                        <div key={p.id} className={`relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:shadow-lg ${
-                            p.is_popular ? "border-purple-500 ring-2 ring-purple-200" : "border-slate-200"
+                        <div key={p.id} className={`relative flex flex-col overflow-hidden rounded-2xl border bg-surface-card shadow-sm transition hover:shadow-lg ${
+                            p.is_popular ? "border-primary ring-2 ring-accent/30" : "border-m3-outline-variant/60"
                         } ${!p.is_active ? "opacity-60" : ""}`}>
                             {p.is_popular && (
-                                <div className="bg-gradient-to-l from-fuchsia-500 to-purple-600 px-4 py-1 text-center text-xs font-bold text-white">
+                                <div className="bg-gradient-to-l from-fuchsia-500 to-accent px-4 py-1 text-center text-xs font-bold text-m3-on-surface">
                                     الأكثر شعبية
                                 </div>
                             )}
                             {!p.is_active && (
-                                <div className="bg-slate-200 px-4 py-1 text-center text-xs font-bold text-slate-700">
+                                <div className="bg-m3-surface-container-low px-4 py-1 text-center text-xs font-bold text-m3-on-surface">
                                     غير مفعّل
                                 </div>
                             )}
                             {p.is_enterprise && (
-                                <div className="absolute left-3 top-3 rounded-md bg-slate-900 px-2 py-0.5 text-[10px] font-semibold text-white">
+                                <div className="absolute left-3 top-3 rounded-md bg-m3-surface-container-highest px-2 py-0.5 text-[10px] font-semibold text-m3-on-surface">
                                     ENTERPRISE
                                 </div>
                             )}
                             <div className="flex flex-col gap-2 p-6">
                                 <div className="flex items-start justify-between">
                                     <div>
-                                        <p className="text-xs font-mono text-slate-400">{p.code}</p>
-                                        <h3 className="text-lg font-bold text-slate-800">{p.name_ar}</h3>
-                                        <p className="text-xs text-slate-500">{p.name_en}</p>
+                                        <p className="text-xs font-mono text-m3-outline">{p.code}</p>
+                                        <h3 className="text-lg font-bold text-m3-on-surface">{p.name_ar}</h3>
+                                        <p className="text-xs text-m3-on-surface-variant">{p.name_en}</p>
                                     </div>
-                                    <div className="text-[10px] font-mono text-slate-400">#{p.sort_order}</div>
+                                    <div className="text-[10px] font-mono text-m3-outline">#{p.sort_order}</div>
                                 </div>
                                 {p.description_ar && (
-                                    <p className="line-clamp-2 text-xs text-slate-500">{p.description_ar}</p>
+                                    <p className="line-clamp-2 text-xs text-m3-on-surface-variant">{p.description_ar}</p>
                                 )}
-                                <div className="mt-2 flex items-end gap-2 border-y border-slate-100 py-3">
+                                <div className="mt-2 flex items-end gap-2 border-y border-m3-surface-container-low py-3">
                                     <div>
-                                        <p className="text-xs text-slate-400">شهرياً</p>
-                                        <p className="text-xl font-extrabold text-purple-600">
+                                        <p className="text-xs text-m3-outline">شهرياً</p>
+                                        <p className="text-xl font-extrabold text-accent">
                                             {fmt(p.price_monthly, p.currency)}
                                         </p>
                                     </div>
-                                    <div className="h-8 w-px bg-slate-200" />
+                                    <div className="h-8 w-px bg-m3-surface-container-low" />
                                     <div>
-                                        <p className="text-xs text-slate-400">سنوياً</p>
-                                        <p className="text-base font-bold text-slate-700">
+                                        <p className="text-xs text-m3-outline">سنوياً</p>
+                                        <p className="text-base font-bold text-m3-on-surface">
                                             {fmt(p.price_yearly, p.currency)}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-2 text-xs">
-                                    <div className="rounded-md bg-slate-50 p-2 text-center">
-                                        <p className="text-[10px] text-slate-400">أقصى عروض</p>
-                                        <p className="font-bold text-slate-700">
+                                    <div className="rounded-md bg-m3-background p-2 text-center">
+                                        <p className="text-[10px] text-m3-outline">أقصى عروض</p>
+                                        <p className="font-bold text-m3-on-surface">
                                             {p.max_offers == null ? "∞" : p.max_offers}
                                         </p>
                                     </div>
-                                    <div className="rounded-md bg-slate-50 p-2 text-center">
-                                        <p className="text-[10px] text-slate-400">فريق</p>
-                                        <p className="font-bold text-slate-700">
+                                    <div className="rounded-md bg-m3-background p-2 text-center">
+                                        <p className="text-[10px] text-m3-outline">فريق</p>
+                                        <p className="font-bold text-m3-on-surface">
                                             {p.max_team == null ? "∞" : p.max_team}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="mt-2 max-h-36 overflow-auto rounded-lg bg-slate-50 p-2">
-                                    <p className="mb-1 text-[10px] font-semibold text-slate-500">المميزات:</p>
+                                <div className="mt-2 max-h-36 overflow-auto rounded-lg bg-m3-background p-2">
+                                    <p className="mb-1 text-[10px] font-semibold text-m3-on-surface-variant">المميزات:</p>
                                     <div className="flex flex-wrap gap-1">
                                         {FEATURES.map(f => (
                                             p.features?.[f.key] && (
@@ -445,14 +445,14 @@ export default function SubscriptionPlansPage() {
                                             )
                                         ))}
                                         {Object.values(p.features || {}).every(v => !v) && (
-                                            <span className="text-[10px] text-slate-400">لا توجد مميزات مفعّلة</span>
+                                            <span className="text-[10px] text-m3-outline">لا توجد مميزات مفعّلة</span>
                                         )}
                                     </div>
                                 </div>
                                 <div className="mt-4 grid grid-cols-2 gap-2">
                                     <button
                                         onClick={() => openEdit(p)}
-                                        className="rounded-lg border border-slate-300 bg-white py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                                        className="rounded-lg border border-m3-outline-variant bg-surface-card py-2 text-xs font-semibold text-m3-on-surface transition hover:bg-m3-background"
                                     >
                                         تعديل
                                     </button>
@@ -471,14 +471,14 @@ export default function SubscriptionPlansPage() {
             )}
 
             {dialogOpen && (
-                <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/50 p-4">
-                    <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl" dir="rtl">
-                        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-                            <h2 className="text-lg font-bold text-slate-800">
+                <div className="fixed inset-0 z-40 flex items-center justify-center bg-m3-surface-container-highest/50 p-4">
+                    <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-surface-card shadow-2xl" dir="rtl">
+                        <div className="flex items-center justify-between border-b border-m3-surface-container-low px-6 py-4">
+                            <h2 className="text-lg font-bold text-m3-on-surface">
                                 {editing.id ? "تعديل الخطة" : "خطة جديدة"}
                             </h2>
                             <button onClick={() => setDialogOpen(false)}
-                                    className="text-slate-400 hover:text-slate-700">
+                                    className="text-m3-outline hover:text-m3-on-surface">
                                 ✕
                             </button>
                         </div>
@@ -534,7 +534,7 @@ export default function SubscriptionPlansPage() {
                                     <input type="number" className="input" dir="ltr"
                                            value={editing.price_monthly}
                                            onChange={e => patch("price_monthly", e.target.value)} />
-                                    <span className="text-xs text-slate-500 font-mono">{editing.currency}</span>
+                                    <span className="text-xs text-m3-on-surface-variant font-mono">{editing.currency}</span>
                                 </div>
                             </Field>
                             <Field label="السعر سنوياً" labelEn="Price yearly">
@@ -542,7 +542,7 @@ export default function SubscriptionPlansPage() {
                                     <input type="number" className="input" dir="ltr"
                                            value={editing.price_yearly}
                                            onChange={e => patch("price_yearly", e.target.value)} />
-                                    <span className="text-xs text-slate-500 font-mono">{editing.currency}</span>
+                                    <span className="text-xs text-m3-on-surface-variant font-mono">{editing.currency}</span>
                                 </div>
                             </Field>
                             <Field label="أعضاء الفريق" labelEn="Max team (فارغ = لا حد)">
@@ -554,17 +554,17 @@ export default function SubscriptionPlansPage() {
                             </Field>
                         </div>
 
-                        <div className="mx-6 mb-3 flex flex-wrap items-center gap-4 rounded-xl bg-slate-50 p-4">
+                        <div className="mx-6 mb-3 flex flex-wrap items-center gap-4 rounded-xl bg-m3-background p-4">
                             <BoolChk label="مفعّل"       checked={editing.is_active}       onChange={v => patch("is_active", v)} />
                             <BoolChk label="الأكثر شعبية" checked={editing.is_popular}      onChange={v => patch("is_popular", v)} />
                             <BoolChk label="Enterprise"   checked={editing.is_enterprise}   onChange={v => patch("is_enterprise", v)} />
                         </div>
 
-                        <div className="mx-6 mb-6 rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-4">
+                        <div className="mx-6 mb-6 rounded-xl border border-m3-outline-variant/60 bg-gradient-to-b from-slate-50 to-surface-card p-4">
                             <div className="mb-3 flex items-start justify-between">
                                 <div>
-                                    <p className="text-sm font-bold text-slate-800">المميزات: Features</p>
-                                    <p className="mt-0.5 text-[10.5px] text-slate-500">
+                                    <p className="text-sm font-bold text-m3-on-surface">المميزات: Features</p>
+                                    <p className="mt-0.5 text-[10.5px] text-m3-on-surface-variant">
                                         ✅ فقط الميزات المفعّلة هنا ستظهر للمستخدم داخل التطبيق.
                                         انظر دليل المرجع بالأعلى للقيم الافتراضية لكل خطة.
                                     </p>
@@ -592,7 +592,7 @@ export default function SubscriptionPlansPage() {
                             </div>
                             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                                 {FEATURES.map(f => (
-                                    <div key={f.key} className="rounded-xl ring-1 ring-slate-200 bg-white shadow-sm p-1">
+                                    <div key={f.key} className="rounded-xl ring-1 ring-m3-outline-variant/60 bg-surface-card shadow-sm p-1">
                                         <BoolChk
                                             label={f.label_ar}
                                             labelEn={f.label + `  [${f.key}]`}
@@ -604,14 +604,14 @@ export default function SubscriptionPlansPage() {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-end gap-3 border-t border-slate-100 px-6 py-4">
+                        <div className="flex items-center justify-end gap-3 border-t border-m3-surface-container-low px-6 py-4">
                             <button onClick={() => setDialogOpen(false)}
-                                    className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                                    className="rounded-lg border border-m3-outline-variant bg-surface-card px-4 py-2 text-sm font-semibold text-m3-on-surface hover:bg-m3-background">
                                 إلغاء
                             </button>
                             <button onClick={save}
                                     disabled={saving}
-                                    className="rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-purple-700 disabled:opacity-60">
+                                    className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-m3-on-surface shadow-md transition hover:bg-primary-container disabled:opacity-60">
                                 {saving ? "جاري الحفظ..." : (editing.id ? "حفظ التغييرات" : "إنشاء الخطة")}
                             </button>
                         </div>
@@ -645,9 +645,9 @@ function Field({ label, labelEn, full, children }: {
 }) {
     return (
         <div className={full ? "md:col-span-2 flex flex-col gap-1" : "flex flex-col gap-1"}>
-            <label className="text-xs font-semibold text-slate-600">
+            <label className="text-xs font-semibold text-m3-on-surface-variant">
                 {label}
-                {labelEn && <span className="mr-2 text-[10px] font-normal text-slate-400">({labelEn})</span>}
+                {labelEn && <span className="mr-2 text-[10px] font-normal text-m3-outline">({labelEn})</span>}
             </label>
             {children}
         </div>
@@ -658,13 +658,13 @@ function BoolChk({ label, labelEn, hint, checked, onChange }: {
     label: string; labelEn?: string; hint?: string; checked: boolean; onChange: (v: boolean) => void;
 }) {
     return (
-        <label className="inline-flex cursor-pointer items-start gap-3 select-none rounded-lg p-2 hover:bg-slate-50 transition">
+        <label className="inline-flex cursor-pointer items-start gap-3 select-none rounded-lg p-2 hover:bg-m3-background transition">
             <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)}
-                   className="mt-0.5 h-5 w-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500" />
+                   className="mt-0.5 h-5 w-5 rounded border-m3-outline-variant text-accent focus:ring-primary" />
             <div className="flex flex-col leading-tight">
-                <span className="text-sm font-semibold text-slate-800">{label}</span>
-                {labelEn && <span className="text-[10px] font-medium text-slate-400">{labelEn}</span>}
-                {hint && <span className="mt-0.5 text-[10.5px] leading-relaxed text-slate-500">{hint}</span>}
+                <span className="text-sm font-semibold text-m3-on-surface">{label}</span>
+                {labelEn && <span className="text-[10px] font-medium text-m3-outline">{labelEn}</span>}
+                {hint && <span className="mt-0.5 text-[10.5px] leading-relaxed text-m3-on-surface-variant">{hint}</span>}
             </div>
         </label>
     );

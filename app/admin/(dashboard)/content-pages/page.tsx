@@ -143,7 +143,7 @@ export default function AdminContentPages() {
         <div dir="rtl" className="space-y-6">
             <div>
                 <h1 className="text-3xl font-bold mb-2">محتوى الصفحات</h1>
-                <p className="text-sm text-gray-500">إدارة محتوى واجهة الموقع (من نحن، الشروط، الخصوصية).</p>
+                <p className="text-sm text-m3-on-surface-variant">إدارة محتوى واجهة الموقع (من نحن، الشروط، الخصوصية).</p>
             </div>
 
             {error && (
@@ -157,29 +157,29 @@ export default function AdminContentPages() {
                 </div>
             )}
 
-            <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <section className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-6 shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">قسم من نحن (بطاقات الصفحة الرئيسية)</h2>
 
                 {isLoading ? (
-                    <p className="text-sm text-gray-500">جاري تحميل المحتوى...</p>
+                    <p className="text-sm text-m3-on-surface-variant">جاري تحميل المحتوى...</p>
                 ) : (
                     <div className="grid grid-cols-1 gap-5">
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">عنوان البطاقة الأولى</label>
+                                <label className="block text-sm font-medium text-m3-on-surface">عنوان البطاقة الأولى</label>
                                 <input
                                     value={aboutCard1Title}
                                     onChange={(e) => setAboutCard1Title(e.target.value)}
-                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    className="w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2 text-sm"
                                     placeholder="من نحن"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">نص البطاقة الأولى</label>
+                                <label className="block text-sm font-medium text-m3-on-surface">نص البطاقة الأولى</label>
                                 <textarea
                                     value={aboutCard1Body}
                                     onChange={(e) => setAboutCard1Body(e.target.value)}
-                                    className="min-h-24 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    className="min-h-24 w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2 text-sm"
                                     placeholder="صورلي منصة تجمع العملاء..."
                                 />
                             </div>
@@ -187,20 +187,20 @@ export default function AdminContentPages() {
 
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">عنوان البطاقة الثانية</label>
+                                <label className="block text-sm font-medium text-m3-on-surface">عنوان البطاقة الثانية</label>
                                 <input
                                     value={aboutCard2Title}
                                     onChange={(e) => setAboutCard2Title(e.target.value)}
-                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    className="w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2 text-sm"
                                     placeholder="تجربة للعملاء"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">نص البطاقة الثانية</label>
+                                <label className="block text-sm font-medium text-m3-on-surface">نص البطاقة الثانية</label>
                                 <textarea
                                     value={aboutCard2Body}
                                     onChange={(e) => setAboutCard2Body(e.target.value)}
-                                    className="min-h-24 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    className="min-h-24 w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2 text-sm"
                                     placeholder="الصفحة الرئيسية مخصصة..."
                                 />
                             </div>
@@ -208,20 +208,20 @@ export default function AdminContentPages() {
 
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">عنوان البطاقة الثالثة</label>
+                                <label className="block text-sm font-medium text-m3-on-surface">عنوان البطاقة الثالثة</label>
                                 <input
                                     value={aboutCard3Title}
                                     onChange={(e) => setAboutCard3Title(e.target.value)}
-                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    className="w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2 text-sm"
                                     placeholder="تصميم قريب من التطبيق"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">نص البطاقة الثالثة</label>
+                                <label className="block text-sm font-medium text-m3-on-surface">نص البطاقة الثالثة</label>
                                 <textarea
                                     value={aboutCard3Body}
                                     onChange={(e) => setAboutCard3Body(e.target.value)}
-                                    className="min-h-24 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    className="min-h-24 w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2 text-sm"
                                     placeholder="نفس الإحساس الداكن..."
                                 />
                             </div>
@@ -230,28 +230,28 @@ export default function AdminContentPages() {
                 )}
             </section>
 
-            <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <section className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-6 shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">صفحة من نحن (صفحة مستقلة)</h2>
 
                 {isLoading ? (
-                    <p className="text-sm text-gray-500">جاري تحميل المحتوى...</p>
+                    <p className="text-sm text-m3-on-surface-variant">جاري تحميل المحتوى...</p>
                 ) : (
                     <div className="grid grid-cols-1 gap-3">
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">عنوان الصفحة</label>
+                            <label className="block text-sm font-medium text-m3-on-surface">عنوان الصفحة</label>
                             <input
                                 value={aboutPageTitle}
                                 onChange={(e) => setAboutPageTitle(e.target.value)}
-                                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                className="w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2 text-sm"
                                 placeholder="من نحن"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">محتوى الصفحة</label>
+                            <label className="block text-sm font-medium text-m3-on-surface">محتوى الصفحة</label>
                             <textarea
                                 value={aboutPageBody}
                                 onChange={(e) => setAboutPageBody(e.target.value)}
-                                className="min-h-64 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                className="min-h-64 w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2 text-sm"
                                 placeholder="اكتب محتوى صفحة من نحن هنا..."
                             />
                         </div>
@@ -259,31 +259,31 @@ export default function AdminContentPages() {
                 )}
             </section>
 
-            <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <section className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-6 shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">شروط الاستخدام</h2>
 
                 {isLoading ? (
-                    <p className="text-sm text-gray-500">جاري تحميل المحتوى...</p>
+                    <p className="text-sm text-m3-on-surface-variant">جاري تحميل المحتوى...</p>
                 ) : (
                     <textarea
                         value={termsBody}
                         onChange={(e) => setTermsBody(e.target.value)}
-                        className="min-h-64 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                        className="min-h-64 w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2 text-sm"
                         placeholder="اكتب شروط الاستخدام هنا..."
                     />
                 )}
             </section>
 
-            <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <section className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-6 shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">سياسة الخصوصية</h2>
 
                 {isLoading ? (
-                    <p className="text-sm text-gray-500">جاري تحميل المحتوى...</p>
+                    <p className="text-sm text-m3-on-surface-variant">جاري تحميل المحتوى...</p>
                 ) : (
                     <textarea
                         value={privacyBody}
                         onChange={(e) => setPrivacyBody(e.target.value)}
-                        className="min-h-64 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                        className="min-h-64 w-full rounded-lg border border-m3-outline-variant/60 px-3 py-2 text-sm"
                         placeholder="اكتب سياسة الخصوصية هنا..."
                     />
                 )}
@@ -293,7 +293,7 @@ export default function AdminContentPages() {
                 <button
                     onClick={handleSave}
                     disabled={isLoading || isSaving}
-                    className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-lg bg-m3-surface-container-highest px-5 py-2.5 text-sm font-semibold text-m3-on-surface shadow-sm transition-colors hover:bg-m3-surface-container-high disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     {isSaving ? 'جاري الحفظ...' : 'حفظ'}
                 </button>

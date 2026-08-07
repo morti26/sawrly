@@ -37,8 +37,8 @@ const STATUS_META: Record<FeatureStatus, { label: string; className: string; dot
     },
     planned: {
         label: 'مخطط له',
-        className: 'bg-slate-100 text-slate-600 border-slate-200',
-        dot: 'bg-slate-400',
+        className: 'bg-m3-surface-container-lowest text-m3-on-surface-variant border-m3-outline-variant/60',
+        dot: 'bg-m3-outline-variant',
     },
 };
 
@@ -465,9 +465,9 @@ function StatsBar() {
     const pctReady = total ? Math.round((counts.ready / total) * 100) : 0;
     return (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <p className="text-xs font-medium text-slate-500">إجمالي الميزات</p>
-                <p className="mt-2 text-3xl font-black text-slate-900">{total}</p>
+            <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
+                <p className="text-xs font-medium text-m3-on-surface-variant">إجمالي الميزات</p>
+                <p className="mt-2 text-3xl font-black text-m3-on-background">{total}</p>
             </div>
             <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
                 <p className="text-xs font-medium text-emerald-700">مُنفّذة وجاهزة</p>
@@ -484,9 +484,9 @@ function StatsBar() {
                 <p className="text-xs font-medium text-amber-700">جزئي / بحاجة لاختبار</p>
                 <p className="mt-2 text-3xl font-black text-amber-800">{counts.partial}</p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
-                <p className="text-xs font-medium text-slate-500">مخطط له (ليس بعد)</p>
-                <p className="mt-2 text-3xl font-black text-slate-700">{counts.planned}</p>
+            <div className="rounded-xl border border-m3-outline-variant/60 bg-m3-background p-5 shadow-sm">
+                <p className="text-xs font-medium text-m3-on-surface-variant">مخطط له (ليس بعد)</p>
+                <p className="mt-2 text-3xl font-black text-m3-on-surface">{counts.planned}</p>
             </div>
         </div>
     );
@@ -497,13 +497,13 @@ export default function AppFeaturesPage() {
         <div dir="rtl" className="space-y-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">ميزات تطبيق صورلي</h1>
-                    <p className="mt-1 max-w-2xl text-sm text-slate-500">
+                    <h1 className="text-2xl font-bold text-m3-on-background">ميزات تطبيق صورلي</h1>
+                    <p className="mt-1 max-w-2xl text-sm text-m3-on-surface-variant">
                         هذه قائمة بكل ما هو مُنفّذ فعلياً داخل تطبيق صورلي على الهاتف (النسخة الحالية). تُستخدم كمرجع لمراجعة ما تم إنجازه قبل إرسال النسخة للعميل.
                     </p>
                 </div>
-                <div className="rounded-xl bg-gradient-to-br from-purple-600 to-fuchsia-500 px-5 py-3 text-right text-white shadow-md shadow-purple-500/20">
-                    <p className="text-xs text-white/80">آخر تحديث للقائمة</p>
+                <div className="rounded-xl bg-gradient-to-br from-accent to-fuchsia-500 px-5 py-3 text-right text-m3-on-surface shadow-md shadow-glow-accent/20">
+                    <p className="text-xs text-m3-on-surface/80">آخر تحديث للقائمة</p>
                     <p className="font-bold">أغسطس 2026 • v1.2.2-hotfix</p>
                 </div>
             </div>
@@ -516,31 +516,31 @@ export default function AppFeaturesPage() {
                 return (
                     <section
                         key={group.id}
-                        className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+                        className="overflow-hidden rounded-2xl border border-m3-outline-variant/60 bg-surface-card shadow-sm"
                     >
-                        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-6 py-4">
+                        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-m3-surface-container-low bg-gradient-to-r from-slate-50 to-surface-card px-6 py-4">
                             <div className="flex items-center gap-3">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-100 text-2xl shadow-inner">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/15 text-2xl shadow-inner">
                                     {group.icon}
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold text-slate-900">{group.title}</h2>
-                                    <p className="text-xs text-slate-500">{group.subtitle}</p>
+                                    <h2 className="text-lg font-bold text-m3-on-background">{group.title}</h2>
+                                    <p className="text-xs text-m3-on-surface-variant">{group.subtitle}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-40 overflow-hidden rounded-full bg-slate-100">
+                                <div className="w-40 overflow-hidden rounded-full bg-m3-surface-container-lowest">
                                     <div
                                         className={`h-2 rounded-full ${pct === 100
                                             ? 'bg-emerald-500'
                                             : pct >= 75
-                                            ? 'bg-purple-500'
+                                            ? 'bg-accent'
                                             : 'bg-amber-500'
                                         }`}
                                         style={{ width: `${pct}%` }}
                                     />
                                 </div>
-                                <span className="min-w-[52px] text-right text-sm font-semibold text-slate-700">
+                                <span className="min-w-[52px] text-right text-sm font-semibold text-m3-on-surface">
                                     {ready}/{group.features.length}
                                 </span>
                             </div>
@@ -554,18 +554,18 @@ export default function AppFeaturesPage() {
                                         className="grid grid-cols-1 items-start gap-4 px-6 py-4 md:grid-cols-12"
                                     >
                                         <div className="flex items-center gap-3 md:col-span-6">
-                                            <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-slate-100 text-xl">
+                                            <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-m3-surface-container-lowest text-xl">
                                                 {f.icon}
                                             </div>
                                             <div>
-                                                <h3 className="font-semibold text-slate-900">
+                                                <h3 className="font-semibold text-m3-on-background">
                                                     {f.title}
                                                 </h3>
-                                                <p className="mt-0.5 text-sm text-slate-500">
+                                                <p className="mt-0.5 text-sm text-m3-on-surface-variant">
                                                     {f.description}
                                                 </p>
                                                 {f.notes && (
-                                                    <p className="mt-1 text-xs text-purple-700">
+                                                    <p className="mt-1 text-xs text-m3-primary">
                                                         💡 {f.notes}
                                                     </p>
                                                 )}
@@ -582,7 +582,7 @@ export default function AppFeaturesPage() {
                                             </span>
                                         </div>
                                         <div className="md:col-span-3 md:text-left">
-                                            <span className="rounded-md bg-slate-900/5 px-2.5 py-1 font-mono text-xs font-medium text-slate-700">
+                                            <span className="rounded-md bg-m3-surface-container-highest/5 px-2.5 py-1 font-mono text-xs font-medium text-m3-on-surface">
                                                 {f.releaseVersion}
                                             </span>
                                         </div>

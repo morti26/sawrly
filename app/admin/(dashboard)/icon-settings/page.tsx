@@ -214,7 +214,7 @@ export default function AdminIconSettingsPage() {
         <div className="space-y-6">
             <div className="flex flex-col gap-2">
                 <h2 className="text-right text-2xl font-bold">أيقونات الحساب والاشتراك</h2>
-                <p className="text-right text-sm text-slate-600">
+                <p className="text-right text-sm text-m3-on-surface-variant">
                     هنا ترفع أيقونات الأنثى والذكر والسوبر أدمن وأنواع الاشتراكات، ثم نربطها
                     داخل التطبيق حسب النوع.
                 </p>
@@ -233,14 +233,14 @@ export default function AdminIconSettingsPage() {
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {cards.map((card) => (
-                    <div key={card.key} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div key={card.key} className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                         <div className="space-y-1 text-right">
-                            <h3 className="font-bold text-slate-900">{card.title}</h3>
-                            <p className="text-sm text-slate-500">{card.description}</p>
+                            <h3 className="font-bold text-m3-on-background">{card.title}</h3>
+                            <p className="text-sm text-m3-on-surface-variant">{card.description}</p>
                         </div>
 
                         <div className="mt-4 flex justify-center">
-                            <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-2xl border border-dashed border-slate-300 bg-slate-50">
+                            <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-2xl border border-dashed border-m3-outline-variant bg-m3-background">
                                 {card.currentUrl ? (
                                     <Image
                                         src={card.currentUrl}
@@ -251,7 +251,7 @@ export default function AdminIconSettingsPage() {
                                         unoptimized
                                     />
                                 ) : (
-                                    <span className="px-3 text-center text-xs text-slate-400">
+                                    <span className="px-3 text-center text-xs text-m3-outline">
                                         لا توجد أيقونة بعد
                                     </span>
                                 )}
@@ -259,7 +259,7 @@ export default function AdminIconSettingsPage() {
                         </div>
 
                         <div className="mt-4 flex flex-col gap-3">
-                            <label className="cursor-pointer rounded-lg bg-slate-900 px-4 py-2 text-center text-sm font-medium text-white transition hover:bg-slate-800">
+                            <label className="cursor-pointer rounded-lg bg-m3-surface-container-highest px-4 py-2 text-center text-sm font-medium text-m3-on-surface transition hover:bg-m3-surface-container-high">
                                 اختر ملف PNG
                                 <input
                                     type="file"
@@ -271,7 +271,7 @@ export default function AdminIconSettingsPage() {
                             <button
                                 type="button"
                                 onClick={() => handleRemove(card.key)}
-                                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                                className="rounded-lg border border-m3-outline-variant/60 px-4 py-2 text-sm font-medium text-m3-on-surface transition hover:bg-m3-background"
                             >
                                 إزالة الأيقونة
                             </button>
@@ -280,12 +280,12 @@ export default function AdminIconSettingsPage() {
                 ))}
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                 <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <button
                         type="button"
                         onClick={() => void loadSettings()}
-                        className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                        className="rounded-lg border border-m3-outline-variant/60 px-4 py-2 text-sm font-medium text-m3-on-surface transition hover:bg-m3-background"
                     >
                         إعادة التحميل
                     </button>
@@ -293,7 +293,7 @@ export default function AdminIconSettingsPage() {
                         type="button"
                         onClick={() => void handleSave()}
                         disabled={saving || loading}
-                        className="rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-purple-300"
+                        className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-m3-on-surface transition hover:bg-primary-container disabled:cursor-not-allowed disabled:bg-accent/60"
                     >
                         {saving ? 'جارٍ الحفظ...' : 'حفظ الأيقونات'}
                     </button>
@@ -301,7 +301,7 @@ export default function AdminIconSettingsPage() {
             </div>
 
             {loading ? (
-                <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-500 shadow-sm">
+                <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card px-4 py-6 text-center text-sm text-m3-on-surface-variant shadow-sm">
                     جارٍ تحميل الأيقونات...
                 </div>
             ) : null}
