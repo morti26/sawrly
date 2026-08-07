@@ -75,7 +75,7 @@ export function LandingPreviewSlider() {
     return (
         <div
             aria-hidden="true"
-            className="mx-auto grid aspect-[4/3] w-full max-w-[38rem] grid-rows-3 overflow-hidden rounded-[2rem] border border-white/10 bg-[#151923]/80 shadow-[0_18px_65px_rgba(255,86,170,0.16),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur"
+            className="mx-auto grid aspect-[4/3] w-full max-w-[38rem] grid-rows-3 overflow-hidden rounded-card border border-m3-card-border bg-m3-surface/80 shadow-[0_18px_65px_rgba(var(--accent-rgb),calc(var(--eff-active-glow-opacity)*0.7)),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-glass"
         >
             {[0, 1, 2].map((row) => {
                 const rowIndex = (activeIndex + row) % visibleSlides.length;
@@ -83,7 +83,7 @@ export function LandingPreviewSlider() {
                 return (
                     <div
                         key={row}
-                        className="relative min-h-0 overflow-hidden border-white/10 first:border-t-0 [&:not(:first-child)]:border-t"
+                        className="relative min-h-0 overflow-hidden border-border-outline-variant first:border-t-0 [&:not(:first-child)]:border-t"
                     >
                         {visibleSlides.map((slide, index) => {
                             const isActive = index === rowIndex;
@@ -92,7 +92,7 @@ export function LandingPreviewSlider() {
                                 return (
                                     <div
                                         key={`${row}-${index}`}
-                                        className={`absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,86,170,0.14),rgba(255,255,255,0)_45%),linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.01))] transition-opacity duration-700 ${isActive ? "opacity-100" : "opacity-0"}`}
+                                        className={`absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(var(--accent-rgb),calc(var(--eff-active-glow-opacity)*0.6)),rgba(255,255,255,0)_45%),linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.01))] transition-opacity duration-700 ${isActive ? "opacity-100" : "opacity-0"}`}
                                     />
                                 );
                             }

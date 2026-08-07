@@ -25,3 +25,11 @@ yarn-error.log*
 pnpm-debug.log*
 devserver*.log
 NUL
+
+.dart_tool/
+static/.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/

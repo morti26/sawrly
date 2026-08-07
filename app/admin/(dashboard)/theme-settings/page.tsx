@@ -3,8 +3,9 @@
 import Image from "next/image";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import * as Pi from "@phosphor-icons/react";
+import type { EnterpriseTheme } from "@/lib/theme_engine";
 
-type ThemeColors = {
+type LegacyThemeColors = {
     primary: string | null;
     primaryLight: string | null;
     primaryDark: string | null;
@@ -23,6 +24,80 @@ type ThemeColors = {
     border: string | null;
     borderLight: string | null;
 };
+
+type M3ThemeColors = {
+    onPrimary: string | null;
+    primaryContainer: string | null;
+    onPrimaryContainer: string | null;
+    primaryFixed: string | null;
+    primaryFixedDim: string | null;
+    onPrimaryFixed: string | null;
+    onPrimaryFixedVariant: string | null;
+    secondary: string | null;
+    onSecondary: string | null;
+    secondaryContainer: string | null;
+    onSecondaryContainer: string | null;
+    secondaryFixed: string | null;
+    secondaryFixedDim: string | null;
+    onSecondaryFixed: string | null;
+    onSecondaryFixedVariant: string | null;
+    tertiary: string | null;
+    onTertiary: string | null;
+    tertiaryContainer: string | null;
+    onTertiaryContainer: string | null;
+    tertiaryFixed: string | null;
+    tertiaryFixedDim: string | null;
+    onTertiaryFixed: string | null;
+    onTertiaryFixedVariant: string | null;
+    onError: string | null;
+    errorContainer: string | null;
+    onErrorContainer: string | null;
+    onSurface: string | null;
+    surfaceDim: string | null;
+    surfaceBright: string | null;
+    surfaceContainerLowest: string | null;
+    surfaceContainerLow: string | null;
+    surfaceContainer: string | null;
+    surfaceContainerHigh: string | null;
+    surfaceContainerHighest: string | null;
+    onSurfaceVariant: string | null;
+    outline: string | null;
+    outlineVariant: string | null;
+    onBackground: string | null;
+    inverseSurface: string | null;
+    inverseOnSurface: string | null;
+    inversePrimary: string | null;
+    shadow: string | null;
+    scrim: string | null;
+    onSuccess: string | null;
+    successContainer: string | null;
+    onSuccessContainer: string | null;
+    onWarning: string | null;
+    warningContainer: string | null;
+    onWarningContainer: string | null;
+    onInfo: string | null;
+    infoContainer: string | null;
+    onInfoContainer: string | null;
+    divider: string | null;
+    splash: string | null;
+    disabled: string | null;
+    onDisabled: string | null;
+    disabledContainer: string | null;
+    heroStart: string | null;
+    heroMid: string | null;
+    heroEnd: string | null;
+    cardBackground: string | null;
+    cardBorder: string | null;
+    badge: string | null;
+    onBadge: string | null;
+    snackbarBackground: string | null;
+    snackbarText: string | null;
+    shimmerBase: string | null;
+    shimmerHighlight: string | null;
+    onAccentPink: string | null;
+};
+
+type ThemeColors = LegacyThemeColors & M3ThemeColors;
 
 type NavIcons = {
     home: string | null;
@@ -66,93 +141,85 @@ type ThemeSettings = {
     effects: ThemeEffects;
 };
 
+type WcagBadge = { aaNormal: boolean; aaaNormal: boolean; ratio: number };
+
 const EMPTY_COLORS: ThemeColors = {
-    primary: null,
-    primaryLight: null,
-    primaryDark: null,
-    accentPink: null,
-    background: null,
-    surface: null,
-    surfaceLight: null,
-    menuBackground: null,
-    textPrimary: null,
-    textSecondary: null,
-    textTertiary: null,
-    success: null,
-    warning: null,
-    error: null,
-    info: null,
-    border: null,
-    borderLight: null,
+    primary: null, primaryLight: null, primaryDark: null, accentPink: null,
+    background: null, surface: null, surfaceLight: null, menuBackground: null,
+    textPrimary: null, textSecondary: null, textTertiary: null,
+    success: null, warning: null, error: null, info: null,
+    border: null, borderLight: null,
+    onPrimary: null, primaryContainer: null, onPrimaryContainer: null,
+    primaryFixed: null, primaryFixedDim: null, onPrimaryFixed: null, onPrimaryFixedVariant: null,
+    secondary: null, onSecondary: null, secondaryContainer: null, onSecondaryContainer: null,
+    secondaryFixed: null, secondaryFixedDim: null, onSecondaryFixed: null, onSecondaryFixedVariant: null,
+    tertiary: null, onTertiary: null, tertiaryContainer: null, onTertiaryContainer: null,
+    tertiaryFixed: null, tertiaryFixedDim: null, onTertiaryFixed: null, onTertiaryFixedVariant: null,
+    onError: null, errorContainer: null, onErrorContainer: null,
+    onSurface: null, surfaceDim: null, surfaceBright: null,
+    surfaceContainerLowest: null, surfaceContainerLow: null, surfaceContainer: null,
+    surfaceContainerHigh: null, surfaceContainerHighest: null,
+    onSurfaceVariant: null, outline: null, outlineVariant: null, onBackground: null,
+    inverseSurface: null, inverseOnSurface: null, inversePrimary: null,
+    shadow: null, scrim: null,
+    onSuccess: null, successContainer: null, onSuccessContainer: null,
+    onWarning: null, warningContainer: null, onWarningContainer: null,
+    onInfo: null, infoContainer: null, onInfoContainer: null,
+    divider: null, splash: null, disabled: null, onDisabled: null, disabledContainer: null,
+    heroStart: null, heroMid: null, heroEnd: null,
+    cardBackground: null, cardBorder: null, badge: null, onBadge: null,
+    snackbarBackground: null, snackbarText: null, shimmerBase: null, shimmerHighlight: null,
+    onAccentPink: null,
 };
 
 const EMPTY_NAV_ICONS: NavIcons = {
-    home: null,
-    search: null,
-    categories: null,
-    orders: null,
-    profile: null,
-    homeActive: null,
-    searchActive: null,
-    categoriesActive: null,
-    ordersActive: null,
-    profileActive: null,
-    homeId: null,
-    searchId: null,
-    categoriesId: null,
-    ordersId: null,
-    profileId: null,
-    homeActiveId: null,
-    searchActiveId: null,
-    categoriesActiveId: null,
-    ordersActiveId: null,
-    profileActiveId: null,
+    home: null, search: null, categories: null, orders: null, profile: null,
+    homeActive: null, searchActive: null, categoriesActive: null,
+    ordersActive: null, profileActive: null,
+    homeId: null, searchId: null, categoriesId: null, ordersId: null, profileId: null,
+    homeActiveId: null, searchActiveId: null, categoriesActiveId: null,
+    ordersActiveId: null, profileActiveId: null,
 };
 
 const EMPTY_EFFECTS: ThemeEffects = {
-    primaryGradientAngle: null,
-    cardRadius: null,
-    chipRadius: null,
-    buttonRadius: null,
-    navShadowOpacity: null,
-    cardShadowOpacity: null,
-    activeGlowOpacity: null,
-    glassBlur: null,
-    surfaceOpacity: null,
-    borderOpacity: null,
+    primaryGradientAngle: null, cardRadius: null, chipRadius: null, buttonRadius: null,
+    navShadowOpacity: null, cardShadowOpacity: null, activeGlowOpacity: null, glassBlur: null,
+    surfaceOpacity: null, borderOpacity: null,
 };
 
 const DEFAULT_EFFECTS: Required<ThemeEffects> = {
-    primaryGradientAngle: 135,
-    cardRadius: 16,
-    chipRadius: 999,
-    buttonRadius: 12,
-    navShadowOpacity: 0.18,
-    cardShadowOpacity: 0.12,
-    activeGlowOpacity: 0.22,
-    glassBlur: 14,
-    surfaceOpacity: 0.85,
-    borderOpacity: 0.45,
+    primaryGradientAngle: 135, cardRadius: 16, chipRadius: 999, buttonRadius: 12,
+    navShadowOpacity: 0.18, cardShadowOpacity: 0.12, activeGlowOpacity: 0.22, glassBlur: 14,
+    surfaceOpacity: 0.85, borderOpacity: 0.45,
 };
 
 const DEFAULT_COLORS: ThemeColors = {
-    primary: "#9B4DFF",
-    primaryLight: "#C48CFF",
-    primaryDark: "#7230CC",
-    accentPink: "#FF4DA6",
-    background: "#46205A",
-    surface: "#57246F",
-    surfaceLight: "#6F2E8E",
-    menuBackground: "#421B54",
-    textPrimary: "#FFFFFF",
-    textSecondary: "#B0B0B0",
-    textTertiary: "#707070",
-    success: "#22C55E",
-    warning: "#F59E0B",
-    error: "#EF4444",
-    info: "#3B82F6",
-    border: "#7B469C",
-    borderLight: "#5E2B79",
+    primary: "#9B4DFF", primaryLight: "#C48CFF", primaryDark: "#7230CC", accentPink: "#FF4DA6",
+    background: "#46205A", surface: "#57246F", surfaceLight: "#6F2E8E", menuBackground: "#421B54",
+    textPrimary: "#FFFFFF", textSecondary: "#B0B0B0", textTertiary: "#707070",
+    success: "#22C55E", warning: "#F59E0B", error: "#EF4444", info: "#3B82F6",
+    border: "#7B469C", borderLight: "#5E2B79",
+    onPrimary: "#FFFFFF", primaryContainer: "#E9DDFF", onPrimaryContainer: "#23005B",
+    primaryFixed: "#E9DDFF", primaryFixedDim: "#D0BCFF", onPrimaryFixed: "#23005B", onPrimaryFixedVariant: "#4F378B",
+    secondary: "#6750A4", onSecondary: "#FFFFFF", secondaryContainer: "#E8DEF8", onSecondaryContainer: "#1F0242",
+    secondaryFixed: "#E8DEF8", secondaryFixedDim: "#CCC2DC", onSecondaryFixed: "#1F0242", onSecondaryFixedVariant: "#4A4458",
+    tertiary: "#7D5260", onTertiary: "#FFFFFF", tertiaryContainer: "#FFD8E4", onTertiaryContainer: "#31111D",
+    tertiaryFixed: "#FFD8E4", tertiaryFixedDim: "#EFB8C8", onTertiaryFixed: "#31111D", onTertiaryFixedVariant: "#633B48",
+    onError: "#FFFFFF", errorContainer: "#FFDAD6", onErrorContainer: "#410002",
+    onSurface: "#1D1B20", surfaceDim: "#DED8E1", surfaceBright: "#FEF7FF",
+    surfaceContainerLowest: "#FFFFFF", surfaceContainerLow: "#F7F2FA", surfaceContainer: "#F3EDF7",
+    surfaceContainerHigh: "#ECE6F0", surfaceContainerHighest: "#E6E0E9",
+    onSurfaceVariant: "#49454F", outline: "#79747E", outlineVariant: "#CAC4D0", onBackground: "#1D1B20",
+    inverseSurface: "#322F35", inverseOnSurface: "#F5EFF7", inversePrimary: "#D0BCFF",
+    shadow: "#000000", scrim: "#000000",
+    onSuccess: "#FFFFFF", successContainer: "#C8E6C9", onSuccessContainer: "#003300",
+    onWarning: "#FFFFFF", warningContainer: "#FFE0B2", onWarningContainer: "#3E2723",
+    onInfo: "#FFFFFF", infoContainer: "#BBDEFB", onInfoContainer: "#0D2A56",
+    divider: "#CAC4D0", splash: "#6750A4", disabled: "#CAC4D0", onDisabled: "#49454F", disabledContainer: "#E6E0E9",
+    heroStart: "#4F378B", heroMid: "#6750A4", heroEnd: "#FF4DA6",
+    cardBackground: "#FFFFFF", cardBorder: "#CAC4D0", badge: "#7D5260", onBadge: "#FFFFFF",
+    snackbarBackground: "#322F35", snackbarText: "#F5EFF7", shimmerBase: "#E6E0E9", shimmerHighlight: "#FEF7FF",
+    onAccentPink: "#FFFFFF",
 };
 
 type ColorField = keyof ThemeColors;
@@ -172,22 +239,15 @@ const EFFECT_FIELDS: { key: EffectField; label: string; desc: string; min: numbe
     { key: "activeGlowOpacity", label: "توهج الزر المفعّل", desc: "توهج خلف أيقونة القسم المفتوح.", min: 0, max: 1, step: 0.01 },
 ];
 
-const PRESET_THEMES: { name: string; label: string; colors: ThemeColors }[] = [
+const PRESET_THEMES: { name: string; label: string; seed: string; colors: ThemeColors }[] = [
     {
-        name: "purple-dream",
-        label: "حلم بنفسجي",
-        colors: {
-            primary: "#9B4DFF", primaryLight: "#C48CFF", primaryDark: "#7230CC", accentPink: "#FF4DA6",
-            background: "#46205A", surface: "#57246F", surfaceLight: "#6F2E8E", menuBackground: "#421B54",
-            textPrimary: "#FFFFFF", textSecondary: "#B0B0B0", textTertiary: "#707070",
-            success: "#22C55E", warning: "#F59E0B", error: "#EF4444", info: "#3B82F6",
-            border: "#7B469C", borderLight: "#5E2B79",
-        },
+        name: "purple-dream", label: "حلم بنفسجي", seed: "#9B4DFF",
+        colors: { ...DEFAULT_COLORS },
     },
     {
-        name: "ocean-teal",
-        label: "محيط زرقاء",
+        name: "ocean-teal", label: "محيط زرقاء", seed: "#10B981",
         colors: {
+            ...DEFAULT_COLORS,
             primary: "#10B981", primaryLight: "#6EE7B7", primaryDark: "#047857", accentPink: "#38BDF8",
             background: "#0B2830", surface: "#0F3441", surfaceLight: "#145063", menuBackground: "#0A2430",
             textPrimary: "#F4FAFA", textSecondary: "#A8C5CC", textTertiary: "#6C8891",
@@ -196,9 +256,9 @@ const PRESET_THEMES: { name: string; label: string; colors: ThemeColors }[] = [
         },
     },
     {
-        name: "sunset-orange",
-        label: "غروب برتقالي",
+        name: "sunset-orange", label: "غروب برتقالي", seed: "#F97316",
         colors: {
+            ...DEFAULT_COLORS,
             primary: "#F97316", primaryLight: "#FDBA74", primaryDark: "#C2410C", accentPink: "#FB7185",
             background: "#2A1410", surface: "#3F1F18", surfaceLight: "#5D2E24", menuBackground: "#23120D",
             textPrimary: "#FFF7ED", textSecondary: "#FED7AA", textTertiary: "#C9996A",
@@ -207,9 +267,9 @@ const PRESET_THEMES: { name: string; label: string; colors: ThemeColors }[] = [
         },
     },
     {
-        name: "royal-gold",
-        label: "ذهبي ملكي",
+        name: "royal-gold", label: "ذهبي ملكي", seed: "#EAB308",
         colors: {
+            ...DEFAULT_COLORS,
             primary: "#EAB308", primaryLight: "#FDE68A", primaryDark: "#A16207", accentPink: "#F472B6",
             background: "#1C1917", surface: "#292524", surfaceLight: "#3F3A36", menuBackground: "#151312",
             textPrimary: "#FAFAF9", textSecondary: "#D6D3D1", textTertiary: "#A8A29E",
@@ -218,9 +278,9 @@ const PRESET_THEMES: { name: string; label: string; colors: ThemeColors }[] = [
         },
     },
     {
-        name: "snow-white",
-        label: "ثلج ناصع (فاتح)",
+        name: "snow-white", label: "ثلج ناصع (فاتح)", seed: "#7C3AED",
         colors: {
+            ...DEFAULT_COLORS,
             primary: "#7C3AED", primaryLight: "#A78BFA", primaryDark: "#5B21B6", accentPink: "#DB2777",
             background: "#F8FAFC", surface: "#FFFFFF", surfaceLight: "#F1F5F9", menuBackground: "#FFFFFF",
             textPrimary: "#0F172A", textSecondary: "#475569", textTertiary: "#94A3B8",
@@ -229,9 +289,9 @@ const PRESET_THEMES: { name: string; label: string; colors: ThemeColors }[] = [
         },
     },
     {
-        name: "neon-cyber",
-        label: "نيون سيبر",
+        name: "neon-cyber", label: "نيون سيبر", seed: "#22D3EE",
         colors: {
+            ...DEFAULT_COLORS,
             primary: "#22D3EE", primaryLight: "#67E8F9", primaryDark: "#0891B2", accentPink: "#F0ABFC",
             background: "#07091C", surface: "#0E1230", surfaceLight: "#181E4A", menuBackground: "#050714",
             textPrimary: "#E0F2FE", textSecondary: "#7DD3FC", textTertiary: "#3B82F6",
@@ -241,7 +301,7 @@ const PRESET_THEMES: { name: string; label: string; colors: ThemeColors }[] = [
     },
 ];
 
-const COLOR_FIELDS: { key: ColorField; label: string; desc: string }[] = [
+const LEGACY_COLOR_FIELDS: { key: ColorField; label: string; desc: string }[] = [
     { key: "primary", label: "اللون الرئيسي", desc: "لون العلامة التجارية الأساسي." },
     { key: "primaryLight", label: "فاتح الرئيسي", desc: "نسخة فاتحة للزرز والتوهجات." },
     { key: "primaryDark", label: "داكن الرئيسي", desc: "نسخة داكنة للتدرجات." },
@@ -259,6 +319,139 @@ const COLOR_FIELDS: { key: ColorField; label: string; desc: string }[] = [
     { key: "info", label: "معلومات", desc: "رسائل معلوماتية." },
     { key: "border", label: "حُدود", desc: "حدود البطاقات." },
     { key: "borderLight", label: "حدود خفيفة", desc: "فواصل داخلية." },
+];
+
+type ColorGroup = {
+    id: string;
+    title: string;
+    desc: string;
+    fields: { key: ColorField; label: string; fgOf?: ColorField; desc?: string }[];
+};
+
+const M3_COLOR_GROUPS: ColorGroup[] = [
+    {
+        id: "primary", title: "مجموعة الرئيسي (Material 3)",
+        desc: "مجموعة الألوان الأساسية للعلامة التجارية مع حاويات وألوان نص مضمونة WCAG.",
+        fields: [
+            { key: "primary", label: "Primary", desc: "اللون الأساسي." },
+            { key: "onPrimary", label: "On Primary", fgOf: "primary", desc: "لون النص فوق Primary." },
+            { key: "primaryContainer", label: "Primary Container", desc: "حاوية مركبات الرئيسية." },
+            { key: "onPrimaryContainer", label: "On Primary Container", fgOf: "primaryContainer", desc: "نص داخل الحاوية." },
+            { key: "primaryFixed", label: "Primary Fixed" },
+            { key: "primaryFixedDim", label: "Primary Fixed Dim" },
+            { key: "onPrimaryFixed", label: "On Primary Fixed", fgOf: "primaryFixed" },
+            { key: "onPrimaryFixedVariant", label: "On Primary Fixed Variant", fgOf: "primaryFixedDim" },
+        ],
+    },
+    {
+        id: "secondary", title: "مجموعة الثانوي (Secondary)",
+        desc: "ألوان ثانوية متناغمة مع الرئيسي (منسقة تلقائياً عبر Smart Palette).",
+        fields: [
+            { key: "secondary", label: "Secondary" },
+            { key: "onSecondary", label: "On Secondary", fgOf: "secondary" },
+            { key: "secondaryContainer", label: "Secondary Container" },
+            { key: "onSecondaryContainer", label: "On Secondary Container", fgOf: "secondaryContainer" },
+            { key: "secondaryFixed", label: "Secondary Fixed" },
+            { key: "secondaryFixedDim", label: "Secondary Fixed Dim" },
+            { key: "onSecondaryFixed", label: "On Secondary Fixed", fgOf: "secondaryFixed" },
+            { key: "onSecondaryFixedVariant", label: "On Secondary Fixed Variant", fgOf: "secondaryFixedDim" },
+        ],
+    },
+    {
+        id: "tertiary", title: "مجموعة الثالث (Tertiary)",
+        desc: "لون تكميلي مستوحى من الحلقة اللونية (hue + 60°) للتباين الجمالي.",
+        fields: [
+            { key: "tertiary", label: "Tertiary" },
+            { key: "onTertiary", label: "On Tertiary", fgOf: "tertiary" },
+            { key: "tertiaryContainer", label: "Tertiary Container" },
+            { key: "onTertiaryContainer", label: "On Tertiary Container", fgOf: "tertiaryContainer" },
+            { key: "tertiaryFixed", label: "Tertiary Fixed" },
+            { key: "tertiaryFixedDim", label: "Tertiary Fixed Dim" },
+            { key: "onTertiaryFixed", label: "On Tertiary Fixed", fgOf: "tertiaryFixed" },
+            { key: "onTertiaryFixedVariant", label: "On Tertiary Fixed Variant", fgOf: "tertiaryFixedDim" },
+        ],
+    },
+    {
+        id: "error", title: "مجموعة الخطأ (Error)",
+        desc: "حالات الخطأ والحاويات مع نصوص مضادة WCAG.",
+        fields: [
+            { key: "error", label: "Error" },
+            { key: "onError", label: "On Error", fgOf: "error" },
+            { key: "errorContainer", label: "Error Container" },
+            { key: "onErrorContainer", label: "On Error Container", fgOf: "errorContainer" },
+        ],
+    },
+    {
+        id: "semantic-status", title: "الحالات الدلالية (نجاح / تحذير / معلومات)",
+        desc: "مستخدمة في الشارات والتنبيهات والرسائل. الألوان مشتقة تلقائياً من النظام.",
+        fields: [
+            { key: "success", label: "Success" },
+            { key: "onSuccess", label: "On Success", fgOf: "success" },
+            { key: "successContainer", label: "Success Container" },
+            { key: "onSuccessContainer", label: "On Success Container", fgOf: "successContainer" },
+            { key: "warning", label: "Warning" },
+            { key: "onWarning", label: "On Warning", fgOf: "warning" },
+            { key: "warningContainer", label: "Warning Container" },
+            { key: "onWarningContainer", label: "On Warning Container", fgOf: "warningContainer" },
+            { key: "info", label: "Info" },
+            { key: "onInfo", label: "On Info", fgOf: "info" },
+            { key: "infoContainer", label: "Info Container" },
+            { key: "onInfoContainer", label: "On Info Container", fgOf: "infoContainer" },
+        ],
+    },
+    {
+        id: "surface", title: "الأسطح (Surface Family)",
+        desc: "تدرج المستويات من الأغمق (Dim) إلى الأكثر سطوعاً (Bright) مع الحاويات الخمس (Material 3).",
+        fields: [
+            { key: "surface", label: "Surface" },
+            { key: "onSurface", label: "On Surface", fgOf: "surface" },
+            { key: "surfaceDim", label: "Surface Dim" },
+            { key: "surfaceBright", label: "Surface Bright" },
+            { key: "surfaceContainerLowest", label: "Surface Container Lowest" },
+            { key: "surfaceContainerLow", label: "Surface Container Low" },
+            { key: "surfaceContainer", label: "Surface Container" },
+            { key: "surfaceContainerHigh", label: "Surface Container High" },
+            { key: "surfaceContainerHighest", label: "Surface Container Highest" },
+            { key: "onSurfaceVariant", label: "On Surface Variant", fgOf: "surfaceContainerHighest" },
+            { key: "onBackground", label: "On Background", fgOf: "background" },
+            { key: "inverseSurface", label: "Inverse Surface" },
+            { key: "inverseOnSurface", label: "Inverse On Surface", fgOf: "inverseSurface" },
+            { key: "inversePrimary", label: "Inverse Primary" },
+        ],
+    },
+    {
+        id: "outlines", title: "الحدود والمخططات (Outline / Divider)",
+        desc: "حدود العناصر والفواصل مع الشفافية.",
+        fields: [
+            { key: "outline", label: "Outline (focus/borders)" },
+            { key: "outlineVariant", label: "Outline Variant" },
+            { key: "divider", label: "Divider (فواصل)" },
+            { key: "cardBorder", label: "Card Border" },
+            { key: "shadow", label: "Shadow" },
+            { key: "scrim", label: "Scrim (شاشة تعتيم)" },
+        ],
+    },
+    {
+        id: "components", title: "مكونات (Hero / Card / Badge / Snackbar / Shimmer / Splash)",
+        desc: "مكونات خاصة بـ صورلي مع تدرجات البطل وشيمر التحميل.",
+        fields: [
+            { key: "heroStart", label: "Hero Gradient Start" },
+            { key: "heroMid", label: "Hero Gradient Mid" },
+            { key: "heroEnd", label: "Hero Gradient End" },
+            { key: "splash", label: "Splash (ripple)" },
+            { key: "cardBackground", label: "Card Background" },
+            { key: "badge", label: "Badge" },
+            { key: "onBadge", label: "On Badge", fgOf: "badge" },
+            { key: "snackbarBackground", label: "Snackbar Background" },
+            { key: "snackbarText", label: "Snackbar Text", fgOf: "snackbarBackground" },
+            { key: "shimmerBase", label: "Shimmer Base" },
+            { key: "shimmerHighlight", label: "Shimmer Highlight" },
+            { key: "disabled", label: "Disabled" },
+            { key: "onDisabled", label: "On Disabled", fgOf: "disabled" },
+            { key: "disabledContainer", label: "Disabled Container" },
+            { key: "onAccentPink", label: "On Accent Pink", fgOf: "accentPink" },
+        ],
+    },
 ];
 
 const NAV_ICON_FIELDS: { key: NavIconField; label: string; desc: string }[] = [
@@ -441,8 +634,6 @@ function hexToCss(hex: string | null, fallback: string): string {
 }
 
 function colorToSixDigitHex(color: string): string {
-    // Tar emot #RGB/#RRGGBB/#RRGGBBAA och returnerar alltid #RRGGBB (alpha tas bort).
-    // Används för <input type=color> som endast accepterar #RRGGBB.
     const c = color.replace("#", "");
     const full =
         c.length === 3
@@ -489,11 +680,64 @@ function withAlpha(colorHex: string, alpha: number): string {
     return `#${full}${alphaHex}`;
 }
 
+function relativeLuminance(hex: string): number {
+    const c = colorToSixDigitHex(hex).replace("#", "");
+    const r = parseInt(c.slice(0, 2), 16) / 255;
+    const g = parseInt(c.slice(2, 4), 16) / 255;
+    const b = parseInt(c.slice(4, 6), 16) / 255;
+    const lin = (s: number) => (s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4));
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+function contrastRatio(a: string, b: string): number {
+    const la = relativeLuminance(a);
+    const lb = relativeLuminance(b);
+    const hi = Math.max(la, lb), lo = Math.min(la, lb);
+    return (hi + 0.05) / (lo + 0.05);
+}
+function wcagQuick(fg: string, bg: string): WcagBadge {
+    const ratio = contrastRatio(fg, bg);
+    return { aaNormal: ratio >= 4.5, aaaNormal: ratio >= 7, ratio };
+}
+
+function WcagTag({ rating }: { rating: WcagBadge }) {
+    if (rating.aaaNormal) {
+        return (
+            <span
+                className="mr-2 rounded-md bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm"
+                title={`WCAG AAA — ${rating.ratio.toFixed(2)}:1`}
+            >
+                ⭐ AAA {rating.ratio.toFixed(1)}
+            </span>
+        );
+    }
+    if (rating.aaNormal) {
+        return (
+            <span
+                className="mr-2 rounded-md bg-green-600 px-2 py-0.5 text-[10px] font-bold text-white"
+                title={`WCAG AA — ${rating.ratio.toFixed(2)}:1`}
+            >
+                ✅ AA {rating.ratio.toFixed(1)}
+            </span>
+        );
+    }
+    return (
+        <span
+            className="mr-2 rounded-md bg-rose-600 px-2 py-0.5 text-[10px] font-bold text-white"
+            title={`Failed WCAG AA — ${rating.ratio.toFixed(2)}:1 (requires 4.5)`}
+        >
+            ❌ {rating.ratio.toFixed(1)}
+        </span>
+    );
+}
+
+const ALL_COLOR_KEYS = new Set([
+    ...LEGACY_COLOR_FIELDS.map((f) => f.key as string),
+    ...M3_COLOR_GROUPS.flatMap((g) => g.fields.map((f) => f.key as string)),
+]);
+
 export default function AdminThemeSettingsPage() {
     const [settings, setSettings] = useState<ThemeSettings>({
-        colors: EMPTY_COLORS,
-        navIcons: EMPTY_NAV_ICONS,
-        effects: EMPTY_EFFECTS,
+        colors: EMPTY_COLORS, navIcons: EMPTY_NAV_ICONS, effects: EMPTY_EFFECTS,
     });
     const [selectedFiles, setSelectedFiles] = useState<Partial<Record<NavIconField, File>>>({});
     const [previewUrls, setPreviewUrls] = useState<Partial<Record<NavIconField, string>>>({});
@@ -506,6 +750,12 @@ export default function AdminThemeSettingsPage() {
     const [error, setError] = useState<string | null>(null);
     const [activeNav, setActiveNav] = useState(0);
     const [iconPickerField, setIconPickerField] = useState<NavIconField | null>(null);
+    const [enterpriseTheme, setEnterpriseTheme] = useState<EnterpriseTheme | null>(null);
+    const [wcagRatings, setWcagRatings] = useState<Record<string, WcagBadge>>({});
+    const [smartSeed, setSmartSeed] = useState<string>("#9B4DFF");
+    const [smartMode, setSmartMode] = useState<"light" | "dark">("dark");
+    const [smartGenerating, setSmartGenerating] = useState(false);
+    const [activeGroup, setActiveGroup] = useState<string | null>("primary");
 
     useEffect(() => {
         void loadSettings();
@@ -521,6 +771,14 @@ export default function AdminThemeSettingsPage() {
 
     const effectiveColors = useMemo<ThemeColors>(() => {
         const next: any = { ...DEFAULT_COLORS };
+        if (enterpriseTheme) {
+            for (const k of ALL_COLOR_KEYS) {
+                const v = (enterpriseTheme as any)[k];
+                if (typeof v === "string" && /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(v)) {
+                    next[k] = v;
+                }
+            }
+        }
         for (const key of Object.keys(EMPTY_COLORS) as ColorField[]) {
             const override = colorInputs[key];
             const hexFromSettings = settings.colors[key];
@@ -529,15 +787,35 @@ export default function AdminThemeSettingsPage() {
                 next[key] = candidate;
             } else if (hexFromSettings && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(hexFromSettings)) {
                 next[key] = hexFromSettings;
-            } else {
-                next[key] = DEFAULT_COLORS[key];
             }
         }
         return next;
-    }, [colorInputs, settings.colors]);
+    }, [colorInputs, settings.colors, enterpriseTheme]);
+
+    const computedWcag = useMemo(() => {
+        const res: Record<string, WcagBadge> = { ...wcagRatings };
+        for (const grp of M3_COLOR_GROUPS) {
+            for (const f of grp.fields) {
+                if (f.fgOf) {
+                    const fg = effectiveColors[f.key];
+                    const bg = effectiveColors[f.fgOf];
+                    if (typeof fg === "string" && typeof bg === "string") {
+                        res[`${f.key}__${f.fgOf}`] = wcagQuick(fg, bg);
+                    }
+                }
+            }
+        }
+        return res;
+    }, [effectiveColors, wcagRatings]);
 
     const effectiveEffects = useMemo<Required<ThemeEffects>>(() => {
         const next: any = { ...DEFAULT_EFFECTS };
+        if (enterpriseTheme?.effects) {
+            for (const k of Object.keys(enterpriseTheme.effects)) {
+                const v = (enterpriseTheme.effects as any)[k];
+                if (typeof v === "number" && Number.isFinite(v)) next[k] = v;
+            }
+        }
         for (const key of Object.keys(EMPTY_EFFECTS) as EffectField[]) {
             const override = effectInputs[key];
             const fromSettings = settings.effects[key];
@@ -545,12 +823,10 @@ export default function AdminThemeSettingsPage() {
                 next[key] = override;
             } else if (typeof fromSettings === "number" && Number.isFinite(fromSettings)) {
                 next[key] = fromSettings;
-            } else {
-                next[key] = DEFAULT_EFFECTS[key];
             }
         }
         return next;
-    }, [effectInputs, settings.effects]);
+    }, [effectInputs, settings.effects, enterpriseTheme]);
 
     const effectiveNavIcons = useMemo<NavIcons>(() => {
         const next: any = { ...EMPTY_NAV_ICONS, ...settings.navIcons };
@@ -569,40 +845,15 @@ export default function AdminThemeSettingsPage() {
 
     function navFieldToIdField(field: NavIconField): NavIconField | null {
         const mapping: Partial<Record<NavIconField, NavIconField>> = {
-            home: "homeId",
-            search: "searchId",
-            categories: "categoriesId",
-            orders: "ordersId",
-            profile: "profileId",
-            homeActive: "homeActiveId",
-            searchActive: "searchActiveId",
-            categoriesActive: "categoriesActiveId",
-            ordersActive: "ordersActiveId",
-            profileActive: "profileActiveId",
-        };
-        return mapping[field] ?? null;
-    }
-
-    function navFieldFromIdField(field: NavIconField): NavIconField | null {
-        const mapping: Partial<Record<NavIconField, NavIconField>> = {
-            homeId: "home",
-            searchId: "search",
-            categoriesId: "categories",
-            ordersId: "orders",
-            profileId: "profile",
-            homeActiveId: "homeActive",
-            searchActiveId: "searchActive",
-            categoriesActiveId: "categoriesActive",
-            ordersActiveId: "ordersActive",
-            profileActiveId: "profileActive",
+            home: "homeId", search: "searchId", categories: "categoriesId", orders: "ordersId", profile: "profileId",
+            homeActive: "homeActiveId", searchActive: "searchActiveId", categoriesActive: "categoriesActiveId",
+            ordersActive: "ordersActiveId", profileActive: "profileActiveId",
         };
         return mapping[field] ?? null;
     }
 
     async function loadSettings() {
-        setLoading(true);
-        setError(null);
-        setMessage(null);
+        setLoading(true); setError(null); setMessage(null);
         try {
             const token = localStorage.getItem("token");
             if (!token) throw new Error("جلسة الأدمن غير متاحة. أعد تسجيل الدخول.");
@@ -615,10 +866,13 @@ export default function AdminThemeSettingsPage() {
             const navIcons = { ...EMPTY_NAV_ICONS, ...(data?.navIcons ?? {}) };
             const effects = { ...EMPTY_EFFECTS, ...(data?.effects ?? {}) };
             setSettings({ colors, navIcons, effects });
+            if (data?.enterprise) setEnterpriseTheme(data.enterprise as EnterpriseTheme);
+            if (data?.wcag) setWcagRatings(data.wcag as any);
+            if (colors.primary) setSmartSeed(colors.primary);
             const inputs: Partial<Record<ColorField, string>> = {};
-            for (const f of COLOR_FIELDS) {
-                const v = colors[f.key];
-                if (v) inputs[f.key] = v;
+            for (const k of Object.keys(EMPTY_COLORS) as ColorField[]) {
+                const v = (colors as any)[k];
+                if (typeof v === "string" && v.length > 0) inputs[k] = v;
             }
             setColorInputs(inputs);
             const eff: Partial<Record<EffectField, number>> = {};
@@ -641,73 +895,103 @@ export default function AdminThemeSettingsPage() {
     }
 
     function handlePickIconId(field: NavIconField, name: string, weight: string) {
-        setMessage(null);
-        setError(null);
+        setMessage(null); setError(null);
         const id = buildIconId(name, weight);
         setIconIdInputs((prev) => ({ ...prev, [field]: id }));
     }
 
     function handleClearIconId(field: NavIconField) {
-        setMessage(null);
-        setError(null);
-        setIconIdInputs((prev) => {
-            const next = { ...prev };
-            delete next[field];
-            return next;
-        });
-        setSettings((prev) => ({
-            ...prev,
-            navIcons: { ...prev.navIcons, [field]: null },
-        }));
+        setMessage(null); setError(null);
+        setIconIdInputs((prev) => { const next = { ...prev }; delete next[field]; return next; });
+        setSettings((prev) => ({ ...prev, navIcons: { ...prev.navIcons, [field]: null } }));
     }
 
     function handleColorChange(key: ColorField, value: string) {
-        setError(null);
-        setMessage(null);
+        setError(null); setMessage(null);
         setColorInputs((prev) => ({ ...prev, [key]: value }));
     }
 
     function handleEffectChange(key: EffectField, raw: number) {
-        setError(null);
-        setMessage(null);
+        setError(null); setMessage(null);
         const meta = EFFECT_FIELDS.find((f) => f.key === key);
-        const value = meta
-            ? Math.min(meta.max, Math.max(meta.min, raw))
-            : raw;
+        const value = meta ? Math.min(meta.max, Math.max(meta.min, raw)) : raw;
         setEffectInputs((prev) => ({ ...prev, [key]: value }));
     }
 
     function handleResetEffect(key: EffectField) {
-        setError(null);
-        setMessage(null);
-        setEffectInputs((prev) => {
-            const next = { ...prev };
-            delete next[key];
-            return next;
-        });
-        setSettings((prev) => ({
-            ...prev,
-            effects: { ...prev.effects, [key]: null },
-        }));
+        setError(null); setMessage(null);
+        setEffectInputs((prev) => { const next = { ...prev }; delete next[key]; return next; });
+        setSettings((prev) => ({ ...prev, effects: { ...prev.effects, [key]: null } }));
     }
 
     function handleApplyPreset(preset: (typeof PRESET_THEMES)[number]) {
-        setError(null);
-        setMessage(null);
+        setError(null); setMessage(null);
+        setSmartSeed(preset.seed);
         const inputs: Partial<Record<ColorField, string>> = {};
-        for (const f of COLOR_FIELDS) {
-            const v = preset.colors[f.key];
-            if (v) inputs[f.key] = v;
+        for (const k of Object.keys(EMPTY_COLORS) as ColorField[]) {
+            const v = (preset.colors as any)[k];
+            if (typeof v === "string") inputs[k] = v;
         }
         setColorInputs(inputs);
         setSettings((prev) => ({ ...prev, colors: { ...preset.colors } }));
     }
 
+    async function handleGenerateSmartPalette(writeToDb: boolean) {
+        setError(null); setMessage(null); setSmartGenerating(true);
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("جلسة الأدمن غير متاحة. أعد تسجيل الدخول.");
+            if (!/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(smartSeed.trim())) {
+                throw new Error("الرجاء إدخال لون صحيح للبذرة (مثل #9B4DFF).");
+            }
+            const body: any = { seedPrimary: smartSeed.trim(), mode: smartMode };
+            const effectsOverride: any = {};
+            for (const f of EFFECT_FIELDS) {
+                const v = effectInputs[f.key] ?? settings.effects[f.key];
+                if (typeof v === "number") effectsOverride[f.key] = v;
+            }
+            if (Object.keys(effectsOverride).length > 0) body.effectsOverride = effectsOverride;
+            if (writeToDb) body.writeToDb = true;
+
+            const res = await fetch("/api/admin/theme-settings?action=smart-palette", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data?.error || "فشل توليد لوحة الألوان الذكية");
+            if (data?.enterprise) {
+                setEnterpriseTheme(data.enterprise as EnterpriseTheme);
+                const ent = data.enterprise as any;
+                const newColors: any = { ...settings.colors };
+                const newInputs: any = { ...colorInputs };
+                for (const k of Object.keys(EMPTY_COLORS)) {
+                    const v = ent[k];
+                    if (typeof v === "string") {
+                        newColors[k] = v;
+                        newInputs[k] = v;
+                    }
+                }
+                setSettings((prev) => ({ ...prev, colors: newColors }));
+                setColorInputs(newInputs);
+                setSmartSeed(ent.primary ?? smartSeed);
+                setMessage(
+                    writeToDb
+                        ? `✅ تم توليد 85 لوناً و10 تأثيرات وحفظها في قاعدة البيانات مباشرة (نسخة ${ent.version ?? ""}). افتح التطبيق للعرض.`
+                        : `✅ تم إنشاء لوحة الم3 بذكاء (نسخة ${ent.version ?? ""}). اضغط "تطبيق وحفظ" لحفظها في النظام.`
+                );
+            }
+        } catch (e) {
+            setError(e instanceof Error ? e.message : "حدث خطأ غير متوقع");
+        } finally {
+            setSmartGenerating(false);
+        }
+    }
+
     function handleFileChange(key: NavIconField, event: ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0];
         if (!file) return;
-        setMessage(null);
-        setError(null);
+        setMessage(null); setError(null);
         setSelectedFiles((prev) => ({ ...prev, [key]: file }));
         setPreviewUrls((prev) => {
             const current = prev[key];
@@ -717,41 +1001,23 @@ export default function AdminThemeSettingsPage() {
     }
 
     function handleRemoveColor(key: ColorField) {
-        setError(null);
-        setMessage(null);
-        setColorInputs((prev) => {
-            const next = { ...prev };
-            delete next[key];
-            return next;
-        });
-        setSettings((prev) => ({
-            ...prev,
-            colors: { ...prev.colors, [key]: null },
-        }));
+        setError(null); setMessage(null);
+        setColorInputs((prev) => { const next = { ...prev }; delete next[key]; return next; });
+        setSettings((prev) => ({ ...prev, colors: { ...prev.colors, [key]: null } }));
     }
 
     function handleRemoveIcon(key: NavIconField) {
-        setMessage(null);
-        setError(null);
-        setSelectedFiles((prev) => {
-            const next = { ...prev };
-            delete next[key];
-            return next;
-        });
+        setMessage(null); setError(null);
+        setSelectedFiles((prev) => { const next = { ...prev }; delete next[key]; return next; });
         setPreviewUrls((prev) => {
             const next = { ...prev };
             if (next[key]) URL.revokeObjectURL(next[key]!);
             delete next[key];
             return next;
         });
-        setSettings((prev) => ({
-            ...prev,
-            navIcons: { ...prev.navIcons, [key]: null },
-        }));
+        setSettings((prev) => ({ ...prev, navIcons: { ...prev.navIcons, [key]: null } }));
         const idKey = navFieldToIdField(key);
-        if (idKey) {
-            handleClearIconId(idKey);
-        }
+        if (idKey) handleClearIconId(idKey);
     }
 
     async function uploadFile(file: File, token: string): Promise<string> {
@@ -764,45 +1030,31 @@ export default function AdminThemeSettingsPage() {
             body: formData,
         });
         const data = await res.json();
-        if (!res.ok || !data?.url) {
-            throw new Error(data?.error || "فشل رفع أيقونة التنقل");
-        }
+        if (!res.ok || !data?.url) throw new Error(data?.error || "فشل رفع أيقونة التنقل");
         return data.url as string;
     }
 
     async function handleSave() {
-        setSaving(true);
-        setError(null);
-        setMessage(null);
+        setSaving(true); setError(null); setMessage(null);
         try {
             const token = localStorage.getItem("token");
             if (!token) throw new Error("جلسة الأدمن غير متاحة. أعد تسجيل الدخول.");
 
             const nextColors: Partial<ThemeColors> = {};
-            for (const f of COLOR_FIELDS) {
-                const raw = colorInputs[f.key];
-                if (raw == null) {
-                    nextColors[f.key] = settings.colors[f.key] ?? null;
-                    continue;
-                }
+            for (const k of Object.keys(EMPTY_COLORS) as ColorField[]) {
+                const raw = colorInputs[k];
+                if (raw == null) { nextColors[k] = settings.colors[k] ?? null; continue; }
                 const trimmed = raw.trim();
-                if (trimmed.length === 0) {
-                    nextColors[f.key] = null;
-                } else if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(trimmed)) {
-                    nextColors[f.key] = trimmed;
-                } else {
-                    nextColors[f.key] = settings.colors[f.key] ?? null;
-                }
+                if (trimmed.length === 0) nextColors[k] = null;
+                else if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(trimmed)) nextColors[k] = trimmed;
+                else nextColors[k] = settings.colors[k] ?? null;
             }
 
             const nextEffects: Partial<ThemeEffects> = {};
             for (const f of EFFECT_FIELDS) {
                 const raw = effectInputs[f.key];
-                if (typeof raw === "number" && Number.isFinite(raw)) {
-                    nextEffects[f.key] = raw;
-                } else {
-                    nextEffects[f.key] = settings.effects[f.key] ?? null;
-                }
+                if (typeof raw === "number" && Number.isFinite(raw)) nextEffects[f.key] = raw;
+                else nextEffects[f.key] = settings.effects[f.key] ?? null;
             }
 
             const nextNavIcons: Partial<NavIcons> = { ...settings.navIcons };
@@ -814,19 +1066,13 @@ export default function AdminThemeSettingsPage() {
                 const raw = iconIdInputs[f.key];
                 if (raw == null) continue;
                 const trimmed = raw.trim();
-                if (trimmed.length === 0) {
-                    nextNavIcons[f.key] = null;
-                } else if (/^[a-z0-9_.-]{1,80}$/i.test(trimmed)) {
-                    nextNavIcons[f.key] = trimmed.toLowerCase();
-                }
+                if (trimmed.length === 0) nextNavIcons[f.key] = null;
+                else if (/^[a-z0-9_.-]{1,80}$/i.test(trimmed)) nextNavIcons[f.key] = trimmed.toLowerCase();
             }
 
             const res = await fetch("/api/admin/theme-settings", {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                 body: JSON.stringify({ colors: nextColors, navIcons: nextNavIcons, effects: nextEffects }),
             });
             const data = await res.json();
@@ -837,10 +1083,12 @@ export default function AdminThemeSettingsPage() {
                 navIcons: { ...EMPTY_NAV_ICONS, ...(data?.navIcons ?? {}) },
                 effects: { ...EMPTY_EFFECTS, ...(data?.effects ?? {}) },
             });
+            if (data?.enterprise) setEnterpriseTheme(data.enterprise as EnterpriseTheme);
+            if (data?.wcag) setWcagRatings(data.wcag as any);
             const cleanInputs: Partial<Record<ColorField, string>> = {};
-            for (const f of COLOR_FIELDS) {
-                const v = data?.colors?.[f.key];
-                if (v) cleanInputs[f.key] = v;
+            for (const k of Object.keys(EMPTY_COLORS) as ColorField[]) {
+                const v = data?.colors?.[k];
+                if (typeof v === "string") cleanInputs[k] = v;
             }
             setColorInputs(cleanInputs);
             const cleanEff: Partial<Record<EffectField, number>> = {};
@@ -856,11 +1104,10 @@ export default function AdminThemeSettingsPage() {
             }
             setIconIdInputs(cleanIconIds);
             setSelectedFiles({});
-            Object.values(previewUrls).forEach((url) => {
-                if (url) URL.revokeObjectURL(url);
-            });
+            Object.values(previewUrls).forEach((url) => { if (url) URL.revokeObjectURL(url); });
             setPreviewUrls({});
-            setMessage("تم حفظ إعدادات المظهر بنجاح — افتح التطبيق لتجد التغييرات فوراً (أو انسحب للتحديث).");
+            const v = data?.enterprise?.version ?? "";
+            setMessage(`تم حفظ إعدادات المظهر بنجاح — Theme Version: ${v}. افتح التطبيق لتجد التغييرات فوراً (انسحب للتحديث أو أعد تشغيل التطبيق).`);
         } catch (e) {
             setError(e instanceof Error ? e.message : "حدث خطأ غير متوقع");
         } finally {
@@ -870,22 +1117,24 @@ export default function AdminThemeSettingsPage() {
 
     const c = effectiveColors;
     const _mergeE: any = { ...DEFAULT_EFFECTS, ...(effectiveEffects as any) };
-    const e = _mergeE as {
-        primaryGradientAngle: number; cardRadius: number; chipRadius: number;
-        buttonRadius: number; navShadowOpacity: number; cardShadowOpacity: number;
-        activeGlowOpacity: number; glassBlur: number;
-        surfaceOpacity: number; borderOpacity: number;
+    const DE = DEFAULT_EFFECTS;
+    const e = {
+        primaryGradientAngle: (_mergeE.primaryGradientAngle ?? DE.primaryGradientAngle) as number,
+        cardRadius: (_mergeE.cardRadius ?? DE.cardRadius) as number,
+        chipRadius: (_mergeE.chipRadius ?? DE.chipRadius) as number,
+        buttonRadius: (_mergeE.buttonRadius ?? DE.buttonRadius) as number,
+        navShadowOpacity: (_mergeE.navShadowOpacity ?? DE.navShadowOpacity) as number,
+        cardShadowOpacity: (_mergeE.cardShadowOpacity ?? DE.cardShadowOpacity) as number,
+        activeGlowOpacity: (_mergeE.activeGlowOpacity ?? DE.activeGlowOpacity) as number,
+        glassBlur: (_mergeE.glassBlur ?? DE.glassBlur) as number,
+        surfaceOpacity: (_mergeE.surfaceOpacity ?? DE.surfaceOpacity) as number,
+        borderOpacity: (_mergeE.borderOpacity ?? DE.borderOpacity) as number,
     };
+
     const previewStyle: React.CSSProperties = {
-        background: `linear-gradient(160deg, ${hexToCss(
-            c.background,
-            DEFAULT_COLORS.background!
-        )} 0%, ${hexToCss(c.primaryDark, DEFAULT_COLORS.primaryDark!)} 55%, ${hexToCss(
-            c.accentPink,
-            DEFAULT_COLORS.accentPink!
-        )} 110%)`,
-        color: hexToCss(c.textPrimary, DEFAULT_COLORS.textPrimary!),
-        borderColor: hexToCss(c.border, DEFAULT_COLORS.border!),
+        background: `linear-gradient(160deg, ${hexToCss(c.heroStart ?? c.background, DEFAULT_COLORS.background!)} 0%, ${hexToCss(c.primaryDark ?? c.surface, DEFAULT_COLORS.primaryDark!)} 55%, ${hexToCss(c.heroEnd ?? c.accentPink, DEFAULT_COLORS.accentPink!)} 110%)`,
+        color: hexToCss(c.textPrimary ?? c.onSurface, DEFAULT_COLORS.textPrimary!),
+        borderColor: hexToCss(c.border ?? c.outline, DEFAULT_COLORS.border!),
         position: "relative",
     };
     const cardRadius = `${e.cardRadius}px`;
@@ -893,8 +1142,8 @@ export default function AdminThemeSettingsPage() {
     const chipRadius = chipRadiusVal >= 999 ? "9999px" : `${chipRadiusVal}px`;
     const buttonRadius = `${e.buttonRadius}px`;
     const glassBlurVal = `${e.glassBlur}px`;
-    const cardSurface = hexToCss(c.surface, DEFAULT_COLORS.surface!);
-    const cardBorder = hexToCss(c.borderLight, DEFAULT_COLORS.borderLight!);
+    const cardSurface = hexToCss(c.cardBackground ?? c.surface, DEFAULT_COLORS.surface!);
+    const cardBorder = hexToCss(c.cardBorder ?? c.borderLight ?? c.outlineVariant, DEFAULT_COLORS.borderLight!);
     const cardStyle: React.CSSProperties = {
         background: withAlpha(cardSurface, e.surfaceOpacity),
         border: `1px solid ${withAlpha(cardBorder, e.borderOpacity)}`,
@@ -908,22 +1157,35 @@ export default function AdminThemeSettingsPage() {
         e.surfaceOpacity
     );
     const primary = hexToCss(c.primary, DEFAULT_COLORS.primary!);
-    const primaryLight = hexToCss(c.primaryLight, DEFAULT_COLORS.primaryLight!);
-    const primaryDark = hexToCss(c.primaryDark, DEFAULT_COLORS.primaryDark!);
+    const primaryLight = hexToCss(c.primaryLight ?? c.primaryFixedDim, DEFAULT_COLORS.primaryLight!);
+    const primaryDark = hexToCss(c.primaryDark ?? c.onPrimaryContainer, DEFAULT_COLORS.primaryDark!);
     const primaryGradient = `linear-gradient(${e.primaryGradientAngle}deg, ${primary}, ${primaryDark})`;
-    const surfaceLight = hexToCss(c.surfaceLight, DEFAULT_COLORS.surfaceLight!);
-    const textSecondary = hexToCss(c.textSecondary, DEFAULT_COLORS.textSecondary!);
-    const textTertiary = hexToCss(c.textTertiary, DEFAULT_COLORS.textTertiary!);
+    const surfaceLight = hexToCss(c.surfaceLight ?? c.surfaceContainerHigh, DEFAULT_COLORS.surfaceLight!);
+    const textSecondary = hexToCss(c.textSecondary ?? c.onSurfaceVariant, DEFAULT_COLORS.textSecondary!);
+    const textTertiary = hexToCss(c.textTertiary ?? c.onSurfaceVariant, DEFAULT_COLORS.textTertiary!);
 
     return (
         <div dir="rtl" className="space-y-6">
             <div className="flex flex-col gap-2">
-                <h2 className="text-right text-2xl font-bold">إعدادات مظهر التطبيق</h2>
+                <h2 className="text-right text-2xl font-bold">إعدادات مظهر التطبيق (Enterprise Theme Engine)</h2>
                 <p className="text-right text-sm text-slate-600">
-                    هنا تحدد ألوان التطبيق بشكل مباشر وتبدّل أيقونات شريط التنقل السفلي. الجانب
-                    الأيسر (أو الأعلى على الهاتف) يعرض نسخة توضيحية من الشاشة الرئيسية مع
-                    القيم الجديدة قبل الحفظ.
+                    نظام الألوان الآن على مستوى Enterprise — Material 3 + 85 لوناً + 5 ألواح لونية نغمية (Tonal
+                    Palettes) + WCAG 2.2 AA/AAA لكل نص. استخدم <strong>Smart Palette</strong> (البذرة) لتوليد
+                    النظام بأكمله بضغطة زر — ثم عدّل التفاصيل إن أردت.
                 </p>
+                {enterpriseTheme?.version ? (
+                    <div className="flex items-center justify-end gap-2 text-[11px]">
+                        <span className="rounded-md bg-slate-900 px-2 py-1 font-mono text-amber-300">
+                            themeVersion: {enterpriseTheme.version}
+                        </span>
+                        <span className="rounded-md bg-emerald-900/20 px-2 py-1 font-mono text-emerald-700">
+                            M3 ColorScheme: 61 tokens
+                        </span>
+                        <span className="rounded-md bg-violet-900/20 px-2 py-1 font-mono text-violet-700">
+                            Semantic: 25 tokens
+                        </span>
+                    </div>
+                ) : null}
             </div>
 
             {message ? (
@@ -945,270 +1207,140 @@ export default function AdminThemeSettingsPage() {
                                 <div className="text-right">
                                     <h3 className="font-bold text-slate-900">معاينة التطبيق</h3>
                                     <p className="mt-1 text-sm text-slate-500">
-                                        هذه نسخة توضيحية لشكل الشاشة الرئيسية مع الألوان
-                                        الحالية. تغيّر اللون في المربعات اليمنى لتجد فرقها فوراً
-                                        هنا قبل الحفظ.
+                                        معاينة المباشرة تعكس التدرج البطولي (Hero)، الحاويات الزجاجية، الحدود، وشريط التنقل بالكامل.
                                     </p>
                                 </div>
                             </div>
 
                             <div className="mt-6 mx-auto w-[320px] overflow-hidden rounded-[36px] border border-slate-300 bg-black p-2 shadow-xl">
-                                <div
-                                    className="flex h-[620px] flex-col overflow-hidden rounded-[28px]"
-                                    style={previewStyle}
-                                >
-                                    <div
-                                        className="flex items-center justify-between px-4 pt-4 pb-3 text-xs"
-                                        style={{
-                                            color: hexToCss(c.textPrimary, DEFAULT_COLORS.textPrimary!),
-                                            opacity: 0.85,
-                                        }}
-                                    >
+                                <div className="flex h-[620px] flex-col overflow-hidden rounded-[28px]" style={previewStyle}>
+                                    <div className="flex items-center justify-between px-4 pt-4 pb-3 text-xs"
+                                         style={{ color: hexToCss(c.textPrimary, DEFAULT_COLORS.textPrimary!), opacity: 0.85 }}>
                                         <span>9:41</span>
-                                        <div className="flex items-center gap-1">
-                                            <span>●●●●</span>
-                                            <span>100%</span>
-                                        </div>
+                                        <div className="flex items-center gap-1"><span>●●●●</span><span>100%</span></div>
                                     </div>
 
-                                    <div
-                                        className="flex items-center justify-between px-4 py-3"
-                                        style={{
-                                            background: withAlpha(surfaceLight, 0.6),
-                                            backdropFilter: `blur(${e.glassBlur}px) saturate(1.2)`,
-                                            WebkitBackdropFilter: `blur(${e.glassBlur}px) saturate(1.2)`,
-                                        }}
-                                    >
-                                        <div
-                                            className="rounded-full px-3 py-1 text-xs"
-                                            style={{
-                                                background: withAlpha(primary, 0.18),
-                                                color: hexToCss(c.textPrimary, DEFAULT_COLORS.textPrimary!),
-                                                borderRadius: chipRadius,
-                                            }}
-                                        >
+                                    <div className="flex items-center justify-between px-4 py-3"
+                                         style={{
+                                             background: withAlpha(surfaceLight, 0.6),
+                                             backdropFilter: `blur(${e.glassBlur}px) saturate(1.2)`,
+                                             WebkitBackdropFilter: `blur(${e.glassBlur}px) saturate(1.2)`,
+                                         }}>
+                                        <div className="rounded-full px-3 py-1 text-xs" style={{
+                                            background: withAlpha(primary, 0.18),
+                                            color: hexToCss(c.textPrimary, DEFAULT_COLORS.textPrimary!),
+                                            borderRadius: chipRadius,
+                                        }}>
                                             مرحباً بك 👋
                                         </div>
                                         <div className="flex gap-2">
-                                            <div
-                                                className="h-7 w-7 rounded-full"
-                                                style={{
-                                                    background: hexToCss(c.surface, DEFAULT_COLORS.surface!),
-                                                    border: `1px solid ${hexToCss(c.borderLight, DEFAULT_COLORS.borderLight!)}`,
-                                                }}
-                                            />
-                                            <div
-                                                className="h-7 w-7 rounded-full"
-                                                style={{
-                                                    background: hexToCss(c.surface, DEFAULT_COLORS.surface!),
-                                                    border: `1px solid ${hexToCss(c.borderLight, DEFAULT_COLORS.borderLight!)}`,
-                                                }}
-                                            />
+                                            <div className="h-7 w-7 rounded-full" style={{
+                                                background: hexToCss(c.surfaceContainer ?? c.surface, DEFAULT_COLORS.surface!),
+                                                border: `1px solid ${hexToCss(c.borderLight, DEFAULT_COLORS.borderLight!)}`,
+                                            }} />
+                                            <div className="h-7 w-7 rounded-full" style={{
+                                                background: hexToCss(c.surfaceContainer ?? c.surface, DEFAULT_COLORS.surface!),
+                                                border: `1px solid ${hexToCss(c.borderLight, DEFAULT_COLORS.borderLight!)}`,
+                                            }} />
                                         </div>
                                     </div>
 
                                     <div className="px-4 pt-4 pb-3 text-right">
-                                        <div className="text-lg font-bold leading-tight">
-                                            اكتشف أحدث الإبداعات
-                                        </div>
+                                        <div className="text-lg font-bold leading-tight">اكتشف أحدث الإبداعات</div>
                                         <div className="mt-1 text-xs" style={{ color: textSecondary }}>
                                             اختر فئة أو ابحث عن مصوّر محترف بالقرب منك
                                         </div>
                                     </div>
 
-                                    <div
-                                        className="mx-4 flex items-center gap-2 rounded-2xl px-3 py-2"
-                                        style={{
-                                            background: withAlpha(cardSurface, e.surfaceOpacity),
-                                            border: `1px solid ${withAlpha(cardBorder, e.borderOpacity)}`,
-                                            color: textTertiary,
-                                            borderRadius: buttonRadius,
-                                            backdropFilter: `blur(${glassBlurVal}) saturate(1.3)`,
-                                            WebkitBackdropFilter: `blur(${glassBlurVal}) saturate(1.3)`,
-                                        }}
-                                    >
+                                    <div className="mx-4 flex items-center gap-2 rounded-2xl px-3 py-2" style={{
+                                        background: withAlpha(cardSurface, e.surfaceOpacity),
+                                        border: `1px solid ${withAlpha(cardBorder, e.borderOpacity)}`,
+                                        color: textTertiary,
+                                        borderRadius: buttonRadius,
+                                        backdropFilter: `blur(${glassBlurVal}) saturate(1.3)`,
+                                        WebkitBackdropFilter: `blur(${glassBlurVal}) saturate(1.3)`,
+                                    }}>
                                         <span>🔍</span>
                                         <span className="text-xs">ابحث عن خدمة، مدينة، حسابات…</span>
                                     </div>
 
                                     <div className="mt-5 px-4">
                                         <div className="flex items-center justify-between">
-                                            <div
-                                                className="text-xs"
-                                                style={{ color: textSecondary }}
-                                            >
-                                                آخر العروض
-                                            </div>
-                                            <div
-                                                className="text-xs font-semibold"
-                                                style={{ color: primaryLight }}
-                                            >
-                                                عرض الكل
-                                            </div>
+                                            <div className="text-xs" style={{ color: textSecondary }}>آخر العروض</div>
+                                            <div className="text-xs font-semibold" style={{ color: primaryLight }}>عرض الكل</div>
                                         </div>
                                         <div className="mt-3 grid grid-cols-2 gap-3">
                                             {[0, 1, 2, 3].map((i) => (
-                                                <div
-                                                    key={i}
-                                                    className="h-24 overflow-hidden border"
-                                                    style={cardStyle}
-                                                >
-                                                    <div
-                                                        className="h-12 w-full"
-                                                        style={{ background: primaryGradient }}
-                                                    />
+                                                <div key={i} className="h-24 overflow-hidden border" style={cardStyle}>
+                                                    <div className="h-12 w-full" style={{ background: primaryGradient }} />
                                                     <div className="px-2 pt-2 text-right">
-                                                        <div
-                                                            className="text-[11px] font-semibold"
-                                                            style={{
-                                                                color: hexToCss(c.textPrimary, DEFAULT_COLORS.textPrimary!),
-                                                            }}
-                                                        >
-                                                            جلسة تصوير
-                                                        </div>
-                                                        <div
-                                                            className="text-[10px]"
-                                                            style={{ color: textTertiary }}
-                                                        >
-                                                            بغداد · 50,000 د.ع
-                                                        </div>
+                                                        <div className="text-[11px] font-semibold" style={{
+                                                            color: hexToCss(c.textPrimary ?? c.onSurface, DEFAULT_COLORS.textPrimary!),
+                                                        }}>جلسة تصوير</div>
+                                                        <div className="text-[10px]" style={{ color: textTertiary }}>بغداد · 50,000 د.ع</div>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
 
-                                    <div
-                                        className="mt-5 mx-4 border px-4 py-3 text-right"
-                                        style={cardStyle}
-                                    >
-                                        <div
-                                            className="text-xs"
-                                            style={{ color: textSecondary }}
-                                        >
-                                            حالة مبدعيّن اليوم
-                                        </div>
+                                    <div className="mt-5 mx-4 border px-4 py-3 text-right" style={cardStyle}>
+                                        <div className="text-xs" style={{ color: textSecondary }}>حالة مبدعيّن اليوم</div>
                                         <div className="mt-2 flex flex-wrap gap-2">
-                                            <span
-                                                className="px-2 py-1 text-[10px]"
-                                                style={{
-                                                    borderRadius: chipRadius,
-                                                    background: withAlpha(
-                                                        hexToCss(c.success, DEFAULT_COLORS.success!),
-                                                        0.16
-                                                    ),
-                                                    color: hexToCss(c.success, DEFAULT_COLORS.success!),
-                                                }}
-                                            >
-                                                12 متاح
-                                            </span>
-                                            <span
-                                                className="px-2 py-1 text-[10px]"
-                                                style={{
-                                                    borderRadius: chipRadius,
-                                                    background: withAlpha(
-                                                        hexToCss(c.warning, DEFAULT_COLORS.warning!),
-                                                        0.16
-                                                    ),
-                                                    color: hexToCss(c.warning, DEFAULT_COLORS.warning!),
-                                                }}
-                                            >
-                                                3 محجوز جزئياً
-                                            </span>
-                                            <span
-                                                className="px-2 py-1 text-[10px]"
-                                                style={{
-                                                    borderRadius: chipRadius,
-                                                    background: withAlpha(
-                                                        hexToCss(c.info, DEFAULT_COLORS.info!),
-                                                        0.16
-                                                    ),
-                                                    color: hexToCss(c.info, DEFAULT_COLORS.info!),
-                                                }}
-                                            >
-                                                8 نشطون
-                                            </span>
+                                            <span className="px-2 py-1 text-[10px]" style={{
+                                                borderRadius: chipRadius,
+                                                background: withAlpha(hexToCss(c.success, DEFAULT_COLORS.success!), 0.16),
+                                                color: hexToCss(c.success, DEFAULT_COLORS.success!),
+                                            }}>12 متاح</span>
+                                            <span className="px-2 py-1 text-[10px]" style={{
+                                                borderRadius: chipRadius,
+                                                background: withAlpha(hexToCss(c.warning, DEFAULT_COLORS.warning!), 0.16),
+                                                color: hexToCss(c.warning, DEFAULT_COLORS.warning!),
+                                            }}>3 محجوز جزئياً</span>
+                                            <span className="px-2 py-1 text-[10px]" style={{
+                                                borderRadius: chipRadius,
+                                                background: withAlpha(hexToCss(c.info, DEFAULT_COLORS.info!), 0.16),
+                                                color: hexToCss(c.info, DEFAULT_COLORS.info!),
+                                            }}>8 نشطون</span>
                                         </div>
                                     </div>
 
                                     <div className="flex-1" />
 
-                                    <div
-                                        className="mx-3 mb-3 flex items-center justify-around px-2 py-2"
-                                        style={{
-                                            background: menuBg,
-                                            borderTop: `1px solid ${hexToCss(c.borderLight, DEFAULT_COLORS.borderLight!)}`,
-                                            borderRadius: cardRadius,
-                                            boxShadow: `0 -8px 26px ${withAlpha(primary, e.navShadowOpacity)}`,
-                                        }}
-                                    >
+                                    <div className="mx-3 mb-3 flex items-center justify-around px-2 py-2" style={{
+                                        background: menuBg,
+                                        borderTop: `1px solid ${hexToCss(c.borderLight, DEFAULT_COLORS.borderLight!)}`,
+                                        borderRadius: cardRadius,
+                                        boxShadow: `0 -8px 26px ${withAlpha(primary, e.navShadowOpacity)}`,
+                                    }}>
                                         {NAV_ORDER.map((item, idx) => {
                                             const isActive = idx === activeNav;
                                             const iconUrl = isActive
                                                 ? effectiveNavIcons[item.activeKey]
                                                 : effectiveNavIcons[item.inKey];
-                                            const idField = navFieldToIdField(
-                                                isActive ? item.activeKey : item.inKey
-                                            );
-                                            const iconId =
-                                                idField != null ? effectiveNavIcons[idField] ?? null : null;
+                                            const idField = navFieldToIdField(isActive ? item.activeKey : item.inKey);
+                                            const iconId = idField != null ? effectiveNavIcons[idField] ?? null : null;
                                             const parsed = parseIconId(iconId);
-                                            const IconComp = parsed
-                                                ? iconComponent(parsed.name, parsed.weight)
-                                                : null;
+                                            const IconComp = parsed ? iconComponent(parsed.name, parsed.weight) : null;
                                             return (
-                                                <button
-                                                    key={item.inKey}
-                                                    type="button"
-                                                    onClick={() => setActiveNav(idx)}
-                                                    className="flex flex-1 flex-col items-center gap-1 py-1"
-                                                    style={{
-                                                        borderRadius: buttonRadius,
-                                                        background: isActive
-                                                            ? withAlpha(primary, e.activeGlowOpacity)
-                                                            : "transparent",
-                                                        boxShadow: isActive
-                                                            ? `0 0 18px ${withAlpha(primary, e.activeGlowOpacity * 0.7)}`
-                                                            : "none",
-                                                    }}
-                                                >
-                                                    {IconComp ? (
-                                                        <IconComp
-                                                            size={22}
-                                                            weight={parsed?.weight ?? "regular"}
-                                                            color={
-                                                                isActive
-                                                                    ? primaryLight
-                                                                    : textSecondary
-                                                            }
-                                                        />
-                                                    ) : iconUrl ? (
-                                                        <Image
-                                                            src={iconUrl}
-                                                            alt={item.label}
-                                                            width={22}
-                                                            height={22}
-                                                            className="h-[22px] w-[22px] object-contain"
-                                                            unoptimized
-                                                        />
-                                                    ) : (
-                                                        <div
-                                                            className="h-[22px] w-[22px] rounded-md"
-                                                            style={{
-                                                                background: isActive
-                                                                    ? primary
-                                                                    : hexToCss(c.textSecondary, DEFAULT_COLORS.textSecondary!),
-                                                            }}
-                                                        />
-                                                    )}
-                                                    <span
-                                                        className="text-[10px]"
+                                                <button key={item.inKey} type="button" onClick={() => setActiveNav(idx)}
+                                                        className="flex flex-1 flex-col items-center gap-1 py-1"
                                                         style={{
-                                                            color: isActive
-                                                                ? primaryLight
-                                                                : textSecondary,
-                                                        }}
-                                                    >
+                                                            borderRadius: buttonRadius,
+                                                            background: isActive ? withAlpha(primary, e.activeGlowOpacity) : "transparent",
+                                                            boxShadow: isActive ? `0 0 18px ${withAlpha(primary, e.activeGlowOpacity * 0.7)}` : "none",
+                                                        }}>
+                                                    {IconComp ? (
+                                                        <IconComp size={22} weight={parsed?.weight ?? "regular"} color={isActive ? primaryLight : textSecondary} />
+                                                    ) : iconUrl ? (
+                                                        <Image src={iconUrl} alt={item.label} width={22} height={22}
+                                                               className="h-[22px] w-[22px] object-contain" unoptimized />
+                                                    ) : (
+                                                        <div className="h-[22px] w-[22px] rounded-md" style={{
+                                                            background: isActive ? primary : hexToCss(c.textSecondary, DEFAULT_COLORS.textSecondary!),
+                                                        }} />
+                                                    )}
+                                                    <span className="text-[10px]" style={{ color: isActive ? primaryLight : textSecondary }}>
                                                         {item.label}
                                                     </span>
                                                 </button>
@@ -1219,27 +1351,18 @@ export default function AdminThemeSettingsPage() {
                             </div>
 
                             <div className="mt-4 text-right text-xs text-slate-500">
-                                ملاحظة: أي لون تركه فارغاً سيعود للون الافتراضي في التطبيق.
-                                الأيقونات المفعّلة في الشريط السفلي هي التي تظهر عند تحديد
-                                القسم.
+                                أي لون تركه فارغاً يستخدم القيمة المشتقة من <strong>Smart Palette</strong>. الألوان الأساسية لـ M3 مضمونة بدرجة WCAG AA كحد أدنى.
                             </div>
                         </div>
 
                         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                <button
-                                    type="button"
-                                    onClick={() => void loadSettings()}
-                                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-                                >
+                                <button type="button" onClick={() => void loadSettings()}
+                                        className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
                                     إعادة التحميل
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={() => void handleSave()}
-                                    disabled={saving || loading}
-                                    className="rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-purple-300"
-                                >
+                                <button type="button" onClick={() => void handleSave()} disabled={saving || loading}
+                                        className="rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-purple-300">
                                     {saving ? "جارٍ الحفظ..." : "حفظ المظهر والأيقونات"}
                                 </button>
                             </div>
@@ -1248,100 +1371,146 @@ export default function AdminThemeSettingsPage() {
                 </div>
 
                 <div className="space-y-6 lg:col-span-3">
+                    {/* Smart Palette */}
+                    <div className="rounded-xl border-2 border-violet-300 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 p-5 shadow-sm">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="text-right">
+                                <h3 className="flex items-center justify-end gap-2 font-bold text-slate-900">
+                                    <span className="rounded-md bg-violet-600 px-2 py-0.5 text-[11px] font-bold text-white shadow">
+                                        Enterprise
+                                    </span>
+                                    لوحة الألوان الذكية (Material Color Utilities)
+                                </h3>
+                                <p className="mt-1 text-sm text-slate-600">
+                                    اختر لوناً واحداً (البذرة) ليتم توليد 5 ألواح نغمية (Primary / Secondary / Tertiary / Neutral /
+                                    NeutralVariant) + 85 لوناً + 10 تأثيرات تلقائياً مع ضمان WCAG AA لكل نص.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-12">
+                            <div className="sm:col-span-4">
+                                <label className="mb-2 block text-right text-xs font-semibold text-slate-700">
+                                    لون البذرة (Seed Primary)
+                                </label>
+                                <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-slate-300 bg-white focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-100">
+                                    <label className="relative block shrink-0 cursor-pointer border-r border-slate-200 bg-slate-50 px-3 py-2">
+                                        <input type="color" value={colorToSixDigitHex(smartSeed)}
+                                               onChange={(e) => setSmartSeed(e.target.value)}
+                                               className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+                                        <div className="h-8 w-8 rounded-md border border-slate-300 shadow-inner"
+                                             style={{ background: colorToSixDigitHex(smartSeed) }} />
+                                    </label>
+                                    <input type="text" dir="ltr" inputMode="text" placeholder="#9B4DFF" value={smartSeed}
+                                           onChange={(e) => setSmartSeed(e.target.value)}
+                                           className="min-w-0 flex-1 bg-transparent px-3 py-2 text-left text-sm font-mono text-slate-900 outline-none placeholder:text-slate-400" />
+                                </div>
+                            </div>
+                            <div className="sm:col-span-3">
+                                <label className="mb-2 block text-right text-xs font-semibold text-slate-700">
+                                    الوضع (Mode)
+                                </label>
+                                <div className="flex rounded-lg border border-slate-300 bg-white p-1">
+                                    <button type="button" onClick={() => setSmartMode("dark")}
+                                            className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+                                                smartMode === "dark"
+                                                    ? "bg-slate-900 text-white shadow-inner"
+                                                    : "text-slate-600 hover:bg-slate-50"
+                                            }`}>🌙 داكن</button>
+                                    <button type="button" onClick={() => setSmartMode("light")}
+                                            className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+                                                smartMode === "light"
+                                                    ? "bg-amber-100 text-amber-900 shadow-inner"
+                                                    : "text-slate-600 hover:bg-slate-50"
+                                            }`}>☀️ فاتح</button>
+                                </div>
+                            </div>
+                            <div className="flex flex-col justify-end gap-2 sm:col-span-5">
+                                <div className="flex flex-wrap gap-2">
+                                    <button type="button" disabled={smartGenerating}
+                                            onClick={() => void handleGenerateSmartPalette(false)}
+                                            className="flex-1 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-violet-700 disabled:opacity-60">
+                                        {smartGenerating ? "جارٍ التوليد..." : "⚡ معاينة فقط"}
+                                    </button>
+                                    <button type="button" disabled={smartGenerating}
+                                            onClick={() => void handleGenerateSmartPalette(true)}
+                                            className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-emerald-700 disabled:opacity-60">
+                                        💾 تطبيق وحفظ مباشر
+                                    </button>
+                                </div>
+                                <p className="text-[11px] text-right text-slate-500">
+                                    💡 تلميح: ابدأ بـ <span className="font-mono">#9B4DFF</span> (Purple Dream) أو{" "}
+                                    <span className="font-mono">#10B981</span> (Ocean) ثم عدّل التفاصيل إن أردت.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Presets */}
                     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                         <div className="text-right">
-                            <h3 className="font-bold text-slate-900">قوالب جاهزة</h3>
+                            <h3 className="font-bold text-slate-900">قوالب جاهزة (Presets)</h3>
                             <p className="mt-1 text-sm text-slate-500">
-                                اضغط على أي قالب لتطبيقه فوراً على جميع الألوان — ثم عدّل التفاصيل
-                                فيما بعد.
+                                اضغط على أي قالب ليتم تعبئة البذرة والألوان الأساسية — ثم استخدم Smart Palette للتوسيع إلى 85 لون.
                             </p>
                         </div>
                         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
                             {PRESET_THEMES.map((preset) => {
-                                const isActive = COLOR_FIELDS.every(
-                                    (f) =>
-                                        (colorInputs[f.key] ??
-                                            settings.colors[f.key] ??
-                                            DEFAULT_COLORS[f.key]) === preset.colors[f.key]
-                                );
+                                const isActive = (colorInputs.primary ?? settings.colors.primary ?? DEFAULT_COLORS.primary) === preset.colors.primary;
                                 return (
-                                    <button
-                                        key={preset.name}
-                                        type="button"
-                                        onClick={() => handleApplyPreset(preset)}
-                                        className={`group flex flex-col items-center gap-2 rounded-xl border p-2 text-right transition ${
-                                            isActive
-                                                ? "border-purple-500 bg-purple-50/70 shadow"
-                                                : "border-slate-200 bg-slate-50/60 hover:border-purple-300 hover:bg-white"
-                                        }`}
-                                    >
-                                        <div
-                                            className="grid h-16 w-full grid-cols-4 overflow-hidden rounded-lg border border-slate-200"
-                                            style={{ background: preset.colors.background ?? undefined }}
-                                        >
+                                    <button key={preset.name} type="button"
+                                            onClick={() => handleApplyPreset(preset)}
+                                            className={`group flex flex-col items-center gap-2 rounded-xl border p-2 text-right transition ${
+                                                isActive
+                                                    ? "border-purple-500 bg-purple-50/70 shadow"
+                                                    : "border-slate-200 bg-slate-50/60 hover:border-purple-300 hover:bg-white"
+                                            }`}>
+                                        <div className="grid h-16 w-full grid-cols-4 overflow-hidden rounded-lg border border-slate-200"
+                                             style={{ background: preset.colors.background ?? undefined }}>
                                             <div style={{ background: preset.colors.primary ?? undefined }} />
                                             <div style={{ background: preset.colors.primaryDark ?? undefined }} />
                                             <div style={{ background: preset.colors.surface ?? undefined }} />
                                             <div style={{ background: preset.colors.accentPink ?? undefined }} />
                                         </div>
-                                        <div className="w-full text-right text-[12px] font-semibold text-slate-900">
-                                            {preset.label}
-                                        </div>
+                                        <div className="w-full text-right text-[12px] font-semibold text-slate-900">{preset.label}</div>
                                     </button>
                                 );
                             })}
                         </div>
                     </div>
 
+                    {/* Legacy Quick Colors */}
                     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <div className="text-right">
-                            <h3 className="font-bold text-slate-900">ألوان التطبيق</h3>
-                            <p className="mt-1 text-sm text-slate-500">
-                                اضغط على المربع اللوني الكبير لاختيار اللون مباشرة، أو اكتب الرمز
-                                إن أردت الدقة. المعاينة على اليسار تتحدّث فوراً.
-                            </p>
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="text-right">
+                                <h3 className="font-bold text-slate-900">ألوان سريعة (الإصدار القديم — متوافق)</h3>
+                                <p className="mt-1 text-sm text-slate-500">
+                                    17 لوناً أساسياً للتوافق مع الإصدارات القديمة من التطبيق. استخدم المجموعات M3 أدناه للتحكم الدقيق.
+                                </p>
+                            </div>
                         </div>
                         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                            {COLOR_FIELDS.map((field) => {
+                            {LEGACY_COLOR_FIELDS.map((field) => {
                                 const current = colorInputs[field.key] ?? "";
-                                const effective = hexToCss(
-                                    effectiveColors[field.key],
-                                    DEFAULT_COLORS[field.key]!
-                                );
+                                const effective = hexToCss(effectiveColors[field.key], (DEFAULT_COLORS as any)[field.key]!);
                                 const isOverriding = current.length > 0 || settings.colors[field.key];
                                 const pickerValue = colorToSixDigitHex(effective);
                                 return (
-                                    <div
-                                        key={field.key}
-                                        className="flex flex-col gap-3 overflow-hidden rounded-xl border border-slate-200 bg-slate-50/60 p-4 text-right"
-                                    >
+                                    <div key={field.key} className="flex flex-col gap-3 overflow-hidden rounded-xl border border-slate-200 bg-slate-50/60 p-4 text-right">
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="min-w-0 flex-1">
-                                                <div className="text-sm font-semibold text-slate-900">
-                                                    {field.label}
-                                                </div>
-                                                <div className="mt-1 text-[11px] text-slate-500">
-                                                    {field.desc}
-                                                </div>
+                                                <div className="text-sm font-semibold text-slate-900">{field.label}</div>
+                                                <div className="mt-1 text-[11px] text-slate-500">{field.desc}</div>
                                             </div>
                                             <label className="relative block shrink-0 cursor-pointer">
-                                                <input
-                                                    type="color"
-                                                    value={pickerValue}
-                                                    onChange={(e) =>
-                                                        handleColorChange(field.key, e.target.value)
-                                                    }
-                                                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                                                />
-                                                <div
-                                                    className="h-16 w-28 overflow-hidden rounded-xl border border-slate-200 shadow-inner transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                                                    style={{
-                                                        background: isOverriding
-                                                            ? `linear-gradient(135deg, ${effective}, ${mixOnBackground(effective, 0.18)})`
-                                                            : effective,
-                                                    }}
-                                                    title="اختر اللون"
-                                                >
+                                                <input type="color" value={pickerValue}
+                                                       onChange={(e) => handleColorChange(field.key, e.target.value)}
+                                                       className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+                                                <div className="h-16 w-28 overflow-hidden rounded-xl border border-slate-200 shadow-inner transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                                                     style={{
+                                                         background: isOverriding
+                                                             ? `linear-gradient(135deg, ${effective}, ${mixOnBackground(effective, 0.18)})`
+                                                             : effective,
+                                                     }} title="اختر اللون">
                                                     <div className="flex h-full items-end justify-start p-1.5">
                                                         <span className="rounded-md bg-black/40 px-2 py-0.5 text-[10px] font-mono tracking-wide text-white">
                                                             {pickerValue}
@@ -1350,46 +1519,22 @@ export default function AdminThemeSettingsPage() {
                                                 </div>
                                             </label>
                                         </div>
-                                        <div
-                                            dir="ltr"
-                                            className="flex items-center overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-purple-400 focus-within:ring-2 focus-within:ring-purple-100"
-                                        >
+                                        <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-purple-400 focus-within:ring-2 focus-within:ring-purple-100">
                                             <label className="relative block shrink-0 cursor-pointer border-r border-slate-200 bg-slate-50/70 px-2.5 py-2">
-                                                <input
-                                                    type="color"
-                                                    value={pickerValue}
-                                                    onChange={(e) =>
-                                                        handleColorChange(field.key, e.target.value)
-                                                    }
-                                                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                                                />
+                                                <input type="color" value={pickerValue}
+                                                       onChange={(e) => handleColorChange(field.key, e.target.value)}
+                                                       className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
                                                 <div className="flex items-center gap-2">
-                                                    <div
-                                                        className="h-8 w-8 rounded-md border border-slate-300 shadow-inner"
-                                                        style={{ background: pickerValue }}
-                                                    />
-                                                    <span className="hidden text-[10px] font-medium text-slate-500 sm:inline">
-                                                        اختر
-                                                    </span>
+                                                    <div className="h-8 w-8 rounded-md border border-slate-300 shadow-inner" style={{ background: pickerValue }} />
+                                                    <span className="hidden text-[10px] font-medium text-slate-500 sm:inline">اختر</span>
                                                 </div>
                                             </label>
-                                            <input
-                                                type="text"
-                                                inputMode="text"
-                                                dir="ltr"
-                                                placeholder="#9B4DFF"
-                                                value={current}
-                                                onChange={(e) =>
-                                                    handleColorChange(field.key, e.target.value)
-                                                }
-                                                className="min-w-0 flex-1 bg-transparent px-3 py-2 text-left text-sm font-mono text-slate-900 outline-none placeholder:text-slate-400"
-                                            />
+                                            <input type="text" inputMode="text" dir="ltr" placeholder="#9B4DFF" value={current}
+                                                   onChange={(e) => handleColorChange(field.key, e.target.value)}
+                                                   className="min-w-0 flex-1 bg-transparent px-3 py-2 text-left text-sm font-mono text-slate-900 outline-none placeholder:text-slate-400" />
                                         </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemoveColor(field.key)}
-                                            className="self-start rounded-md border border-slate-200 bg-white px-3 py-1 text-[11px] text-slate-600 transition hover:bg-slate-100"
-                                        >
+                                        <button type="button" onClick={() => handleRemoveColor(field.key)}
+                                                className="self-start rounded-md border border-slate-200 bg-white px-3 py-1 text-[11px] text-slate-600 transition hover:bg-slate-100">
                                             إرجاع للافتراضي
                                         </button>
                                     </div>
@@ -1398,12 +1543,109 @@ export default function AdminThemeSettingsPage() {
                         </div>
                     </div>
 
+                    {/* M3 Color Groups Tabs */}
+                    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <div className="text-right">
+                            <h3 className="font-bold text-slate-900">مجموعات Material 3 (85 لوناً + واجهة WCAG)</h3>
+                            <p className="mt-1 text-sm text-slate-500">
+                                اختر المجموعة لتصفح الألوان الدقيقة. كل لون نص يُظهر علامة WCAG ⭐ (AAA) / ✅ (AA) / ❌ (أقل من AA).
+                            </p>
+                        </div>
+                        <div className="mt-4 flex flex-wrap gap-2 border-b border-slate-200 pb-3">
+                            {M3_COLOR_GROUPS.map((grp) => (
+                                <button key={grp.id} type="button" onClick={() => setActiveGroup(activeGroup === grp.id ? null : grp.id)}
+                                        className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
+                                            activeGroup === grp.id
+                                                ? "border-violet-500 bg-violet-600 text-white shadow-sm"
+                                                : "border-slate-200 bg-white text-slate-700 hover:border-violet-300 hover:bg-violet-50"
+                                        }`}>
+                                    {grp.title}
+                                    <span className="mr-1 rounded bg-black/10 px-1.5 py-0.5 text-[10px] opacity-70">
+                                        {grp.fields.length}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+
+                        {M3_COLOR_GROUPS.map((grp) => {
+                            if (activeGroup !== grp.id) return null;
+                            return (
+                                <div key={grp.id} className="mt-4">
+                                    <div className="mb-3 rounded-lg border border-violet-200 bg-violet-50/60 px-4 py-3 text-right">
+                                        <div className="font-semibold text-violet-900">{grp.title}</div>
+                                        <div className="mt-1 text-[12px] text-violet-800/80">{grp.desc}</div>
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                                        {grp.fields.map((field) => {
+                                            const current = colorInputs[field.key] ?? "";
+                                            const effective = hexToCss(effectiveColors[field.key], (DEFAULT_COLORS as any)[field.key]!);
+                                            const pickerValue = colorToSixDigitHex(effective);
+                                            const wcagKey = `${field.key}__${field.fgOf}`;
+                                            const rating = field.fgOf ? computedWcag[wcagKey] : null;
+                                            return (
+                                                <div key={field.key} className="flex flex-col gap-3 overflow-hidden rounded-xl border border-slate-200 bg-slate-50/60 p-4 text-right">
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex flex-wrap items-center justify-end gap-1">
+                                                                {rating ? <WcagTag rating={rating} /> : null}
+                                                                <div className="text-sm font-semibold text-slate-900">{field.label}</div>
+                                                            </div>
+                                                            {field.desc ? (
+                                                                <div className="mt-1 text-[11px] text-slate-500">{field.desc}</div>
+                                                            ) : null}
+                                                            {field.fgOf ? (
+                                                                <div className="mt-1 flex items-center justify-end gap-2 text-[10px] text-slate-400">
+                                                                    <span>نص فوق:</span>
+                                                                    <span dir="ltr" className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-white/80">
+                                                                        {field.fgOf}
+                                                                    </span>
+                                                                </div>
+                                                            ) : null}
+                                                        </div>
+                                                        <label className="relative block shrink-0 cursor-pointer">
+                                                            <input type="color" value={pickerValue}
+                                                                   onChange={(e) => handleColorChange(field.key, e.target.value)}
+                                                                   className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+                                                            <div className="h-14 w-24 overflow-hidden rounded-xl border border-slate-200 shadow-inner transition-transform hover:scale-[1.02]"
+                                                                 style={{ background: effective }}>
+                                                                <div className="flex h-full items-end justify-start p-1">
+                                                                    <span className="rounded bg-black/50 px-1.5 py-0.5 text-[9px] font-mono text-white">
+                                                                        {pickerValue}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-100">
+                                                        <label className="relative block shrink-0 cursor-pointer border-r border-slate-200 bg-slate-50/70 px-2.5 py-2">
+                                                            <input type="color" value={pickerValue}
+                                                                   onChange={(e) => handleColorChange(field.key, e.target.value)}
+                                                                   className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+                                                            <div className="h-8 w-8 rounded-md border border-slate-300 shadow-inner" style={{ background: pickerValue }} />
+                                                        </label>
+                                                        <input type="text" inputMode="text" dir="ltr" placeholder="#9B4DFF" value={current}
+                                                               onChange={(e) => handleColorChange(field.key, e.target.value)}
+                                                               className="min-w-0 flex-1 bg-transparent px-3 py-2 text-left text-sm font-mono text-slate-900 outline-none placeholder:text-slate-400" />
+                                                    </div>
+                                                    <button type="button" onClick={() => handleRemoveColor(field.key)}
+                                                            className="self-start rounded-md border border-slate-200 bg-white px-3 py-1 text-[11px] text-slate-600 transition hover:bg-slate-100">
+                                                        إرجاع للافتراضي (Smart Palette)
+                                                    </button>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Effects */}
                     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                         <div className="text-right">
                             <h3 className="font-bold text-slate-900">تأثيرات وتفاصيل التصميم</h3>
                             <p className="mt-1 text-sm text-slate-500">
-                                حرّك المؤشرات لتجربة التدرجات، حواف البطاقات، ظلال الأزرار، وتوهج
-                                القسم المفعّل.
+                                حرّك المؤشرات لتجربة التدرجات، حواف البطاقات، ظلال الأزرار، وتوهج القسم المفعّل.
                             </p>
                         </div>
                         <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-2">
@@ -1417,61 +1659,32 @@ export default function AdminThemeSettingsPage() {
                                     field.key === "primaryGradientAngle"
                                         ? `linear-gradient(${value}deg, ${primary}, ${primaryDark})`
                                         : undefined;
-                                const isOverriding =
-                                    typeof raw === "number" && Number.isFinite(raw);
+                                const isOverriding = typeof raw === "number" && Number.isFinite(raw);
                                 return (
-                                    <div
-                                        key={field.key}
-                                        className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 text-right"
-                                    >
+                                    <div key={field.key} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 text-right">
                                         <div className="flex items-start justify-between gap-3">
                                             <div>
-                                                <div className="text-sm font-semibold text-slate-900">
-                                                    {field.label}
-                                                </div>
-                                                <div className="mt-1 text-[11px] text-slate-500">
-                                                    {field.desc}
-                                                </div>
+                                                <div className="text-sm font-semibold text-slate-900">{field.label}</div>
+                                                <div className="mt-1 text-[11px] text-slate-500">{field.desc}</div>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <div
-                                                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-left text-xs font-mono text-slate-900"
-                                                    dir="ltr"
-                                                >
-                                                    {field.key.includes("Opacity")
-                                                        ? value.toFixed(2)
-                                                        : value}
+                                                <div className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-left text-xs font-mono text-slate-900" dir="ltr">
+                                                    {field.key.includes("Opacity") ? value.toFixed(2) : value}
                                                     {field.suffix ?? ""}
                                                 </div>
                                                 {preview ? (
-                                                    <div
-                                                        className="h-10 w-10 rounded-lg border border-slate-200"
-                                                        style={{ background: preview }}
-                                                    />
+                                                    <div className="h-10 w-10 rounded-lg border border-slate-200" style={{ background: preview }} />
                                                 ) : null}
                                             </div>
                                         </div>
                                         <div className="mt-3 flex items-center gap-3">
-                                            <input
-                                                type="range"
-                                                min={field.min}
-                                                max={field.max}
-                                                step={field.step}
-                                                value={value}
-                                                onChange={(e) =>
-                                                    handleEffectChange(
-                                                        field.key,
-                                                        parseFloat(e.target.value)
-                                                    )
-                                                }
-                                                className="h-2 flex-1 cursor-pointer accent-purple-600"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => handleResetEffect(field.key)}
-                                                disabled={!isOverriding}
-                                                className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
-                                            >
+                                            <input type="range" min={field.min} max={field.max} step={field.step}
+                                                   value={value}
+                                                   onChange={(e) => handleEffectChange(field.key, parseFloat(e.target.value))}
+                                                   className="h-2 flex-1 cursor-pointer accent-purple-600" />
+                                            <button type="button" onClick={() => handleResetEffect(field.key)}
+                                                    disabled={!isOverriding}
+                                                    className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50">
                                                 افتراضي
                                             </button>
                                         </div>
@@ -1481,226 +1694,121 @@ export default function AdminThemeSettingsPage() {
                         </div>
                     </div>
 
+                    {/* Nav Icons */}
                     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                         <div className="text-right">
                             <h3 className="font-bold text-slate-900">أيقونات شريط التنقل السفلي</h3>
                             <p className="mt-1 text-sm text-slate-500">
-                                لكل زر حالتان: عادية (غير محدّدة) ومفعّلة (عند فتح القسم). اختر
-                                من مكتبة الأيقونات الجاهزة (Phosphor — 78 أيقونة مع 6 أنماط)
-                                أو ارفع صورة مخصصة PNG/WEBP.
+                                لكل زر حالتان: عادية ومفعّلة. اختر من مكتبة Phosphor (78 أيقونة × 6 أنماط) أو ارفع صورة مخصصة.
                             </p>
                         </div>
-
                         <div className="mt-4 space-y-5">
                             {NAV_ORDER.map((pair) => {
                                 const inactive = NAV_ICON_FIELDS.find((f) => f.key === pair.inKey)!;
                                 const active = NAV_ICON_FIELDS.find((f) => f.key === pair.activeKey)!;
                                 const inIdKey = navFieldToIdField(pair.inKey)!;
                                 const activeIdKey = navFieldToIdField(pair.activeKey)!;
-                                const inactiveUrl =
-                                    previewUrls[pair.inKey] ?? settings.navIcons[pair.inKey] ?? null;
-                                const activeUrl =
-                                    previewUrls[pair.activeKey] ??
-                                    settings.navIcons[pair.activeKey] ??
-                                    null;
-                                const inactiveId =
-                                    iconIdInputs[inIdKey] ?? settings.navIcons[inIdKey] ?? null;
-                                const activeId =
-                                    iconIdInputs[activeIdKey] ?? settings.navIcons[activeIdKey] ?? null;
+                                const inactiveUrl = previewUrls[pair.inKey] ?? settings.navIcons[pair.inKey] ?? null;
+                                const activeUrl = previewUrls[pair.activeKey] ?? settings.navIcons[pair.activeKey] ?? null;
+                                const inactiveId = iconIdInputs[inIdKey] ?? settings.navIcons[inIdKey] ?? null;
+                                const activeId = iconIdInputs[activeIdKey] ?? settings.navIcons[activeIdKey] ?? null;
                                 const inParsed = parseIconId(inactiveId);
                                 const activeParsed = parseIconId(activeId);
-                                const InIconComp = inParsed
-                                    ? iconComponent(inParsed.name, inParsed.weight)
-                                    : null;
-                                const ActiveIconComp = activeParsed
-                                    ? iconComponent(activeParsed.name, activeParsed.weight)
-                                    : null;
+                                const InIconComp = inParsed ? iconComponent(inParsed.name, inParsed.weight) : null;
+                                const ActiveIconComp = activeParsed ? iconComponent(activeParsed.name, activeParsed.weight) : null;
                                 return (
-                                    <div
-                                        key={pair.inKey}
-                                        className="space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-4"
-                                    >
+                                    <div key={pair.inKey} className="space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
                                         <div className="text-right">
-                                            <div className="text-base font-bold text-slate-900">
-                                                {pair.label}
-                                            </div>
-                                            <div className="text-[11px] text-slate-500">
-                                                {inactive.desc}
-                                            </div>
+                                            <div className="text-base font-bold text-slate-900">{pair.label}</div>
+                                            <div className="text-[11px] text-slate-500">{inactive.desc}</div>
                                         </div>
-
                                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                             <div className="space-y-3 text-right">
-                                                <div className="text-sm font-semibold text-slate-900">
-                                                    حالة عادية (غير محدّدة)
-                                                </div>
+                                                <div className="text-sm font-semibold text-slate-900">حالة عادية (غير محدّدة)</div>
                                                 <div className="grid grid-cols-2 gap-2">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setIconPickerField(inIdKey)}
-                                                        className="rounded-lg bg-slate-900 px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-slate-800"
-                                                    >
+                                                    <button type="button" onClick={() => setIconPickerField(inIdKey)}
+                                                            className="rounded-lg bg-slate-900 px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-slate-800">
                                                         اختر من المكتبة
                                                     </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleClearIconId(inIdKey)}
-                                                        disabled={!inactiveId}
-                                                        className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
-                                                    >
+                                                    <button type="button" onClick={() => handleClearIconId(inIdKey)} disabled={!inactiveId}
+                                                            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50">
                                                         إزالة الأيقونة
                                                     </button>
                                                 </div>
                                                 <div className="flex justify-center">
-                                                    <div
-                                                        className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed border-slate-300"
-                                                        style={{
-                                                            background: hexToCss(
-                                                                c.menuBackground,
-                                                                DEFAULT_COLORS.menuBackground!
-                                                            ),
-                                                        }}
-                                                    >
+                                                    <div className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed border-slate-300"
+                                                         style={{ background: hexToCss(c.menuBackground, DEFAULT_COLORS.menuBackground!) }}>
                                                         {InIconComp ? (
-                                                            <InIconComp
-                                                                size={48}
-                                                                weight={inParsed?.weight ?? "regular"}
-                                                                color={hexToCss(
-                                                                    c.textSecondary,
-                                                                    DEFAULT_COLORS.textSecondary!
-                                                                )}
-                                                            />
+                                                            <InIconComp size={48} weight={inParsed?.weight ?? "regular"}
+                                                                       color={hexToCss(c.textSecondary, DEFAULT_COLORS.textSecondary!)} />
                                                         ) : inactiveUrl ? (
-                                                            <Image
-                                                                src={inactiveUrl}
-                                                                alt={inactive.label}
-                                                                width={64}
-                                                                height={64}
-                                                                className="h-16 w-16 object-contain"
-                                                                unoptimized
-                                                            />
+                                                            <Image src={inactiveUrl} alt={inactive.label} width={64} height={64}
+                                                                   className="h-16 w-16 object-contain" unoptimized />
                                                         ) : (
-                                                            <span className="text-center text-[11px] text-slate-300">
-                                                                لا توجد أيقونة
-                                                            </span>
+                                                            <span className="text-center text-[11px] text-slate-300">لا توجد أيقونة</span>
                                                         )}
                                                     </div>
                                                 </div>
                                                 {inParsed ? (
-                                                    <div
-                                                        dir="ltr"
-                                                        className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-center font-mono text-[11px] text-slate-600"
-                                                    >
+                                                    <div dir="ltr" className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-center font-mono text-[11px] text-slate-600">
                                                         {buildIconId(inParsed.name, inParsed.weight)}
                                                     </div>
                                                 ) : null}
                                                 <div className="space-y-2 border-t border-dashed border-slate-300 pt-3">
-                                                    <div className="text-[11px] font-medium text-slate-600">
-                                                        أو صورة مخصصة (PNG/WEBP):
-                                                    </div>
+                                                    <div className="text-[11px] font-medium text-slate-600">أو صورة مخصصة (PNG/WEBP):</div>
                                                     <label className="block cursor-pointer rounded-lg border border-slate-300 bg-white px-3 py-2 text-center text-xs font-medium text-slate-700 transition hover:bg-slate-100">
                                                         اختيار ملف
-                                                        <input
-                                                            type="file"
-                                                            accept="image/png,image/webp,image/jpeg"
-                                                            className="hidden"
-                                                            onChange={(event) =>
-                                                                handleFileChange(pair.inKey, event)
-                                                            }
-                                                        />
+                                                        <input type="file" accept="image/png,image/webp,image/jpeg" className="hidden"
+                                                               onChange={(event) => handleFileChange(pair.inKey, event)} />
                                                     </label>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleRemoveIcon(pair.inKey)}
-                                                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-700 transition hover:bg-slate-100"
-                                                    >
+                                                    <button type="button" onClick={() => handleRemoveIcon(pair.inKey)}
+                                                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-700 transition hover:bg-slate-100">
                                                         إزالة الصورة
                                                     </button>
                                                 </div>
                                             </div>
-
                                             <div className="space-y-3 text-right">
-                                                <div className="text-sm font-semibold text-slate-900">
-                                                    حالة مفعّلة (عند فتح القسم)
-                                                </div>
+                                                <div className="text-sm font-semibold text-slate-900">حالة مفعّلة (عند فتح القسم)</div>
                                                 <div className="grid grid-cols-2 gap-2">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setIconPickerField(activeIdKey)}
-                                                        className="rounded-lg bg-purple-600 px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-purple-700"
-                                                    >
+                                                    <button type="button" onClick={() => setIconPickerField(activeIdKey)}
+                                                            className="rounded-lg bg-purple-600 px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-purple-700">
                                                         اختر من المكتبة
                                                     </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleClearIconId(activeIdKey)}
-                                                        disabled={!activeId}
-                                                        className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
-                                                    >
+                                                    <button type="button" onClick={() => handleClearIconId(activeIdKey)} disabled={!activeId}
+                                                            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50">
                                                         إزالة الأيقونة
                                                     </button>
                                                 </div>
                                                 <div className="flex justify-center">
-                                                    <div
-                                                        className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed"
-                                                        style={{
-                                                            background: withAlpha(primary, 0.18),
-                                                            borderColor: hexToCss(
-                                                                c.primaryLight,
-                                                                DEFAULT_COLORS.primaryLight!
-                                                            ),
-                                                        }}
-                                                    >
+                                                    <div className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed"
+                                                         style={{
+                                                             background: withAlpha(primary, 0.18),
+                                                             borderColor: hexToCss(c.primaryLight, DEFAULT_COLORS.primaryLight!),
+                                                         }}>
                                                         {ActiveIconComp ? (
-                                                            <ActiveIconComp
-                                                                size={48}
-                                                                weight={activeParsed?.weight ?? "fill"}
-                                                                color={primaryLight}
-                                                            />
+                                                            <ActiveIconComp size={48} weight={activeParsed?.weight ?? "fill"} color={primaryLight} />
                                                         ) : activeUrl ? (
-                                                            <Image
-                                                                src={activeUrl}
-                                                                alt={active.label}
-                                                                width={64}
-                                                                height={64}
-                                                                className="h-16 w-16 object-contain"
-                                                                unoptimized
-                                                            />
+                                                            <Image src={activeUrl} alt={active.label} width={64} height={64}
+                                                                   className="h-16 w-16 object-contain" unoptimized />
                                                         ) : (
-                                                            <span className="text-center text-[11px] text-slate-300">
-                                                                لا توجد أيقونة مفعّلة
-                                                            </span>
+                                                            <span className="text-center text-[11px] text-slate-300">لا توجد أيقونة مفعّلة</span>
                                                         )}
                                                     </div>
                                                 </div>
                                                 {activeParsed ? (
-                                                    <div
-                                                        dir="ltr"
-                                                        className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-center font-mono text-[11px] text-slate-600"
-                                                    >
+                                                    <div dir="ltr" className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-center font-mono text-[11px] text-slate-600">
                                                         {buildIconId(activeParsed.name, activeParsed.weight)}
                                                     </div>
                                                 ) : null}
                                                 <div className="space-y-2 border-t border-dashed border-slate-300 pt-3">
-                                                    <div className="text-[11px] font-medium text-slate-600">
-                                                        أو صورة مخصصة (PNG/WEBP):
-                                                    </div>
+                                                    <div className="text-[11px] font-medium text-slate-600">أو صورة مخصصة (PNG/WEBP):</div>
                                                     <label className="block cursor-pointer rounded-lg border border-purple-300 bg-purple-50 px-3 py-2 text-center text-xs font-medium text-purple-700 transition hover:bg-purple-100">
                                                         اختيار ملف
-                                                        <input
-                                                            type="file"
-                                                            accept="image/png,image/webp,image/jpeg"
-                                                            className="hidden"
-                                                            onChange={(event) =>
-                                                                handleFileChange(pair.activeKey, event)
-                                                            }
-                                                        />
+                                                        <input type="file" accept="image/png,image/webp,image/jpeg" className="hidden"
+                                                               onChange={(event) => handleFileChange(pair.activeKey, event)} />
                                                     </label>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleRemoveIcon(pair.activeKey)}
-                                                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-700 transition hover:bg-slate-100"
-                                                    >
+                                                    <button type="button" onClick={() => handleRemoveIcon(pair.activeKey)}
+                                                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-700 transition hover:bg-slate-100">
                                                         إزالة الصورة
                                                     </button>
                                                 </div>
@@ -1720,9 +1828,7 @@ export default function AdminThemeSettingsPage() {
                                 handlePickIconId(iconPickerField, name, weight);
                                 setIconPickerField(null);
                             }}
-                            defaultWeight={
-                                iconPickerField.toLowerCase().includes("active") ? "fill" : "regular"
-                            }
+                            defaultWeight={iconPickerField.toLowerCase().includes("active") ? "fill" : "regular"}
                         />
                     ) : null}
                 </div>
@@ -1767,11 +1873,8 @@ function IconPickerModal(props: {
                             </span>
                         </div>
                     </div>
-                    <button
-                        type="button"
-                        onClick={props.onClose}
-                        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100"
-                    >
+                    <button type="button" onClick={props.onClose}
+                            className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100">
                         إغلاق
                     </button>
                 </div>
@@ -1783,38 +1886,23 @@ function IconPickerModal(props: {
                                 const Comp = iconComponent("house", w.key);
                                 const active = w.key === weight;
                                 return (
-                                    <button
-                                        key={w.key}
-                                        type="button"
-                                        onClick={() => setWeight(w.key)}
-                                        className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
-                                            active
-                                                ? "border-purple-500 bg-purple-50 text-purple-700 shadow-sm"
-                                                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                                        }`}
-                                    >
+                                    <button key={w.key} type="button" onClick={() => setWeight(w.key)}
+                                            className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                                                active
+                                                    ? "border-purple-500 bg-purple-50 text-purple-700 shadow-sm"
+                                                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                                            }`}>
                                         {Comp ? <Comp size={16} /> : null}
                                         {w.label}
                                     </button>
                                 );
                             })}
                         </div>
-                        <div
-                            dir="ltr"
-                            className="flex items-center overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-purple-400 focus-within:ring-2 focus-within:ring-purple-100"
-                        >
-                            <Pi.MagnifyingGlass
-                                size={16}
-                                className="ml-2 shrink-0 text-slate-400"
-                                weight="bold"
-                            />
-                            <input
-                                type="text"
-                                value={query}
-                                onChange={(e) => setQuery(e.target.value)}
-                                placeholder="ابحث باسم الأيقونة (home, search, gem, heart...)"
-                                className="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-sm text-slate-900 outline-none placeholder:text-slate-400"
-                            />
+                        <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-purple-400 focus-within:ring-2 focus-within:ring-purple-100">
+                            <Pi.MagnifyingGlass size={16} className="ml-2 shrink-0 text-slate-400" weight="bold" />
+                            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
+                                   placeholder="ابحث باسم الأيقونة (home, search, gem, heart...)"
+                                   className="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-sm text-slate-900 outline-none placeholder:text-slate-400" />
                         </div>
                     </div>
                 </div>
@@ -1830,17 +1918,11 @@ function IconPickerModal(props: {
                                 const Comp = iconComponent(item.name, weight);
                                 if (!Comp) return null;
                                 return (
-                                    <button
-                                        key={item.name}
-                                        type="button"
-                                        title={`${item.label} — ${item.name} (${weight})`}
-                                        onClick={() => props.onPick(item.name, weight)}
-                                        className="group flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border border-slate-200 bg-slate-50/50 p-1.5 text-center transition hover:-translate-y-0.5 hover:border-purple-400 hover:bg-purple-50 hover:shadow-md active:translate-y-0"
-                                    >
-                                        <Comp
-                                            size={24}
-                                            className="text-slate-700 group-hover:text-purple-600"
-                                        />
+                                    <button key={item.name} type="button"
+                                            title={`${item.label} — ${item.name} (${weight})`}
+                                            onClick={() => props.onPick(item.name, weight)}
+                                            className="group flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border border-slate-200 bg-slate-50/50 p-1.5 text-center transition hover:-translate-y-0.5 hover:border-purple-400 hover:bg-purple-50 hover:shadow-md active:translate-y-0">
+                                        <Comp size={24} className="text-slate-700 group-hover:text-purple-600" />
                                         <span className="truncate text-[9px] font-medium text-slate-500 group-hover:text-purple-700">
                                             {item.label}
                                         </span>
@@ -1853,8 +1935,7 @@ function IconPickerModal(props: {
 
                 <div className="flex items-center justify-between gap-2 border-t border-slate-200 bg-slate-50 px-5 py-2.5 text-[11px] text-slate-500">
                     <span>
-                        المكتبة تحتوي على 78 أيقونة × 6 أنماط (Phosphor Icons) — يتطابق مع Flutter
-                        مباشرةً.
+                        المكتبة تحتوي على 78 أيقونة × 6 أنماط (Phosphor Icons) — يتطابق مع Flutter مباشرةً.
                     </span>
                     <span dir="ltr" className="font-mono">
                         {filtered.length} / {PHOSPHOR_ICONS.length}

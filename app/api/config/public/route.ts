@@ -1,113 +1,42 @@
 import { NextResponse } from 'next/server';
 import { APP_SETTING_KEYS, getAppSetting } from '@/lib/app_settings';
+import {
+    buildEnterpriseFromSeed,
+    type EnterpriseTheme,
+    isValidHex,
+    normalizeHex,
+} from '@/lib/theme_engine';
+import { ALL_THEME_COLOR_KEYS } from '@/app/api/admin/theme-settings/route';
 
 export const dynamic = 'force-dynamic';
 
-export type PublicThemeEffects = {
-    primaryGradientAngle: number | null;
-    cardRadius: number | null;
-    chipRadius: number | null;
-    buttonRadius: number | null;
-    navShadowOpacity: number | null;
-    cardShadowOpacity: number | null;
-    activeGlowOpacity: number | null;
-    glassBlur: number | null;
-    surfaceOpacity: number | null;
-    borderOpacity: number | null;
-};
-
-export type PublicThemeConfig = {
-    colors: {
-        primary: string | null;
-        primaryLight: string | null;
-        primaryDark: string | null;
-        accentPink: string | null;
-        background: string | null;
-        surface: string | null;
-        surfaceLight: string | null;
-        menuBackground: string | null;
-        textPrimary: string | null;
-        textSecondary: string | null;
-        textTertiary: string | null;
-        success: string | null;
-        warning: string | null;
-        error: string | null;
-        info: string | null;
-        border: string | null;
-        borderLight: string | null;
-    };
-    navIcons: {
-        home: string | null;
-        search: string | null;
-        categories: string | null;
-        orders: string | null;
-        profile: string | null;
-        homeActive: string | null;
-        searchActive: string | null;
-        categoriesActive: string | null;
-        ordersActive: string | null;
-        profileActive: string | null;
-        homeId: string | null;
-        searchId: string | null;
-        categoriesId: string | null;
-        ordersId: string | null;
-        profileId: string | null;
-        homeActiveId: string | null;
-        searchActiveId: string | null;
-        categoriesActiveId: string | null;
-        ordersActiveId: string | null;
-        profileActiveId: string | null;
-    };
-    effects: PublicThemeEffects;
-};
-
-const COLOR_KEYS = [
-    ['primary', APP_SETTING_KEYS.themePrimary] as const,
-    ['primaryLight', APP_SETTING_KEYS.themePrimaryLight] as const,
-    ['primaryDark', APP_SETTING_KEYS.themePrimaryDark] as const,
-    ['accentPink', APP_SETTING_KEYS.themeAccentPink] as const,
-    ['background', APP_SETTING_KEYS.themeBackground] as const,
-    ['surface', APP_SETTING_KEYS.themeSurface] as const,
-    ['surfaceLight', APP_SETTING_KEYS.themeSurfaceLight] as const,
-    ['menuBackground', APP_SETTING_KEYS.themeMenuBackground] as const,
-    ['textPrimary', APP_SETTING_KEYS.themeTextPrimary] as const,
-    ['textSecondary', APP_SETTING_KEYS.themeTextSecondary] as const,
-    ['textTertiary', APP_SETTING_KEYS.themeTextTertiary] as const,
-    ['success', APP_SETTING_KEYS.themeSuccess] as const,
-    ['warning', APP_SETTING_KEYS.themeWarning] as const,
-    ['error', APP_SETTING_KEYS.themeError] as const,
-    ['info', APP_SETTING_KEYS.themeInfo] as const,
-    ['border', APP_SETTING_KEYS.themeBorder] as const,
-    ['borderLight', APP_SETTING_KEYS.themeBorderLight] as const,
+const NAV_ICON_KEYS: [string, string][] = [
+    ['home', APP_SETTING_KEYS.navIconHomeUrl],
+    ['search', APP_SETTING_KEYS.navIconSearchUrl],
+    ['categories', APP_SETTING_KEYS.navIconCategoriesUrl],
+    ['orders', APP_SETTING_KEYS.navIconOrdersUrl],
+    ['profile', APP_SETTING_KEYS.navIconProfileUrl],
+    ['homeActive', APP_SETTING_KEYS.navIconHomeActiveUrl],
+    ['searchActive', APP_SETTING_KEYS.navIconSearchActiveUrl],
+    ['categoriesActive', APP_SETTING_KEYS.navIconCategoriesActiveUrl],
+    ['ordersActive', APP_SETTING_KEYS.navIconOrdersActiveUrl],
+    ['profileActive', APP_SETTING_KEYS.navIconProfileActiveUrl],
 ];
 
-const NAV_ICON_KEYS = [
-    ['home', APP_SETTING_KEYS.navIconHomeUrl] as const,
-    ['search', APP_SETTING_KEYS.navIconSearchUrl] as const,
-    ['categories', APP_SETTING_KEYS.navIconCategoriesUrl] as const,
-    ['orders', APP_SETTING_KEYS.navIconOrdersUrl] as const,
-    ['profile', APP_SETTING_KEYS.navIconProfileUrl] as const,
-    ['homeActive', APP_SETTING_KEYS.navIconHomeActiveUrl] as const,
-    ['searchActive', APP_SETTING_KEYS.navIconSearchActiveUrl] as const,
-    ['categoriesActive', APP_SETTING_KEYS.navIconCategoriesActiveUrl] as const,
-    ['ordersActive', APP_SETTING_KEYS.navIconOrdersActiveUrl] as const,
-    ['profileActive', APP_SETTING_KEYS.navIconProfileActiveUrl] as const,
+const NAV_ICON_ID_KEYS: [string, string][] = [
+    ['homeId', APP_SETTING_KEYS.navIconHomeId],
+    ['searchId', APP_SETTING_KEYS.navIconSearchId],
+    ['categoriesId', APP_SETTING_KEYS.navIconCategoriesId],
+    ['ordersId', APP_SETTING_KEYS.navIconOrdersId],
+    ['profileId', APP_SETTING_KEYS.navIconProfileId],
+    ['homeActiveId', APP_SETTING_KEYS.navIconHomeActiveId],
+    ['searchActiveId', APP_SETTING_KEYS.navIconSearchActiveId],
+    ['categoriesActiveId', APP_SETTING_KEYS.navIconCategoriesActiveId],
+    ['ordersActiveId', APP_SETTING_KEYS.navIconOrdersActiveId],
+    ['profileActiveId', APP_SETTING_KEYS.navIconProfileActiveId],
 ];
 
-const NAV_ICON_ID_KEYS = [
-    ['homeId', APP_SETTING_KEYS.navIconHomeId] as const,
-    ['searchId', APP_SETTING_KEYS.navIconSearchId] as const,
-    ['categoriesId', APP_SETTING_KEYS.navIconCategoriesId] as const,
-    ['ordersId', APP_SETTING_KEYS.navIconOrdersId] as const,
-    ['profileId', APP_SETTING_KEYS.navIconProfileId] as const,
-    ['homeActiveId', APP_SETTING_KEYS.navIconHomeActiveId] as const,
-    ['searchActiveId', APP_SETTING_KEYS.navIconSearchActiveId] as const,
-    ['categoriesActiveId', APP_SETTING_KEYS.navIconCategoriesActiveId] as const,
-    ['ordersActiveId', APP_SETTING_KEYS.navIconOrdersActiveId] as const,
-    ['profileActiveId', APP_SETTING_KEYS.navIconProfileActiveId] as const,
-];
-
-const EFFECT_KEYS: [keyof PublicThemeEffects, string][] = [
+const EFFECT_KEYS: [string, string][] = [
     ['primaryGradientAngle', APP_SETTING_KEYS.effPrimaryGradientAngle],
     ['cardRadius', APP_SETTING_KEYS.effCardRadius],
     ['chipRadius', APP_SETTING_KEYS.effChipRadius],
@@ -120,61 +49,96 @@ const EFFECT_KEYS: [keyof PublicThemeEffects, string][] = [
     ['borderOpacity', APP_SETTING_KEYS.effBorderOpacity],
 ];
 
-function emptyTheme(): PublicThemeConfig {
-    const colors: PublicThemeConfig['colors'] = {
-        primary: null,
-        primaryLight: null,
-        primaryDark: null,
-        accentPink: null,
-        background: null,
-        surface: null,
-        surfaceLight: null,
-        menuBackground: null,
-        textPrimary: null,
-        textSecondary: null,
-        textTertiary: null,
-        success: null,
-        warning: null,
-        error: null,
-        info: null,
-        border: null,
-        borderLight: null,
-    };
-    const navIcons: PublicThemeConfig['navIcons'] = {
-        home: null,
-        search: null,
-        categories: null,
-        orders: null,
-        profile: null,
-        homeActive: null,
-        searchActive: null,
-        categoriesActive: null,
-        ordersActive: null,
-        profileActive: null,
-        homeId: null,
-        searchId: null,
-        categoriesId: null,
-        ordersId: null,
-        profileId: null,
-        homeActiveId: null,
-        searchActiveId: null,
-        categoriesActiveId: null,
-        ordersActiveId: null,
-        profileActiveId: null,
-    };
-    const effects: PublicThemeEffects = {
-        primaryGradientAngle: null,
-        cardRadius: null,
-        chipRadius: null,
-        buttonRadius: null,
-        navShadowOpacity: null,
-        cardShadowOpacity: null,
-        activeGlowOpacity: null,
-        glassBlur: null,
-        surfaceOpacity: null,
-        borderOpacity: null,
-    };
-    return { colors, navIcons, effects };
+const LEGACY_COLOR_KEYS: [string, string][] = [
+    ['primary', APP_SETTING_KEYS.themePrimary],
+    ['primaryLight', APP_SETTING_KEYS.themePrimaryLight],
+    ['primaryDark', APP_SETTING_KEYS.themePrimaryDark],
+    ['accentPink', APP_SETTING_KEYS.themeAccentPink],
+    ['background', APP_SETTING_KEYS.themeBackground],
+    ['surface', APP_SETTING_KEYS.themeSurface],
+    ['surfaceLight', APP_SETTING_KEYS.themeSurfaceLight],
+    ['menuBackground', APP_SETTING_KEYS.themeMenuBackground],
+    ['textPrimary', APP_SETTING_KEYS.themeTextPrimary],
+    ['textSecondary', APP_SETTING_KEYS.themeTextSecondary],
+    ['textTertiary', APP_SETTING_KEYS.themeTextTertiary],
+    ['success', APP_SETTING_KEYS.themeSuccess],
+    ['warning', APP_SETTING_KEYS.themeWarning],
+    ['error', APP_SETTING_KEYS.themeError],
+    ['info', APP_SETTING_KEYS.themeInfo],
+    ['border', APP_SETTING_KEYS.themeBorder],
+    ['borderLight', APP_SETTING_KEYS.themeBorderLight],
+];
+
+type LegacyColors = {
+    primary: string | null;
+    primaryLight: string | null;
+    primaryDark: string | null;
+    accentPink: string | null;
+    background: string | null;
+    surface: string | null;
+    surfaceLight: string | null;
+    menuBackground: string | null;
+    textPrimary: string | null;
+    textSecondary: string | null;
+    textTertiary: string | null;
+    success: string | null;
+    warning: string | null;
+    error: string | null;
+    info: string | null;
+    border: string | null;
+    borderLight: string | null;
+};
+
+type NavIcons = {
+    home: string | null;
+    search: string | null;
+    categories: string | null;
+    orders: string | null;
+    profile: string | null;
+    homeActive: string | null;
+    searchActive: string | null;
+    categoriesActive: string | null;
+    ordersActive: string | null;
+    profileActive: string | null;
+    homeId: string | null;
+    searchId: string | null;
+    categoriesId: string | null;
+    ordersId: string | null;
+    profileId: string | null;
+    homeActiveId: string | null;
+    searchActiveId: string | null;
+    categoriesActiveId: string | null;
+    ordersActiveId: string | null;
+    profileActiveId: string | null;
+};
+
+type Effects = {
+    primaryGradientAngle: number | null;
+    cardRadius: number | null;
+    chipRadius: number | null;
+    buttonRadius: number | null;
+    navShadowOpacity: number | null;
+    cardShadowOpacity: number | null;
+    activeGlowOpacity: number | null;
+    glassBlur: number | null;
+    surfaceOpacity: number | null;
+    borderOpacity: number | null;
+};
+
+function emptyLegacyColors(): LegacyColors {
+    const c: any = {};
+    for (const [k] of LEGACY_COLOR_KEYS) c[k] = null;
+    return c as LegacyColors;
+}
+function emptyNav(): NavIcons {
+    const o: any = {};
+    [...NAV_ICON_KEYS, ...NAV_ICON_ID_KEYS].forEach(([k]) => (o[k] = null));
+    return o as NavIcons;
+}
+function emptyEffects(): Effects {
+    const o: any = {};
+    for (const [k] of EFFECT_KEYS) o[k] = null;
+    return o as Effects;
 }
 
 function isValidHexColor(value: string | null): value is string {
@@ -202,7 +166,12 @@ export async function GET() {
     let unlimitedMonthlySubscriptionIconUrl: string | null = null;
     let unlimitedYearlySubscriptionIconUrl: string | null = null;
 
-    const theme = emptyTheme();
+    const colors = emptyLegacyColors();
+    const navIcons = emptyNav();
+    const effects = emptyEffects();
+
+    const allColorDbOverrides: Partial<EnterpriseTheme> = {} as any;
+    let seedPrimary = '#7C3AED';
 
     try {
         const reads = await Promise.all([
@@ -213,7 +182,8 @@ export async function GET() {
             getAppSetting(APP_SETTING_KEYS.limitedMonthlySubscriptionIconUrl),
             getAppSetting(APP_SETTING_KEYS.unlimitedMonthlySubscriptionIconUrl),
             getAppSetting(APP_SETTING_KEYS.unlimitedYearlySubscriptionIconUrl),
-            ...COLOR_KEYS.map(([, k]) => getAppSetting(k)),
+            ...LEGACY_COLOR_KEYS.map(([, k]) => getAppSetting(k)),
+            ...ALL_THEME_COLOR_KEYS.slice(LEGACY_COLOR_KEYS.length).map(([, k]) => getAppSetting(k)),
             ...NAV_ICON_KEYS.map(([, k]) => getAppSetting(k)),
             ...NAV_ICON_ID_KEYS.map(([, k]) => getAppSetting(k)),
             ...EFFECT_KEYS.map(([, k]) => getAppSetting(k)),
@@ -226,37 +196,70 @@ export async function GET() {
         unlimitedMonthlySubscriptionIconUrl = reads[5];
         unlimitedYearlySubscriptionIconUrl = reads[6];
         let cursor = 7;
-        for (const [key] of COLOR_KEYS) {
+
+        for (const [key] of LEGACY_COLOR_KEYS) {
             const raw = reads[cursor];
             cursor += 1;
-            (theme.colors as any)[key] = isValidHexColor(raw) ? raw!.trim() : null;
+            (colors as any)[key] = isValidHexColor(raw) ? raw!.trim() : null;
+            if (key === 'primary' && isValidHexColor(raw)) {
+                seedPrimary = raw!.trim();
+            }
+        }
+        for (let i = LEGACY_COLOR_KEYS.length; i < ALL_THEME_COLOR_KEYS.length; i++) {
+            const raw = reads[cursor];
+            cursor += 1;
+            const [key] = ALL_THEME_COLOR_KEYS[i];
+            if (isValidHexColor(raw)) {
+                (allColorDbOverrides as any)[key] = normalizeHex(raw!, raw!);
+            }
         }
         for (const [key] of NAV_ICON_KEYS) {
             const raw = reads[cursor];
             cursor += 1;
             const t = typeof raw === 'string' ? raw.trim() : '';
             const ok = t.length === 0 ? false : t.startsWith('/') || /^https?:\/\//i.test(t);
-            (theme.navIcons as any)[key] = ok ? t : null;
+            (navIcons as any)[key] = ok ? t : null;
         }
         for (const [key] of NAV_ICON_ID_KEYS) {
             const raw = reads[cursor];
             cursor += 1;
             const t = typeof raw === 'string' ? raw.trim() : '';
             const ok = t.length > 0 && /^[a-z0-9_.-]{1,80}$/i.test(t);
-            (theme.navIcons as any)[key] = ok ? t.toLowerCase() : null;
+            (navIcons as any)[key] = ok ? t.toLowerCase() : null;
         }
         for (const [key] of EFFECT_KEYS) {
             const raw = reads[cursor];
             cursor += 1;
-            (theme.effects as any)[key] = parseEffect(raw);
+            (effects as any)[key] = parseEffect(raw);
         }
     } catch (e) {
-        // Keep this endpoint available even if settings storage fails.
         console.error('Public Config: failed to read app settings', e);
     }
 
     if (!adminWhatsApp) {
         console.warn('ADMIN_WHATSAPP_E164 is not set');
+    }
+
+    // Bygg Enterprise tema (med fallback om endast primary finns, overridea med DB-fält)
+    const effectsOverride: Partial<EnterpriseTheme['effects']> = {};
+    for (const [k] of EFFECT_KEYS) {
+        const v = (effects as any)[k];
+        if (typeof v === 'number') (effectsOverride as any)[k] = v;
+    }
+
+    const enterprise: EnterpriseTheme = buildEnterpriseFromSeed(
+        seedPrimary,
+        'dark',
+        effectsOverride,
+        allColorDbOverrides,
+    );
+
+    // Backward compat: fyll i legacy colors ifall de är null (from enterprise)
+    const mergedLegacy: LegacyColors = { ...colors };
+    for (const [k] of LEGACY_COLOR_KEYS) {
+        if ((mergedLegacy as any)[k] == null && typeof (enterprise as any)[k] === 'string' && isValidHex((enterprise as any)[k])) {
+            (mergedLegacy as any)[k] = (enterprise as any)[k];
+        }
     }
 
     return NextResponse.json({
@@ -268,6 +271,12 @@ export async function GET() {
         limitedMonthlySubscriptionIconUrl,
         unlimitedMonthlySubscriptionIconUrl,
         unlimitedYearlySubscriptionIconUrl,
-        theme,
+        theme: {
+            version: enterprise.version,
+            colors: mergedLegacy,
+            navIcons,
+            effects,
+        },
+        enterprise,
     });
 }

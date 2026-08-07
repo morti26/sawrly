@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ADMIN_PANEL_ROLES, requireRole } from '@/lib/auth';
 import { APP_SETTING_KEYS, getAppSetting, setAppSetting } from '@/lib/app_settings';
+import {
+    buildEnterpriseFromSeed,
+    type EnterpriseTheme,
+    isValidHex,
+    DEFAULT_EFFECTS,
+    normalizeHex,
+    wcagRating,
+} from '@/lib/theme_engine';
 
 const THEME_COLOR_KEYS = [
     ['primary', APP_SETTING_KEYS.themePrimary] as const,
@@ -20,7 +28,84 @@ const THEME_COLOR_KEYS = [
     ['info', APP_SETTING_KEYS.themeInfo] as const,
     ['border', APP_SETTING_KEYS.themeBorder] as const,
     ['borderLight', APP_SETTING_KEYS.themeBorderLight] as const,
-];
+] as const;
+
+const THEME_M3_COLOR_KEYS = [
+    ['onPrimary', APP_SETTING_KEYS.themeOnPrimary],
+    ['primaryContainer', APP_SETTING_KEYS.themePrimaryContainer],
+    ['onPrimaryContainer', APP_SETTING_KEYS.themeOnPrimaryContainer],
+    ['primaryFixed', APP_SETTING_KEYS.themePrimaryFixed],
+    ['primaryFixedDim', APP_SETTING_KEYS.themePrimaryFixedDim],
+    ['onPrimaryFixed', APP_SETTING_KEYS.themeOnPrimaryFixed],
+    ['onPrimaryFixedVariant', APP_SETTING_KEYS.themeOnPrimaryFixedVariant],
+    ['secondary', APP_SETTING_KEYS.themeSecondary],
+    ['onSecondary', APP_SETTING_KEYS.themeOnSecondary],
+    ['secondaryContainer', APP_SETTING_KEYS.themeSecondaryContainer],
+    ['onSecondaryContainer', APP_SETTING_KEYS.themeOnSecondaryContainer],
+    ['secondaryFixed', APP_SETTING_KEYS.themeSecondaryFixed],
+    ['secondaryFixedDim', APP_SETTING_KEYS.themeSecondaryFixedDim],
+    ['onSecondaryFixed', APP_SETTING_KEYS.themeOnSecondaryFixed],
+    ['onSecondaryFixedVariant', APP_SETTING_KEYS.themeOnSecondaryFixedVariant],
+    ['tertiary', APP_SETTING_KEYS.themeTertiary],
+    ['onTertiary', APP_SETTING_KEYS.themeOnTertiary],
+    ['tertiaryContainer', APP_SETTING_KEYS.themeTertiaryContainer],
+    ['onTertiaryContainer', APP_SETTING_KEYS.themeOnTertiaryContainer],
+    ['tertiaryFixed', APP_SETTING_KEYS.themeTertiaryFixed],
+    ['tertiaryFixedDim', APP_SETTING_KEYS.themeTertiaryFixedDim],
+    ['onTertiaryFixed', APP_SETTING_KEYS.themeOnTertiaryFixed],
+    ['onTertiaryFixedVariant', APP_SETTING_KEYS.themeOnTertiaryFixedVariant],
+    ['onError', APP_SETTING_KEYS.themeOnError],
+    ['errorContainer', APP_SETTING_KEYS.themeErrorContainer],
+    ['onErrorContainer', APP_SETTING_KEYS.themeOnErrorContainer],
+    ['onSurface', APP_SETTING_KEYS.themeOnSurface],
+    ['surfaceDim', APP_SETTING_KEYS.themeSurfaceDim],
+    ['surfaceBright', APP_SETTING_KEYS.themeSurfaceBright],
+    ['surfaceContainerLowest', APP_SETTING_KEYS.themeSurfaceContainerLowest],
+    ['surfaceContainerLow', APP_SETTING_KEYS.themeSurfaceContainerLow],
+    ['surfaceContainer', APP_SETTING_KEYS.themeSurfaceContainer],
+    ['surfaceContainerHigh', APP_SETTING_KEYS.themeSurfaceContainerHigh],
+    ['surfaceContainerHighest', APP_SETTING_KEYS.themeSurfaceContainerHighest],
+    ['onSurfaceVariant', APP_SETTING_KEYS.themeOnSurfaceVariant],
+    ['outline', APP_SETTING_KEYS.themeOutline],
+    ['outlineVariant', APP_SETTING_KEYS.themeOutlineVariant],
+    ['onBackground', APP_SETTING_KEYS.themeOnBackground],
+    ['inverseSurface', APP_SETTING_KEYS.themeInverseSurface],
+    ['inverseOnSurface', APP_SETTING_KEYS.themeInverseOnSurface],
+    ['inversePrimary', APP_SETTING_KEYS.themeInversePrimary],
+    ['shadow', APP_SETTING_KEYS.themeShadow],
+    ['scrim', APP_SETTING_KEYS.themeScrim],
+    ['onSuccess', APP_SETTING_KEYS.themeOnSuccess],
+    ['successContainer', APP_SETTING_KEYS.themeSuccessContainer],
+    ['onSuccessContainer', APP_SETTING_KEYS.themeOnSuccessContainer],
+    ['onWarning', APP_SETTING_KEYS.themeOnWarning],
+    ['warningContainer', APP_SETTING_KEYS.themeWarningContainer],
+    ['onWarningContainer', APP_SETTING_KEYS.themeOnWarningContainer],
+    ['onInfo', APP_SETTING_KEYS.themeOnInfo],
+    ['infoContainer', APP_SETTING_KEYS.themeInfoContainer],
+    ['onInfoContainer', APP_SETTING_KEYS.themeOnInfoContainer],
+    ['divider', APP_SETTING_KEYS.themeDivider],
+    ['splash', APP_SETTING_KEYS.themeSplash],
+    ['disabled', APP_SETTING_KEYS.themeDisabled],
+    ['onDisabled', APP_SETTING_KEYS.themeOnDisabled],
+    ['disabledContainer', APP_SETTING_KEYS.themeDisabledContainer],
+    ['heroStart', APP_SETTING_KEYS.themeHeroStart],
+    ['heroMid', APP_SETTING_KEYS.themeHeroMid],
+    ['heroEnd', APP_SETTING_KEYS.themeHeroEnd],
+    ['cardBackground', APP_SETTING_KEYS.themeCardBackground],
+    ['cardBorder', APP_SETTING_KEYS.themeCardBorder],
+    ['badge', APP_SETTING_KEYS.themeBadge],
+    ['onBadge', APP_SETTING_KEYS.themeOnBadge],
+    ['snackbarBackground', APP_SETTING_KEYS.themeSnackbarBackground],
+    ['snackbarText', APP_SETTING_KEYS.themeSnackbarText],
+    ['shimmerBase', APP_SETTING_KEYS.themeShimmerBase],
+    ['shimmerHighlight', APP_SETTING_KEYS.themeShimmerHighlight],
+    ['onAccentPink', APP_SETTING_KEYS.themeOnAccentPink],
+] as const;
+
+export const ALL_THEME_COLOR_KEYS = [
+    ...THEME_COLOR_KEYS,
+    ...THEME_M3_COLOR_KEYS,
+] as const;
 
 const NAV_ICON_KEYS = [
     ['home', APP_SETTING_KEYS.navIconHomeUrl] as const,
@@ -61,25 +146,11 @@ const EFFECT_KEYS = [
     ['borderOpacity', APP_SETTING_KEYS.effBorderOpacity] as const,
 ];
 
-export type AdminThemeColors = {
-    primary: string | null;
-    primaryLight: string | null;
-    primaryDark: string | null;
-    accentPink: string | null;
-    background: string | null;
-    surface: string | null;
-    surfaceLight: string | null;
-    menuBackground: string | null;
-    textPrimary: string | null;
-    textSecondary: string | null;
-    textTertiary: string | null;
-    success: string | null;
-    warning: string | null;
-    error: string | null;
-    info: string | null;
-    border: string | null;
-    borderLight: string | null;
-};
+type LegacyColorKey = typeof THEME_COLOR_KEYS[number][0];
+type M3ColorKey = typeof THEME_M3_COLOR_KEYS[number][0];
+export type AdminThemeColors =
+    & Record<LegacyColorKey, string | null>
+    & Record<M3ColorKey, string | null>;
 
 export type AdminNavIcons = {
     home: string | null;
@@ -121,16 +192,14 @@ export type ThemeSettingsResponse = {
     colors: AdminThemeColors;
     navIcons: AdminNavIcons;
     effects: AdminThemeEffects;
+    enterprise?: EnterpriseTheme;
+    wcag?: Record<string, { ratio: number; aaNormal: boolean; aaaNormal: boolean }>;
 };
 
 function _emptyColors(): AdminThemeColors {
-    return {
-        primary: null, primaryLight: null, primaryDark: null, accentPink: null,
-        background: null, surface: null, surfaceLight: null, menuBackground: null,
-        textPrimary: null, textSecondary: null, textTertiary: null,
-        success: null, warning: null, error: null, info: null,
-        border: null, borderLight: null,
-    };
+    const out: any = {};
+    for (const [k] of ALL_THEME_COLOR_KEYS) out[k] = null;
+    return out as AdminThemeColors;
 }
 
 function _emptyNavIcons(): AdminNavIcons {
@@ -216,9 +285,36 @@ function normalizeEffect(key: string, value: unknown): number | null {
     return n;
 }
 
-async function readThemeSettings(): Promise<ThemeSettingsResponse> {
+/**
+ * Bygg enterprise-temat från DB-värden. Om primary finns (men inte alla M3-fält),
+ * appliceras smart palette-seed från primary + overrides av de fält som finns i DB.
+ */
+async function buildEnterpriseFromDb(
+    colors: AdminThemeColors,
+    effects: AdminThemeEffects,
+): Promise<EnterpriseTheme> {
+    const seed = normalizeHex(
+        colors.primary || '#7C3AED',
+        '#7C3AED',
+    );
+    const effectsOverride: Partial<EnterpriseTheme['effects']> = {};
+    for (const [k] of EFFECT_KEYS) {
+        const v = (effects as any)[k];
+        if (typeof v === 'number') (effectsOverride as any)[k] = v;
+    }
+    const overrides: Partial<EnterpriseTheme> = {};
+    for (const [k] of ALL_THEME_COLOR_KEYS) {
+        const raw = (colors as any)[k];
+        if (isValidHex(raw)) (overrides as any)[k] = normalizeHex(raw, raw);
+    }
+    return buildEnterpriseFromSeed(seed, 'dark', effectsOverride, overrides);
+}
+
+async function readThemeSettings(
+    includeEnterprise = true,
+): Promise<ThemeSettingsResponse> {
     const reads = await Promise.all([
-        ...THEME_COLOR_KEYS.map(([, k]) => getAppSetting(k)),
+        ...ALL_THEME_COLOR_KEYS.map(([, k]) => getAppSetting(k)),
         ...NAV_ICON_KEYS.map(([, k]) => getAppSetting(k)),
         ...NAV_ICON_ID_KEYS.map(([, k]) => getAppSetting(k)),
         ...EFFECT_KEYS.map(([, k]) => getAppSetting(k)),
@@ -227,7 +323,7 @@ async function readThemeSettings(): Promise<ThemeSettingsResponse> {
     const navIcons = _emptyNavIcons();
     const effects = _emptyEffects();
     let cursor = 0;
-    for (const [key] of THEME_COLOR_KEYS) {
+    for (const [key] of ALL_THEME_COLOR_KEYS) {
         (colors as any)[key] = normalizeHexColor(reads[cursor]);
         cursor += 1;
     }
@@ -245,7 +341,27 @@ async function readThemeSettings(): Promise<ThemeSettingsResponse> {
         (effects as any)[key] = parsed == null || !Number.isFinite(parsed) ? null : parsed;
         cursor += 1;
     }
-    return { colors, navIcons, effects };
+
+    const resp: ThemeSettingsResponse = { colors, navIcons, effects };
+    if (includeEnterprise) {
+        const ent = await buildEnterpriseFromDb(colors, effects);
+        resp.enterprise = ent;
+        resp.wcag = {
+            onPrimary: wcagRating(ent.onPrimary, ent.primary),
+            onSecondary: wcagRating(ent.onSecondary, ent.secondary),
+            onTertiary: wcagRating(ent.onTertiary, ent.tertiary),
+            onError: wcagRating(ent.onError, ent.error),
+            onSurface: wcagRating(ent.onSurface, ent.surface),
+            onSuccess: wcagRating(ent.onSuccess, ent.success),
+            onWarning: wcagRating(ent.onWarning, ent.warning),
+            onInfo: wcagRating(ent.onInfo, ent.info),
+            onAccentPink: wcagRating(ent.onAccentPink, ent.accentPink),
+            textPrimaryOnSurface: wcagRating(ent.textPrimary, ent.surface),
+            snackbar: wcagRating(ent.snackbarText, ent.snackbarBackground),
+            badge: wcagRating(ent.onBadge, ent.badge),
+        };
+    }
+    return resp;
 }
 
 export async function GET(req: NextRequest) {
@@ -254,7 +370,9 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: authCheck.error }, { status: authCheck.status });
     }
     try {
-        return NextResponse.json(await readThemeSettings());
+        const url = new URL(req.url);
+        const noEnt = url.searchParams.get('enterprise') === '0';
+        return NextResponse.json(await readThemeSettings(!noEnt));
     } catch (error) {
         console.error('Admin theme settings GET error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
@@ -274,7 +392,7 @@ export async function PUT(req: NextRequest) {
         };
 
         const updates: Array<[string, string | null]> = [];
-        for (const [key, dbKey] of THEME_COLOR_KEYS) {
+        for (const [key, dbKey] of ALL_THEME_COLOR_KEYS) {
             const raw = (body.colors ?? {})[key as keyof AdminThemeColors];
             updates.push([dbKey, normalizeHexColor(raw)]);
         }
@@ -293,9 +411,9 @@ export async function PUT(req: NextRequest) {
         }
 
         const invalidColor = updates.find(([dbKey, v]) => {
-            const isColorKey = THEME_COLOR_KEYS.some(([, k]) => k === dbKey);
+            const isColorKey = ALL_THEME_COLOR_KEYS.some(([, k]) => k === dbKey);
             if (!isColorKey) return false;
-            const fromBody = THEME_COLOR_KEYS.find(([, k]) => k === dbKey)?.[0];
+            const fromBody = ALL_THEME_COLOR_KEYS.find(([, k]) => k === dbKey)?.[0];
             if (!fromBody) return false;
             const raw = (body.colors ?? {})[fromBody as keyof AdminThemeColors];
             if (raw == null) return false;
@@ -309,44 +427,88 @@ export async function PUT(req: NextRequest) {
             );
         }
 
-        const invalidIcon = updates.find(([dbKey, v]) => {
-            const isIconKey = NAV_ICON_KEYS.some(([, k]) => k === dbKey);
-            if (!isIconKey) return false;
-            const fromBody = NAV_ICON_KEYS.find(([, k]) => k === dbKey)?.[0];
-            if (!fromBody) return false;
-            const raw = (body.navIcons ?? {})[fromBody as keyof AdminNavIcons];
-            if (raw == null) return false;
-            if (typeof raw === 'string' && raw.trim().length === 0) return false;
-            return v === null;
-        });
-        if (invalidIcon) {
-            return NextResponse.json(
-                { error: 'Invalid icon URL (use /path or https://host/path)' },
-                { status: 400 }
-            );
-        }
-
-        const invalidIconId = updates.find(([dbKey, v]) => {
-            const isIdKey = NAV_ICON_ID_KEYS.some(([, k]) => k === dbKey);
-            if (!isIdKey) return false;
-            const fromBody = NAV_ICON_ID_KEYS.find(([, k]) => k === dbKey)?.[0];
-            if (!fromBody) return false;
-            const raw = (body.navIcons ?? {})[fromBody as keyof AdminNavIcons];
-            if (raw == null) return false;
-            if (typeof raw === 'string' && raw.trim().length === 0) return false;
-            return v === null;
-        });
-        if (invalidIconId) {
-            return NextResponse.json(
-                { error: 'Invalid icon id (use phosphor.&lt;name&gt;.&lt;weight&gt;), ex: phosphor.house.fill' },
-                { status: 400 }
-            );
-        }
-
         await Promise.all(updates.map(([key, value]) => setAppSetting(key, value)));
         return NextResponse.json(await readThemeSettings());
     } catch (error) {
         console.error('Admin theme settings PUT error:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}
+
+/**
+ * POST /api/admin/theme-settings?action=smart-palette
+ * Body: { seedPrimary: "#RRGGBB", mode?: "dark"|"light", writeToDb?: boolean,
+ *         effectsOverride?: {...}, overrides?: {...} }
+ *
+ * Endast seedPrimary krävs → returnerar hela EnterpriseTheme.
+ * Om writeToDb=true (krävs) skrivs alla 85 färg-nycklar + 10 effekter till DB.
+ */
+export async function POST(req: NextRequest) {
+    const authCheck = requireRole(req, ADMIN_PANEL_ROLES);
+    if (authCheck.error || !authCheck.user) {
+        return NextResponse.json({ error: authCheck.error }, { status: authCheck.status });
+    }
+    try {
+        const url = new URL(req.url);
+        const action = url.searchParams.get('action');
+
+        if (action === 'smart-palette') {
+            const body = (await req.json()) as {
+                seedPrimary: string;
+                mode?: 'light' | 'dark';
+                writeToDb?: boolean;
+                effectsOverride?: Partial<EnterpriseTheme['effects']>;
+                overrides?: Partial<EnterpriseTheme>;
+            };
+            const seed = normalizeHexColor(body?.seedPrimary);
+            if (!seed) {
+                return NextResponse.json(
+                    { error: 'seedPrimary must be a valid hex color (#RRGGBB)' },
+                    { status: 400 },
+                );
+            }
+            const mode: 'light' | 'dark' = body?.mode === 'light' ? 'light' : 'dark';
+            const ent = buildEnterpriseFromSeed(
+                seed,
+                mode,
+                body?.effectsOverride ?? {},
+                body?.overrides ?? {},
+            );
+
+            if (body?.writeToDb) {
+                const updates: Array<[string, string | null]> = [];
+                for (const [k, dbKey] of ALL_THEME_COLOR_KEYS) {
+                    const v = (ent as any)[k];
+                    if (typeof v === 'string' && isValidHex(v)) {
+                        updates.push([dbKey, v]);
+                    }
+                }
+                const allEffectKeys = Object.keys(DEFAULT_EFFECTS) as (keyof EnterpriseTheme['effects'])[];
+                for (const k of allEffectKeys) {
+                    const mapping = EFFECT_KEYS.find(([ek]) => ek === k);
+                    if (!mapping) continue;
+                    const v = ent.effects[k];
+                    updates.push([mapping[1], typeof v === 'number' ? String(v) : null]);
+                }
+                await Promise.all(updates.map(([key, value]) => setAppSetting(key, value)));
+                return NextResponse.json({
+                    ok: true,
+                    wroteColors: updates.filter(([db]) =>
+                        ALL_THEME_COLOR_KEYS.some(([, k]) => k === db)
+                    ).length,
+                    wroteEffects: updates.filter(([db]) =>
+                        EFFECT_KEYS.some(([, k]) => k === db)
+                    ).length,
+                    enterprise: ent,
+                });
+            }
+
+            return NextResponse.json({ ok: true, enterprise: ent });
+        }
+
+        return NextResponse.json({ error: 'Unknown action. Use ?action=smart-palette' }, { status: 400 });
+    } catch (error) {
+        console.error('Admin theme settings POST error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
