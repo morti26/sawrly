@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
-import '../../core/theme/app_theme_service.dart';
-import '../../core/theme/app_theme_config.dart';
+import '../../theme/app_theme_service.dart';
+import '../../theme/app_theme_config.dart';
 
 // ============================================================================
 // Backwards-compatible GlobalSearchScreen
@@ -12,11 +12,7 @@ class GlobalSearchScreen extends StatefulWidget {
   final String initialQuery;
   final int initialTabIndex;
 
-  const GlobalSearchScreen({
-    super.key,
-    this.initialQuery = '',
-    this.initialTabIndex = 0,
-  });
+  const GlobalSearchScreen({super.key, this.initialQuery = '', this.initialTabIndex = 0});
 
   @override
   State<GlobalSearchScreen> createState() => _GlobalSearchScreenState();
@@ -32,12 +28,14 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> with SingleTick
   bool _isLoadingCreators = false;
   bool _isLoadingOffers = false;
 
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'https://sawrly.com/api',
-    connectTimeout: const Duration(seconds: 12),
-    receiveTimeout: const Duration(seconds: 10),
-    headers: const {'Accept': 'application/json'},
-  ));
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: 'https://sawrly.com/api',
+      connectTimeout: const Duration(seconds: 12),
+      receiveTimeout: const Duration(seconds: 10),
+      headers: const {'Accept': 'application/json'},
+    ),
+  );
 
   @override
   void initState() {
@@ -161,13 +159,7 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> with SingleTick
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildCreatorsList(),
-          _buildOffersList(),
-        ],
-      ),
+      body: TabBarView(controller: _tabController, children: [_buildCreatorsList(), _buildOffersList()]),
     );
   }
 
@@ -210,10 +202,16 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> with SingleTick
                   )
                 : null,
             child: avatarUrl == null
-                ? Text(initials, style: TextStyle(color: ent.onPrimaryContainer, fontWeight: FontWeight.w800))
+                ? Text(
+                    initials,
+                    style: TextStyle(color: ent.onPrimaryContainer, fontWeight: FontWeight.w800),
+                  )
                 : null,
           ),
-          title: Text(name, style: TextStyle(fontWeight: FontWeight.w600, color: ent.onSurface)),
+          title: Text(
+            name,
+            style: TextStyle(fontWeight: FontWeight.w600, color: ent.onSurface),
+          ),
           subtitle: Text('منشئ محتوى', style: TextStyle(color: ent.onSurfaceVariant, fontSize: 12)),
           trailing: Icon(Icons.arrow_forward_ios, size: 14, color: ent.onSurfaceVariant),
           onTap: () {
@@ -283,9 +281,8 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> with SingleTick
                     ? Image.network(
                         imgSrc,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Center(
-                          child: Icon(Icons.image_not_supported, color: ent.onSurfaceVariant),
-                        ),
+                        errorBuilder: (_, __, ___) =>
+                            Center(child: Icon(Icons.image_not_supported, color: ent.onSurfaceVariant)),
                       )
                     : ColoredBox(
                         color: ent.surfaceContainerHigh,
@@ -318,7 +315,7 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> with SingleTick
               Padding(
                 padding: const EdgeInsets.only(right: 12),
                 child: Icon(Icons.arrow_forward_ios, size: 14, color: ent.onSurfaceVariant),
-              )
+              ),
             ],
           ),
         );

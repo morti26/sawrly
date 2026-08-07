@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/theme/app_theme_service.dart';
-import '../../../core/theme/app_theme_config.dart';
+import '../../theme/app_theme_service.dart';
+import '../../theme/app_theme_config.dart';
 
 // ============================================================================
 // Camera Logo Widget — no PNG, no white background, pure Flutter gradient
@@ -40,9 +40,7 @@ class CameraLogoWidget extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.elliptical(200, 200),
-                  ),
+                  borderRadius: BorderRadius.only(bottomLeft: Radius.elliptical(200, 200)),
                 ),
               ),
             ),
@@ -58,9 +56,7 @@ class CameraLogoWidget extends StatelessWidget {
                     begin: Alignment.topRight,
                     end: Alignment.bottomLeft,
                   ),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.elliptical(200, 200),
-                  ),
+                  borderRadius: BorderRadius.only(topLeft: Radius.elliptical(200, 200)),
                 ),
               ),
             ),
@@ -68,10 +64,7 @@ class CameraLogoWidget extends StatelessWidget {
               child: Container(
                 width: size * 0.58,
                 height: size * 0.58,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
+                decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
               ),
             ),
             Center(
@@ -94,10 +87,7 @@ class CameraLogoWidget extends StatelessWidget {
               child: Container(
                 width: size * 0.12,
                 height: size * 0.12,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.55),
-                ),
+                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: 0.55)),
               ),
             ),
           ],
@@ -146,10 +136,7 @@ class HomeHeader extends StatelessWidget {
             transform: GradientRotation((effects.primaryGradientAngle * 3.14159) / 180),
           ),
           borderRadius: BorderRadius.circular(effects.cardRadius > 0 ? effects.cardRadius : 16),
-          border: Border.all(
-            color: ent.cardBorder,
-            width: 1,
-          ),
+          border: Border.all(color: ent.cardBorder, width: 1),
           boxShadow: [
             BoxShadow(
               color: ent.primary.withValues(alpha: effects.activeGlowOpacity),
@@ -167,11 +154,7 @@ class HomeHeader extends StatelessWidget {
                 const SizedBox(width: 10),
                 Text(
                   'صورلي',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: ent.onPrimary,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: ent.onPrimary),
                 ),
               ],
             ),
@@ -223,9 +206,7 @@ class HomeHeader extends StatelessWidget {
         ),
       );
     } catch (_) {
-      ScaffoldMessenger.of(ctx).showSnackBar(
-        SnackBar(content: Text('Coming soon: $label')),
-      );
+      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text('Coming soon: $label')));
     }
   }
 }
