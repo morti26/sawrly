@@ -67,7 +67,7 @@ class SawrlyApp extends StatelessWidget {
           splashColor: ent.primary.withValues(alpha: 0.20),
           highlightColor: ent.primary.withValues(alpha: 0.10),
           fontFamily: 'Tajawal',
-          pageTransitionsTheme: const PageTransitionsTheme(
+          pageTransitionsTheme: PageTransitionsTheme(
             builders: {
               TargetPlatform.android: ZoomPageTransitionsBuilder(),
               TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
