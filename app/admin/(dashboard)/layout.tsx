@@ -46,7 +46,7 @@ export default function AdminLayout({
 
     return (
         <div dir="rtl" className="flex h-screen flex-row bg-m3-background text-m3-on-background">
-            <aside className="relative z-20 flex w-64 flex-col bg-m3-surface-container-highest shadow-nav">
+            <aside className="relative z-20 flex w-64 flex-col bg-m3-surface-container shadow-nav border-l border-m3-outline-variant">
                 <div className="mb-4 flex items-center gap-3 border-b border-m3-outline-variant px-6 py-8">
                     <h1 className="text-2xl font-black tracking-tight text-m3-on-surface">لوحة تحكم صورلي</h1>
                 </div>
@@ -59,8 +59,8 @@ export default function AdminLayout({
                                 key={item.href}
                                 href={item.href}
                                 className={`block rounded-button px-4 py-2.5 font-medium transition-all duration-200 ${isActive
-                                    ? 'bg-accent text-m3-on-accent shadow-button'
-                                    : 'text-m3-on-surface-variant hover:-translate-x-1 hover:bg-m3-surface-container-high hover:text-m3-on-surface'
+                                    ? 'bg-m3-primary text-m3-on-primary shadow-button ring-2 ring-m3-primary/30'
+                                    : 'text-m3-text-secondary hover:-translate-x-1 hover:bg-m3-surface-container-highest hover:text-m3-on-surface'
                                     }`}
                             >
                                 {item.label}
