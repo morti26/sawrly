@@ -1,0 +1,240 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ======================================================================
+   DESIGN TOKENS — FALLBACKS (överskrids AV ThemeProvider när klienten laddats)
+   Default: #ff4a97 rosa dark theme — matchar Sawrly-identiteten.
+   ThemeProvider skriver över ALLA dessa via CSS custom properties.
+   ====================================================================== */
+
+:root {
+  /* 1. Material 3 COLOR SCHEME (85 tokens) — default fallback */
+  --m3-primary: #ff4a97;
+  --m3-on-primary: #ffffff;
+  --m3-primary-container: #5a2e4a;
+  --m3-on-primary-container: #ffd9ea;
+  --m3-secondary: #cc89b0;
+  --m3-on-secondary: #2a1522;
+  --m3-tertiary: #a0a9ff;
+  --m3-on-tertiary: #12142e;
+  --m3-error: #ff5449;
+  --m3-on-error: #ffffff;
+  --m3-success: #4ade80;
+  --m3-on-success: #003814;
+  --m3-warning: #fbbf24;
+  --m3-on-warning: #2e1a00;
+  --m3-info: #60a5fa;
+  --m3-on-info: #001b3d;
+  --m3-surface: #151923;
+  --m3-on-surface: #ffffff;
+  --m3-surface-container-lowest: #08090d;
+  --m3-surface-container-low: #12161f;
+  --m3-surface-container: #1a1d28;
+  --m3-surface-container-high: #232736;
+  --m3-surface-container-highest: #2c3143;
+  --m3-outline: #636878;
+  --m3-outline-variant: #2d303c;
+  --m3-background: #151923;
+  --m3-on-background: #ffffff;
+  --m3-inverse-surface: #e7e0e0;
+  --m3-inverse-on-surface: #161921;
+  --m3-inverse-primary: #a3306b;
+  --m3-shadow: #000000;
+  --m3-scrim: #000000;
+  --m3-divider: rgba(255, 255, 255, 0.08);
+  --m3-splash: #ff4a97;
+  --m3-disabled: #2c3143;
+  --m3-on-disabled: #8e8e8e;
+  --m3-disabled-container: #1e2028;
+  --m3-hero-start: #1a1d28;
+  --m3-hero-mid: #5a2e7d;
+  --m3-hero-end: #ff4a97;
+  --m3-card-background: #1a1d28;
+  --m3-card-border: rgba(255, 255, 255, 0.08);
+  --m3-badge: #ff4a97;
+  --m3-on-badge: #ffffff;
+  --m3-snackbar-background: #222530;
+  --m3-snackbar-text: #ffffff;
+  --m3-shimmer-base: #1a1d28;
+  --m3-shimmer-highlight: #2c3143;
+  --m3-accent-pink: #ff4a97;
+  --m3-on-accent-pink: #ffffff;
+  --m3-menu-background: #13151d;
+  --m3-text-primary: #ffffff;
+  --m3-text-secondary: #b6b9c3;
+  --m3-text-tertiary: #7e8393;
+  --m3-border: #494c5a;
+  --m3-border-light: rgba(255, 255, 255, 0.08);
+  --m3-surface-light: #2c3143;
+
+  /* 2. LEGACY design tokens (bakåtkompabilitet) */
+  --color-primary: var(--m3-accent-pink, #ff4a97);
+  --color-primary-light: var(--m3-primary-container, #ff8ad4);
+  --color-primary-dark: var(--m3-primary, #c93678);
+
+  --color-background: var(--m3-background, #161921);
+  --color-background-light: var(--m3-surface-container, #1e2028);
+
+  --color-surface: var(--m3-surface, #222530);
+  --color-surface-light: var(--m3-surface-light, #2d3140);
+
+  --color-text-primary: var(--m3-text-primary, #ffffff);
+  --color-text-secondary: var(--m3-text-secondary, #b0b0b0);
+  --color-text-tertiary: var(--m3-text-tertiary, #707070);
+
+  --color-status-success: var(--m3-success, #22c55e);
+  --color-status-warning: var(--m3-warning, #f59e0b);
+  --color-status-error: var(--m3-error, #ef4444);
+  --color-status-info: var(--m3-info, #3b82f6);
+
+  --color-border: var(--m3-border, #3d3d4d);
+  --color-border-light: var(--m3-border-light, #2d2d3d);
+
+  /* 3. EFFECTS */
+  --eff-primary-gradient-angle: 135deg;
+  --eff-card-radius: 16px;
+  --eff-chip-radius: 999px;
+  --eff-button-radius: 12px;
+  --eff-nav-shadow-opacity: 0.18;
+  --eff-card-shadow-opacity: 0.12;
+  --eff-active-glow-opacity: 0.22;
+  --eff-glass-blur: 14px;
+  --eff-surface-opacity: 0.85;
+  --eff-border-opacity: 0.45;
+
+  /* 4. State layers + shadows */
+  --state-hover-opacity: 0.08;
+  --state-focus-opacity: 0.12;
+  --state-pressed-opacity: 0.1;
+  --state-dragged-opacity: 0.16;
+  --shadow-level-1: rgba(0,0,0,0.14);
+  --shadow-level-2: rgba(0,0,0,0.18);
+  --shadow-level-3: rgba(0,0,0,0.24);
+
+  /* 5. Hjälpvariabler */
+  --accent-rgb: 255, 74, 151;
+  --primary-rgb: 255, 74, 151;
+  --hero-gradient: linear-gradient(135deg, #1a1d28, #5a2e7d, #ff4a97);
+  --hero-start: #1a1d28;
+  --hero-mid: #5a2e7d;
+  --hero-end: #ff4a97;
+
+  /* 6. Spacing (statiska, ändras ej av tema) */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-xxl: 24px;
+  --spacing-xxxl: 32px;
+
+  /* 7. Border radius (effekter kan överskrida vissa) */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: var(--eff-card-radius, 16px);
+  --radius-xl: 24px;
+
+  /* 8. Komposita shadows */
+  --shadow-card: 0 2px 10px var(--shadow-level-2);
+  --shadow-button: 0 6px 20px rgba(var(--accent-rgb), var(--eff-active-glow-opacity));
+  --shadow-modal: 0 8px 30px var(--shadow-level-3);
+
+  /* 9. Tailwind (next/image etc) */
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 21, 25, 35;
+  --background-end-rgb: 13, 13, 18;
+}
+
+body {
+  direction: rtl;
+  color: var(--m3-text-primary, #ffffff);
+  background-color: var(--m3-background, #151923);
+  background-image:
+    radial-gradient(1100px circle at 78% 18%,
+      rgba(var(--accent-rgb, 255, 86, 170), calc(var(--eff-active-glow-opacity, 0.22) * 1.7)),
+      rgba(var(--accent-rgb, 255, 86, 170), calc(var(--eff-active-glow-opacity, 0.22) * 0.82)) 22%,
+      rgba(var(--accent-rgb, 255, 86, 170), 0) 58%),
+    radial-gradient(980px circle at 18% 22%,
+      rgba(var(--accent-rgb, 255, 86, 170), calc(var(--eff-active-glow-opacity, 0.22) * 0.6)),
+      rgba(var(--accent-rgb, 255, 86, 170), 0) 60%),
+    radial-gradient(900px circle at 16% 68%,
+      rgba(var(--primary-rgb, 54, 69, 114), 0.42),
+      rgba(var(--primary-rgb, 54, 69, 114), 0) 62%),
+    var(--hero-gradient, linear-gradient(135deg, #1a1d28, #5a2e7d, #ff4a97));
+  background-blend-mode: soft-light, normal, normal, normal;
+  font-family: 'Tajawal', sans-serif;
+  min-height: 100vh;
+}
+
+/* ======================================================================
+   UTILITY CLASSES för design tokens + Material 3
+   ====================================================================== */
+
+@layer utilities {
+  /* Legacy (bakåtkomp) */
+  .text-primary { color: var(--color-primary); }
+  .text-primary-light { color: var(--color-primary-light); }
+  .text-primary-dark { color: var(--color-primary-dark); }
+
+  .bg-primary { background-color: var(--color-primary); }
+  .bg-primary-light { background-color: var(--color-primary-light); }
+  .bg-primary-dark { background-color: var(--color-primary-dark); }
+
+  .bg-background { background-color: var(--color-background); }
+  .bg-background-light { background-color: var(--color-background-light); }
+
+  .bg-surface { background-color: var(--color-surface); }
+  .bg-surface-light { background-color: var(--color-surface-light); }
+
+  .border-border { border-color: var(--color-border); }
+  .border-border-light { border-color: var(--color-border-light); }
+
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-button { box-shadow: var(--shadow-button); }
+  .shadow-modal { box-shadow: var(--shadow-modal); }
+
+  /* Material 3 nya tokens */
+  .bg-m3-surface { background-color: var(--m3-surface); }
+  .bg-m3-surface-container { background-color: var(--m3-surface-container); }
+  .bg-m3-surface-container-high { background-color: var(--m3-surface-container-high); }
+  .bg-m3-surface-container-highest { background-color: var(--m3-surface-container-highest); }
+  .bg-m3-card { background-color: var(--m3-card-background); }
+  .bg-m3-primary { background-color: var(--m3-primary); }
+  .bg-m3-primary-container { background-color: var(--m3-primary-container); }
+  .bg-m3-accent { background-color: var(--m3-accent-pink); }
+  .bg-m3-menu { background-color: var(--m3-menu-background); }
+  .bg-m3-disabled { background-color: var(--m3-disabled); }
+
+  .text-m3-on-surface { color: var(--m3-on-surface); }
+  .text-m3-text-primary { color: var(--m3-text-primary); }
+  .text-m3-text-secondary { color: var(--m3-text-secondary); }
+  .text-m3-text-tertiary { color: var(--m3-text-tertiary); }
+  .text-m3-on-primary { color: var(--m3-on-primary); }
+  .text-m3-on-accent { color: var(--m3-on-accent-pink); }
+  .text-m3-primary { color: var(--m3-primary); }
+  .text-m3-accent { color: var(--m3-accent-pink); }
+  .text-m3-outline { color: var(--m3-outline); }
+
+  .border-m3-outline { border-color: var(--m3-outline); }
+  .border-m3-outline-variant { border-color: var(--m3-outline-variant); }
+  .border-m3-card { border-color: var(--m3-card-border); }
+
+  .rounded-card { border-radius: var(--eff-card-radius); }
+  .rounded-button { border-radius: var(--eff-button-radius); }
+  .rounded-chip { border-radius: var(--eff-chip-radius); }
+
+  .bg-glass {
+    background-color: color-mix(in srgb, var(--m3-surface-container) calc(var(--eff-surface-opacity) * 100%), transparent);
+    backdrop-filter: blur(var(--eff-glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--eff-glass-blur)) saturate(140%);
+  }
+
+  .hero-gradient-bg {
+    background: var(--hero-gradient);
+  }
+
+  .shadow-glow-accent {
+    box-shadow: 0 8px 28px rgba(var(--accent-rgb), var(--eff-active-glow-opacity));
+  }
+}

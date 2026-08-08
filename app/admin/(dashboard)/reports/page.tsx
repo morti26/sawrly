@@ -1,0 +1,317 @@
+"use client";
+
+import NextImage from 'next/image';
+import { useEffect, useMemo, useState } from "react";
+
+type ReportStatus = "pending" | "in_review" | "resolved" | "rejected";
+
+interface MediaReport {
+    report_scope: "media" | "content";
+    target_type: "media" | "offer" | "profile" | "story";
+    id: string;
+    media_id: string | null;
+    reason: string;
+    details: string | null;
+    status: ReportStatus;
+    admin_note: string | null;
+    handled_at: string | null;
+    created_at: string;
+    updated_at: string;
+    media_url: string | null;
+    media_type: "image" | "video" | null;
+    target_label: string | null;
+    creator_id: string | null;
+    creator_name: string | null;
+    reporter_name: string;
+    reporter_role: string;
+    handled_by_name: string | null;
+}
+
+const targetLabels: Record<MediaReport["target_type"], string> = {
+    media: "وسائط",
+    offer: "عرض",
+    profile: "حساب",
+    story: "قصة",
+};
+
+const statusLabels: Record<ReportStatus, string> = {
+    pending: "قيد الانتظار",
+    in_review: "قيد المراجعة",
+    resolved: "تم الحل",
+    rejected: "مرفوض",
+};
+
+const statusClasses: Record<ReportStatus, string> = {
+    pending: "bg-amber-100 text-amber-800 border-amber-300",
+    in_review: "bg-blue-100 text-blue-800 border-blue-300",
+    resolved: "bg-green-100 text-green-800 border-green-300",
+    rejected: "bg-red-100 text-red-800 border-red-300",
+};
+
+export default function AdminReportsPage() {
+    const [reports, setReports] = useState<MediaReport[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [updatingId, setUpdatingId] = useState<string | null>(null);
+    const [filter, setFilter] = useState<"all" | ReportStatus>("all");
+    const [notes, setNotes] = useState<Record<string, string>>({});
+    const [error, setError] = useState<string | null>(null);
+
+    const counts = useMemo(() => {
+        const data = { all: reports.length, pending: 0, in_review: 0, resolved: 0, rejected: 0 };
+        for (const report of reports) {
+            data[report.status] += 1;
+        }
+        return data;
+    }, [reports]);
+
+    const fetchReports = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const token = localStorage.getItem("token");
+            const query = filter === "all" ? "" : `?status=${filter}`;
+            const res = await fetch(`/api/admin/reports${query}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data?.error || "تعذر تحميل البلاغات");
+            }
+            const data = await res.json();
+            setReports(data);
+            setNotes((prev) => {
+                const next = { ...prev };
+                for (const report of data as MediaReport[]) {
+                    if (next[report.id] === undefined && report.admin_note) {
+                        next[report.id] = report.admin_note;
+                    }
+                }
+                return next;
+            });
+        } catch (e: any) {
+            setError(e?.message || "تعذر تحميل البلاغات");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        void fetchReports();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filter]);
+
+    const updateStatus = async (
+        report: MediaReport,
+        status: ReportStatus,
+        removeMedia = false,
+    ) => {
+        try {
+            setUpdatingId(report.id);
+            setError(null);
+            const token = localStorage.getItem("token");
+            const res = await fetch("/api/admin/reports", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    scope: report.report_scope,
+                    id: report.id,
+                    status,
+                    adminNote: (notes[report.id] || "").trim(),
+                    removeMedia,
+                }),
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data?.error || "تعذر تحديث البلاغ");
+            }
+            await fetchReports();
+        } catch (e: any) {
+            setError(e?.message || "تعذر تحديث البلاغ");
+        } finally {
+            setUpdatingId(null);
+        }
+    };
+
+    return (
+        <div className="space-y-6" dir="rtl">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold text-m3-on-background">البلاغات</h1>
+                    <p className="text-m3-on-surface-variant">راجع بلاغات الوسائط والعروض والحسابات والقصص من هنا.</p>
+                </div>
+                <button
+                    onClick={fetchReports}
+                    className="px-4 py-2 rounded bg-m3-on-surface text-m3-on-surface hover:bg-m3-surface-container-high"
+                >
+                    تحديث
+                </button>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <button
+                    onClick={() => setFilter("all")}
+                    className={`rounded border px-3 py-2 text-sm ${filter === "all" ? "bg-m3-on-surface text-m3-on-surface border-m3-outline" : "bg-surface-card text-m3-on-surface border-m3-outline-variant"}`}
+                >
+                    الكل ({counts.all})
+                </button>
+                {(["pending", "in_review", "resolved", "rejected"] as ReportStatus[]).map((status) => (
+                    <button
+                        key={status}
+                        onClick={() => setFilter(status)}
+                        className={`rounded border px-3 py-2 text-sm ${filter === status ? "bg-m3-on-surface text-m3-on-surface border-m3-outline" : "bg-surface-card text-m3-on-surface border-m3-outline-variant"}`}
+                    >
+                        {statusLabels[status]} ({counts[status]})
+                    </button>
+                ))}
+            </div>
+
+            {error && (
+                <div className="rounded border border-red-300 bg-red-50 text-red-700 px-4 py-3">
+                    {error}
+                </div>
+            )}
+
+            {loading ? (
+                <div className="rounded border bg-surface-card p-8 text-center text-m3-on-surface-variant">جاري تحميل البلاغات...</div>
+            ) : reports.length === 0 ? (
+                <div className="rounded border bg-surface-card p-8 text-center text-m3-on-surface-variant">لا توجد بلاغات حالياً.</div>
+            ) : (
+                <div className="space-y-4">
+                    {reports.map((report) => {
+                        const isUpdating = updatingId === report.id;
+                        return (
+                            <div key={report.id} className="rounded-lg border bg-surface-card p-4 shadow-sm">
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex items-center gap-3">
+                                        <span className={`text-xs px-2 py-1 rounded border ${statusClasses[report.status]}`}>
+                                            {statusLabels[report.status]}
+                                        </span>
+                                        <span className="text-xs text-m3-on-surface-variant">
+                                            {new Date(report.created_at).toLocaleString("ar-IQ")}
+                                        </span>
+                                    </div>
+                                    <span className="text-xs text-m3-outline font-mono" dir="ltr">{report.id}</span>
+                                </div>
+
+                                <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                    <div className="rounded border bg-m3-background overflow-hidden min-h-[180px]">
+                                        {!report.media_url ? (
+                                            <div className="h-full flex items-center justify-center text-sm text-m3-on-surface-variant p-4">
+                                                الوسائط غير متاحة حالياً
+                                            </div>
+                                        ) : report.media_type === "video" ? (
+                                            <video src={report.media_url} controls className="w-full h-full object-cover" />
+                                        ) : (
+                                            <NextImage
+                                                src={report.media_url}
+                                                alt="الوسائط المبلغ عنها"
+                                                width={640}
+                                                height={360}
+                                                className="h-full w-full object-cover"
+                                                unoptimized
+                                            />
+                                        )}
+                                    </div>
+
+                                    <div className="lg:col-span-2 space-y-3">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                            <div className="rounded border p-3 bg-m3-background">
+                                                <div className="text-m3-on-surface-variant text-xs mb-1">المبلِّغ</div>
+                                                <div className="font-semibold">{report.reporter_name}</div>
+                                                <div className="text-m3-on-surface-variant">{report.reporter_role}</div>
+                                            </div>
+                                            <div className="rounded border p-3 bg-m3-background">
+                                                <div className="text-m3-on-surface-variant text-xs mb-1">المبدع</div>
+                                                <div className="font-semibold">{report.creator_name || "غير معروف"}</div>
+                                                <div className="text-m3-on-surface-variant">
+                                                    {targetLabels[report.target_type]}
+                                                    {report.media_type === "video" ? " - فيديو" : report.media_type === "image" ? " - صورة" : ""}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="rounded border p-3">
+                                            <div className="text-xs text-m3-on-surface-variant mb-1">نوع البلاغ</div>
+                                            <div className="text-sm text-m3-on-surface mb-2">{targetLabels[report.target_type]}</div>
+                                            {report.target_label && (
+                                                <>
+                                                    <div className="text-xs text-m3-on-surface-variant mb-1">العنصر المبلغ عنه</div>
+                                                    <div className="font-medium text-m3-on-background">{report.target_label}</div>
+                                                </>
+                                            )}
+                                            <div className="mt-3 text-xs text-m3-on-surface-variant mb-1">سبب البلاغ</div>
+                                            <div className="font-medium text-m3-on-background">{report.reason}</div>
+                                            {report.details && (
+                                                <div className="mt-2 text-sm text-m3-on-surface whitespace-pre-wrap">{report.details}</div>
+                                            )}
+                                        </div>
+
+                                        <textarea
+                                            value={notes[report.id] ?? ""}
+                                            onChange={(e) => setNotes((prev) => ({ ...prev, [report.id]: e.target.value }))}
+                                            placeholder="ملاحظة الإدارة..."
+                                            className="w-full border rounded p-2 text-sm"
+                                            rows={2}
+                                        />
+
+                                        <div className="flex flex-wrap gap-2">
+                                            <button
+                                                disabled={isUpdating}
+                                                onClick={() => updateStatus(report, "in_review")}
+                                                className="px-3 py-2 rounded bg-blue-600 text-m3-on-surface text-sm disabled:opacity-50"
+                                            >
+                                                قيد المراجعة
+                                            </button>
+                                            <button
+                                                disabled={isUpdating}
+                                                onClick={() => updateStatus(report, "resolved")}
+                                                className="px-3 py-2 rounded bg-green-600 text-m3-on-surface text-sm disabled:opacity-50"
+                                            >
+                                                حل البلاغ
+                                            </button>
+                                            <button
+                                                disabled={isUpdating}
+                                                onClick={() => updateStatus(report, "rejected")}
+                                                className="px-3 py-2 rounded bg-m3-surface-container-high text-m3-on-surface text-sm disabled:opacity-50"
+                                            >
+                                                رفض البلاغ
+                                            </button>
+                    {(report.report_scope === "media" || report.target_type === "story") && (
+                        <button
+                            disabled={isUpdating || (report.report_scope === "media" ? !report.media_id : false)}
+                            onClick={() => {
+                                const ok = window.confirm(
+                                    report.target_type === "story"
+                                        ? "هل تريد حذف القصة وإنهاء البلاغ؟"
+                                        : "هل تريد حذف الوسائط وإنهاء البلاغ؟"
+                                );
+                                if (ok) {
+                                    void updateStatus(report, "resolved", true);
+                                }
+                            }}
+                            className="px-3 py-2 rounded bg-red-600 text-m3-on-surface text-sm disabled:opacity-50"
+                        >
+                            {report.target_type === "story" ? "حل + حذف القصة" : "حل + حذف الوسائط"}
+                        </button>
+                    )}
+                                        </div>
+
+                                        {(report.handled_by_name || report.handled_at) && (
+                                            <div className="text-xs text-m3-on-surface-variant">
+                                                تمت المعالجة بواسطة {report.handled_by_name || "الإدارة"} بتاريخ{" "}
+                                                {report.handled_at ? new Date(report.handled_at).toLocaleString("ar-IQ") : "-"}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+}
