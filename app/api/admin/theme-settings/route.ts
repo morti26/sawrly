@@ -9,6 +9,7 @@ import {
     normalizeHex,
     wcagRating,
 } from '@/lib/theme_engine';
+import { getThemeTemplateById } from '@/lib/theme_templates';
 
 const THEME_COLOR_KEYS = [
     ['primary', APP_SETTING_KEYS.themePrimary] as const,
@@ -133,6 +134,19 @@ const NAV_ICON_ID_KEYS = [
     ['profileActiveId', APP_SETTING_KEYS.navIconProfileActiveId] as const,
 ];
 
+const NAV_ICON_LIBRARY_KEYS = [
+    ['homeLibrary', APP_SETTING_KEYS.navIconHomeLibrary] as const,
+    ['searchLibrary', APP_SETTING_KEYS.navIconSearchLibrary] as const,
+    ['categoriesLibrary', APP_SETTING_KEYS.navIconCategoriesLibrary] as const,
+    ['ordersLibrary', APP_SETTING_KEYS.navIconOrdersLibrary] as const,
+    ['profileLibrary', APP_SETTING_KEYS.navIconProfileLibrary] as const,
+    ['homeActiveLibrary', APP_SETTING_KEYS.navIconHomeActiveLibrary] as const,
+    ['searchActiveLibrary', APP_SETTING_KEYS.navIconSearchActiveLibrary] as const,
+    ['categoriesActiveLibrary', APP_SETTING_KEYS.navIconCategoriesActiveLibrary] as const,
+    ['ordersActiveLibrary', APP_SETTING_KEYS.navIconOrdersActiveLibrary] as const,
+    ['profileActiveLibrary', APP_SETTING_KEYS.navIconProfileActiveLibrary] as const,
+];
+
 const EFFECT_KEYS = [
     ['primaryGradientAngle', APP_SETTING_KEYS.effPrimaryGradientAngle] as const,
     ['cardRadius', APP_SETTING_KEYS.effCardRadius] as const,
@@ -145,6 +159,20 @@ const EFFECT_KEYS = [
     ['surfaceOpacity', APP_SETTING_KEYS.effSurfaceOpacity] as const,
     ['borderOpacity', APP_SETTING_KEYS.effBorderOpacity] as const,
 ];
+
+const FEATURE_KEYS = [
+    ['themeMode', APP_SETTING_KEYS.themeMode] as const,
+    ['lightSeedPrimary', APP_SETTING_KEYS.lightSeedPrimary] as const,
+    ['iconLibraryDefault', APP_SETTING_KEYS.iconLibraryDefault] as const,
+    ['dynamicColorEnabled', APP_SETTING_KEYS.dynamicColorEnabled] as const,
+    ['animationsEnabled', APP_SETTING_KEYS.animationsEnabled] as const,
+    ['pageTransitionStyle', APP_SETTING_KEYS.pageTransitionStyle] as const,
+    ['activeTemplateId', APP_SETTING_KEYS.activeTemplateId] as const,
+];
+
+const VALID_THEME_MODES = new Set(['dark', 'light', 'system']);
+const VALID_ICON_LIBRARIES = new Set(['phosphor', 'material', 'fontawesome', 'lucide']);
+const VALID_PAGE_TRANSITIONS = new Set(['cupertino', 'fade', 'sharedAxis', 'zoom']);
 
 type LegacyColorKey = typeof THEME_COLOR_KEYS[number][0];
 type M3ColorKey = typeof THEME_M3_COLOR_KEYS[number][0];
@@ -175,6 +203,19 @@ export type AdminNavIcons = {
     profileActiveId: string | null;
 };
 
+export type AdminNavIconLibraries = {
+    homeLibrary: string | null;
+    searchLibrary: string | null;
+    categoriesLibrary: string | null;
+    ordersLibrary: string | null;
+    profileLibrary: string | null;
+    homeActiveLibrary: string | null;
+    searchActiveLibrary: string | null;
+    categoriesActiveLibrary: string | null;
+    ordersActiveLibrary: string | null;
+    profileActiveLibrary: string | null;
+};
+
 export type AdminThemeEffects = {
     primaryGradientAngle: number | null;
     cardRadius: number | null;
@@ -188,10 +229,22 @@ export type AdminThemeEffects = {
     borderOpacity: number | null;
 };
 
+export type AdminThemeFeatures = {
+    themeMode: 'dark' | 'light' | 'system' | null;
+    lightSeedPrimary: string | null;
+    iconLibraryDefault: 'phosphor' | 'material' | 'fontawesome' | 'lucide' | null;
+    dynamicColorEnabled: boolean | null;
+    animationsEnabled: boolean | null;
+    pageTransitionStyle: 'cupertino' | 'fade' | 'sharedAxis' | 'zoom' | null;
+    activeTemplateId: string | null;
+};
+
 export type ThemeSettingsResponse = {
     colors: AdminThemeColors;
     navIcons: AdminNavIcons;
+    navIconLibraries: AdminNavIconLibraries;
     effects: AdminThemeEffects;
+    features: AdminThemeFeatures;
     enterprise?: EnterpriseTheme;
     wcag?: Record<string, { ratio: number; aaNormal: boolean; aaaNormal: boolean }>;
 };
@@ -213,11 +266,31 @@ function _emptyNavIcons(): AdminNavIcons {
     };
 }
 
+function _emptyNavIconLibraries(): AdminNavIconLibraries {
+    return {
+        homeLibrary: null, searchLibrary: null, categoriesLibrary: null, ordersLibrary: null, profileLibrary: null,
+        homeActiveLibrary: null, searchActiveLibrary: null, categoriesActiveLibrary: null,
+        ordersActiveLibrary: null, profileActiveLibrary: null,
+    };
+}
+
 function _emptyEffects(): AdminThemeEffects {
     return {
         primaryGradientAngle: null, cardRadius: null, chipRadius: null, buttonRadius: null,
         navShadowOpacity: null, cardShadowOpacity: null, activeGlowOpacity: null, glassBlur: null,
         surfaceOpacity: null, borderOpacity: null,
+    };
+}
+
+function _emptyFeatures(): AdminThemeFeatures {
+    return {
+        themeMode: null,
+        lightSeedPrimary: null,
+        iconLibraryDefault: null,
+        dynamicColorEnabled: null,
+        animationsEnabled: null,
+        pageTransitionStyle: null,
+        activeTemplateId: null,
     };
 }
 
@@ -265,6 +338,47 @@ function normalizeIconId(value: unknown): string | null {
     return null;
 }
 
+function normalizeIconLibrary(value: unknown): string | null {
+    if (value == null) return null;
+    const s = typeof value === 'string' ? value.trim().toLowerCase() : '';
+    if (VALID_ICON_LIBRARIES.has(s)) return s;
+    return null;
+}
+
+function normalizeThemeMode(value: unknown): 'dark' | 'light' | 'system' | null {
+    if (value == null) return null;
+    const s = typeof value === 'string' ? value.trim().toLowerCase() : '';
+    if (s === 'dark' || s === 'light' || s === 'system') return s;
+    return null;
+}
+
+function normalizePageTransition(value: unknown): 'cupertino' | 'fade' | 'sharedAxis' | 'zoom' | null {
+    if (value == null) return null;
+    const s = typeof value === 'string' ? value.trim() : '';
+    if (VALID_PAGE_TRANSITIONS.has(s)) return s as any;
+    return null;
+}
+
+function normalizeBool(value: unknown): boolean | null {
+    if (value == null) return null;
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') {
+        const s = value.trim().toLowerCase();
+        if (s === 'true' || s === '1' || s === 'yes') return true;
+        if (s === 'false' || s === '0' || s === 'no') return false;
+    }
+    return null;
+}
+
+function boolToDb(v: boolean | null): string | null {
+    return v == null ? null : (v ? 'true' : 'false');
+}
+
+function dbToBool(raw: string | null): boolean | null {
+    if (raw == null || raw === '') return null;
+    return raw === 'true' || raw === '1' || raw.toLowerCase() === 'yes';
+}
+
 function normalizeEffect(key: string, value: unknown): number | null {
     if (value == null) return null;
     if (typeof value === 'number') {
@@ -285,10 +399,6 @@ function normalizeEffect(key: string, value: unknown): number | null {
     return n;
 }
 
-/**
- * Bygg enterprise-temat från DB-värden. Om primary finns (men inte alla M3-fält),
- * appliceras smart palette-seed från primary + overrides av de fält som finns i DB.
- */
 async function buildEnterpriseFromDb(
     colors: AdminThemeColors,
     effects: AdminThemeEffects,
@@ -317,11 +427,15 @@ async function readThemeSettings(
         ...ALL_THEME_COLOR_KEYS.map(([, k]) => getAppSetting(k)),
         ...NAV_ICON_KEYS.map(([, k]) => getAppSetting(k)),
         ...NAV_ICON_ID_KEYS.map(([, k]) => getAppSetting(k)),
+        ...NAV_ICON_LIBRARY_KEYS.map(([, k]) => getAppSetting(k)),
         ...EFFECT_KEYS.map(([, k]) => getAppSetting(k)),
+        ...FEATURE_KEYS.map(([, k]) => getAppSetting(k)),
     ]);
     const colors = _emptyColors();
     const navIcons = _emptyNavIcons();
+    const navIconLibraries = _emptyNavIconLibraries();
     const effects = _emptyEffects();
+    const features = _emptyFeatures();
     let cursor = 0;
     for (const [key] of ALL_THEME_COLOR_KEYS) {
         (colors as any)[key] = normalizeHexColor(reads[cursor]);
@@ -335,14 +449,46 @@ async function readThemeSettings(
         (navIcons as any)[key] = normalizeIconId(reads[cursor]);
         cursor += 1;
     }
+    for (const [key] of NAV_ICON_LIBRARY_KEYS) {
+        (navIconLibraries as any)[key] = normalizeIconLibrary(reads[cursor]);
+        cursor += 1;
+    }
     for (const [key] of EFFECT_KEYS) {
         const raw = reads[cursor];
         const parsed = raw == null || raw === '' ? null : Number(raw);
         (effects as any)[key] = parsed == null || !Number.isFinite(parsed) ? null : parsed;
         cursor += 1;
     }
+    for (let i = 0; i < FEATURE_KEYS.length; i++) {
+        const [key] = FEATURE_KEYS[i];
+        const raw = reads[cursor];
+        cursor += 1;
+        switch (key) {
+            case 'themeMode':
+                features.themeMode = normalizeThemeMode(raw);
+                break;
+            case 'lightSeedPrimary':
+                features.lightSeedPrimary = normalizeHexColor(raw);
+                break;
+            case 'iconLibraryDefault':
+                features.iconLibraryDefault = normalizeIconLibrary(raw) as any;
+                break;
+            case 'dynamicColorEnabled':
+                features.dynamicColorEnabled = dbToBool(raw);
+                break;
+            case 'animationsEnabled':
+                features.animationsEnabled = dbToBool(raw);
+                break;
+            case 'pageTransitionStyle':
+                features.pageTransitionStyle = normalizePageTransition(raw);
+                break;
+            case 'activeTemplateId':
+                features.activeTemplateId = (typeof raw === 'string' && raw.trim()) ? raw.trim() : null;
+                break;
+        }
+    }
 
-    const resp: ThemeSettingsResponse = { colors, navIcons, effects };
+    const resp: ThemeSettingsResponse = { colors, navIcons, navIconLibraries, effects, features };
     if (includeEnterprise) {
         const ent = await buildEnterpriseFromDb(colors, effects);
         resp.enterprise = ent;
@@ -388,7 +534,9 @@ export async function PUT(req: NextRequest) {
         const body = (await req.json()) as {
             colors?: Partial<AdminThemeColors> | null;
             navIcons?: Partial<AdminNavIcons> | null;
+            navIconLibraries?: Partial<AdminNavIconLibraries> | null;
             effects?: Partial<AdminThemeEffects> | null;
+            features?: Partial<AdminThemeFeatures> | null;
         };
 
         const updates: Array<[string, string | null]> = [];
@@ -404,10 +552,47 @@ export async function PUT(req: NextRequest) {
             const raw = (body.navIcons ?? {})[key as keyof AdminNavIcons];
             updates.push([dbKey, normalizeIconId(raw)]);
         }
+        for (const [key, dbKey] of NAV_ICON_LIBRARY_KEYS) {
+            const raw = (body.navIconLibraries ?? {})[key as keyof AdminNavIconLibraries];
+            updates.push([dbKey, normalizeIconLibrary(raw)]);
+        }
         for (const [key, dbKey] of EFFECT_KEYS) {
             const raw = (body.effects ?? {})[key as keyof AdminThemeEffects];
             const value = normalizeEffect(key, raw);
             updates.push([dbKey, value == null ? null : String(value)]);
+        }
+        const feats = body.features ?? {};
+        for (const [key, dbKey] of FEATURE_KEYS) {
+            const raw = (feats as any)[key];
+            switch (key) {
+                case 'themeMode': {
+                    const v = normalizeThemeMode(raw);
+                    updates.push([dbKey, v]);
+                    break;
+                }
+                case 'lightSeedPrimary': {
+                    updates.push([dbKey, normalizeHexColor(raw)]);
+                    break;
+                }
+                case 'iconLibraryDefault': {
+                    updates.push([dbKey, normalizeIconLibrary(raw)]);
+                    break;
+                }
+                case 'dynamicColorEnabled':
+                case 'animationsEnabled': {
+                    updates.push([dbKey, boolToDb(normalizeBool(raw))]);
+                    break;
+                }
+                case 'pageTransitionStyle': {
+                    updates.push([dbKey, normalizePageTransition(raw)]);
+                    break;
+                }
+                case 'activeTemplateId': {
+                    const v = (typeof raw === 'string' && raw.trim()) ? raw.trim() : null;
+                    updates.push([dbKey, v]);
+                    break;
+                }
+            }
         }
 
         const invalidColor = updates.find(([dbKey, v]) => {
@@ -435,6 +620,36 @@ export async function PUT(req: NextRequest) {
     }
 }
 
+async function _applyTemplateToDb(templateId: string): Promise<ThemeSettingsResponse> {
+    const tpl = await getThemeTemplateById(templateId);
+    if (!tpl) {
+        throw new Error(`TEMPLATE_NOT_FOUND:${templateId}`);
+    }
+    const updates: Array<[string, string | null]> = [];
+    const colorsJson = tpl.colors_json ?? {};
+    const navJson = tpl.nav_icons_json ?? {};
+    const effectsJson = tpl.effects_json ?? {};
+    for (const [key, dbKey] of ALL_THEME_COLOR_KEYS) {
+        updates.push([dbKey, normalizeHexColor((colorsJson as any)[key])]);
+    }
+    for (const [key, dbKey] of NAV_ICON_KEYS) {
+        updates.push([dbKey, normalizeUrl((navJson as any)[key])]);
+    }
+    for (const [key, dbKey] of NAV_ICON_ID_KEYS) {
+        updates.push([dbKey, normalizeIconId((navJson as any)[key])]);
+    }
+    for (const [key, dbKey] of NAV_ICON_LIBRARY_KEYS) {
+        updates.push([dbKey, normalizeIconLibrary((navJson as any)[key])]);
+    }
+    for (const [key, dbKey] of EFFECT_KEYS) {
+        const val = normalizeEffect(key, (effectsJson as any)[key]);
+        updates.push([dbKey, val == null ? null : String(val)]);
+    }
+    updates.push([APP_SETTING_KEYS.activeTemplateId, templateId]);
+    await Promise.all(updates.map(([k, v]) => setAppSetting(k, v)));
+    return await readThemeSettings();
+}
+
 /**
  * POST /api/admin/theme-settings?action=smart-palette
  * Body: { seedPrimary: "#RRGGBB", mode?: "dark"|"light", writeToDb?: boolean,
@@ -442,6 +657,11 @@ export async function PUT(req: NextRequest) {
  *
  * Endast seedPrimary krävs → returnerar hela EnterpriseTheme.
  * Om writeToDb=true (krävs) skrivs alla 85 färg-nycklar + 10 effekter till DB.
+ *
+ * ELLER:
+ * POST /api/admin/theme-settings?action=apply-template
+ * Body: { templateId: string }
+ *   → Expanderar mallens JSON till samtliga app_settings nycklar + sätter activeTemplateId!
  */
 export async function POST(req: NextRequest) {
     const authCheck = requireRole(req, ADMIN_PANEL_ROLES);
@@ -451,6 +671,27 @@ export async function POST(req: NextRequest) {
     try {
         const url = new URL(req.url);
         const action = url.searchParams.get('action');
+
+        if (action === 'apply-template') {
+            const body = (await req.json()) as { templateId?: string };
+            const templateId = typeof body?.templateId === 'string' ? body.templateId.trim() : '';
+            if (!templateId) {
+                return NextResponse.json(
+                    { error: 'templateId is required' },
+                    { status: 400 },
+                );
+            }
+            try {
+                const applied = await _applyTemplateToDb(templateId);
+                return NextResponse.json({ ok: true, appliedTemplateId: templateId, ...applied });
+            } catch (e: any) {
+                const msg = typeof e?.message === 'string' ? e.message : String(e);
+                if (msg.startsWith('TEMPLATE_NOT_FOUND:')) {
+                    return NextResponse.json({ error: 'Template not found' }, { status: 404 });
+                }
+                throw e;
+            }
+        }
 
         if (action === 'smart-palette') {
             const body = (await req.json()) as {
@@ -506,7 +747,10 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ ok: true, enterprise: ent });
         }
 
-        return NextResponse.json({ error: 'Unknown action. Use ?action=smart-palette' }, { status: 400 });
+        return NextResponse.json(
+            { error: 'Unknown action. Use ?action=smart-palette or ?action=apply-template' },
+            { status: 400 }
+        );
     } catch (error) {
         console.error('Admin theme settings POST error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

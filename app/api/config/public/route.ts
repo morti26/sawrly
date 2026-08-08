@@ -36,6 +36,19 @@ const NAV_ICON_ID_KEYS: [string, string][] = [
     ['profileActiveId', APP_SETTING_KEYS.navIconProfileActiveId],
 ];
 
+const NAV_ICON_LIBRARY_KEYS: [string, string][] = [
+    ['homeLibrary', APP_SETTING_KEYS.navIconHomeLibrary],
+    ['searchLibrary', APP_SETTING_KEYS.navIconSearchLibrary],
+    ['categoriesLibrary', APP_SETTING_KEYS.navIconCategoriesLibrary],
+    ['ordersLibrary', APP_SETTING_KEYS.navIconOrdersLibrary],
+    ['profileLibrary', APP_SETTING_KEYS.navIconProfileLibrary],
+    ['homeActiveLibrary', APP_SETTING_KEYS.navIconHomeActiveLibrary],
+    ['searchActiveLibrary', APP_SETTING_KEYS.navIconSearchActiveLibrary],
+    ['categoriesActiveLibrary', APP_SETTING_KEYS.navIconCategoriesActiveLibrary],
+    ['ordersActiveLibrary', APP_SETTING_KEYS.navIconOrdersActiveLibrary],
+    ['profileActiveLibrary', APP_SETTING_KEYS.navIconProfileActiveLibrary],
+];
+
 const EFFECT_KEYS: [string, string][] = [
     ['primaryGradientAngle', APP_SETTING_KEYS.effPrimaryGradientAngle],
     ['cardRadius', APP_SETTING_KEYS.effCardRadius],
@@ -110,6 +123,16 @@ type NavIcons = {
     categoriesActiveId: string | null;
     ordersActiveId: string | null;
     profileActiveId: string | null;
+    homeLibrary: string | null;
+    searchLibrary: string | null;
+    categoriesLibrary: string | null;
+    ordersLibrary: string | null;
+    profileLibrary: string | null;
+    homeActiveLibrary: string | null;
+    searchActiveLibrary: string | null;
+    categoriesActiveLibrary: string | null;
+    ordersActiveLibrary: string | null;
+    profileActiveLibrary: string | null;
 };
 
 type Effects = {
@@ -125,6 +148,15 @@ type Effects = {
     borderOpacity: number | null;
 };
 
+type Features = {
+    themeMode: 'dark' | 'light' | 'system';
+    iconLibraryDefault: 'phosphor' | 'material' | 'fontawesome' | 'lucide';
+    dynamicColorEnabled: boolean;
+    animationsEnabled: boolean;
+    pageTransitionStyle: 'cupertino' | 'fade' | 'sharedAxis' | 'zoom';
+    activeTemplateId: string | null;
+};
+
 function emptyLegacyColors(): LegacyColors {
     const c: any = {};
     for (const [k] of LEGACY_COLOR_KEYS) c[k] = null;
@@ -132,13 +164,23 @@ function emptyLegacyColors(): LegacyColors {
 }
 function emptyNav(): NavIcons {
     const o: any = {};
-    [...NAV_ICON_KEYS, ...NAV_ICON_ID_KEYS].forEach(([k]) => (o[k] = null));
+    [...NAV_ICON_KEYS, ...NAV_ICON_ID_KEYS, ...NAV_ICON_LIBRARY_KEYS].forEach(([k]) => (o[k] = null));
     return o as NavIcons;
 }
 function emptyEffects(): Effects {
     const o: any = {};
     for (const [k] of EFFECT_KEYS) o[k] = null;
     return o as Effects;
+}
+function defaultFeatures(): Features {
+    return {
+        themeMode: 'dark',
+        iconLibraryDefault: 'phosphor',
+        dynamicColorEnabled: true,
+        animationsEnabled: true,
+        pageTransitionStyle: 'cupertino',
+        activeTemplateId: null,
+    };
 }
 
 function isValidHexColor(value: string | null): value is string {
@@ -156,6 +198,25 @@ function parseEffect(raw: string | null): number | null {
     return n;
 }
 
+const VALID_THEME_MODES = new Set(['dark', 'light', 'system']);
+const VALID_ICON_LIBRARIES = new Set(['phosphor', 'material', 'fontawesome', 'lucide']);
+const VALID_TRANSITIONS = new Set(['cupertino', 'fade', 'sharedAxis', 'zoom']);
+
+function parseFeatures(raws: Record<string, string | null>): Features {
+    const d = defaultFeatures();
+    const mode = (raws.themeMode || '').trim().toLowerCase();
+    if (VALID_THEME_MODES.has(mode)) d.themeMode = mode as Features['themeMode'];
+    const lib = (raws.iconLibraryDefault || '').trim().toLowerCase();
+    if (VALID_ICON_LIBRARIES.has(lib)) d.iconLibraryDefault = lib as Features['iconLibraryDefault'];
+    d.dynamicColorEnabled = (raws.dynamicColorEnabled || 'true').trim().toLowerCase() !== 'false';
+    d.animationsEnabled = (raws.animationsEnabled || 'true').trim().toLowerCase() !== 'false';
+    const tr = (raws.pageTransitionStyle || '').trim().toLowerCase();
+    if (VALID_TRANSITIONS.has(tr)) d.pageTransitionStyle = tr as Features['pageTransitionStyle'];
+    const tpl = (raws.activeTemplateId || '').trim();
+    d.activeTemplateId = tpl.length > 0 && tpl.length < 64 ? tpl : null;
+    return d;
+}
+
 export async function GET() {
     const adminWhatsApp = process.env.ADMIN_WHATSAPP_E164;
     let homeLogoUrl: string | null = null;
@@ -169,9 +230,21 @@ export async function GET() {
     const colors = emptyLegacyColors();
     const navIcons = emptyNav();
     const effects = emptyEffects();
+    const featuresRaw: Record<string, string | null> = {};
+    let lightSeedPrimary: string | null = null;
 
     const allColorDbOverrides: Partial<EnterpriseTheme> = {} as any;
     let seedPrimary = '#7C3AED';
+
+    const FEATURE_KEYS: [string, string][] = [
+        ['themeMode', APP_SETTING_KEYS.themeMode],
+        ['lightSeedPrimary', APP_SETTING_KEYS.lightSeedPrimary],
+        ['iconLibraryDefault', APP_SETTING_KEYS.iconLibraryDefault],
+        ['dynamicColorEnabled', APP_SETTING_KEYS.dynamicColorEnabled],
+        ['animationsEnabled', APP_SETTING_KEYS.animationsEnabled],
+        ['pageTransitionStyle', APP_SETTING_KEYS.pageTransitionStyle],
+        ['activeTemplateId', APP_SETTING_KEYS.activeTemplateId],
+    ];
 
     try {
         const reads = await Promise.all([
@@ -186,7 +259,9 @@ export async function GET() {
             ...ALL_THEME_COLOR_KEYS.slice(LEGACY_COLOR_KEYS.length).map(([, k]) => getAppSetting(k)),
             ...NAV_ICON_KEYS.map(([, k]) => getAppSetting(k)),
             ...NAV_ICON_ID_KEYS.map(([, k]) => getAppSetting(k)),
+            ...NAV_ICON_LIBRARY_KEYS.map(([, k]) => getAppSetting(k)),
             ...EFFECT_KEYS.map(([, k]) => getAppSetting(k)),
+            ...FEATURE_KEYS.map(([, k]) => getAppSetting(k)),
         ]);
         homeLogoUrl = reads[0];
         femaleProfileIconUrl = reads[1];
@@ -227,10 +302,25 @@ export async function GET() {
             const ok = t.length > 0 && /^[a-z0-9_.-]{1,80}$/i.test(t);
             (navIcons as any)[key] = ok ? t.toLowerCase() : null;
         }
+        for (const [key] of NAV_ICON_LIBRARY_KEYS) {
+            const raw = reads[cursor];
+            cursor += 1;
+            const t = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+            const ok = VALID_ICON_LIBRARIES.has(t);
+            (navIcons as any)[key] = ok ? t : null;
+        }
         for (const [key] of EFFECT_KEYS) {
             const raw = reads[cursor];
             cursor += 1;
             (effects as any)[key] = parseEffect(raw);
+        }
+        for (const [key] of FEATURE_KEYS) {
+            const raw = reads[cursor];
+            cursor += 1;
+            featuresRaw[key] = typeof raw === 'string' ? raw.trim() : null;
+            if (key === 'lightSeedPrimary' && isValidHexColor(raw)) {
+                lightSeedPrimary = raw!.trim();
+            }
         }
     } catch (e) {
         console.error('Public Config: failed to read app settings', e);
@@ -240,25 +330,32 @@ export async function GET() {
         console.warn('ADMIN_WHATSAPP_E164 is not set');
     }
 
-    // Bygg Enterprise tema (med fallback om endast primary finns, overridea med DB-fält)
     const effectsOverride: Partial<EnterpriseTheme['effects']> = {};
     for (const [k] of EFFECT_KEYS) {
         const v = (effects as any)[k];
         if (typeof v === 'number') (effectsOverride as any)[k] = v;
     }
 
-    const enterprise: EnterpriseTheme = buildEnterpriseFromSeed(
+    const features = parseFeatures(featuresRaw);
+
+    const enterpriseDark: EnterpriseTheme = buildEnterpriseFromSeed(
         seedPrimary,
         'dark',
         effectsOverride,
         allColorDbOverrides,
     );
 
-    // Backward compat: fyll i legacy colors ifall de är null (from enterprise)
+    const enterpriseLight: EnterpriseTheme = buildEnterpriseFromSeed(
+        lightSeedPrimary && isValidHexColor(lightSeedPrimary) ? lightSeedPrimary : seedPrimary,
+        'light',
+        effectsOverride,
+        allColorDbOverrides,
+    );
+
     const mergedLegacy: LegacyColors = { ...colors };
     for (const [k] of LEGACY_COLOR_KEYS) {
-        if ((mergedLegacy as any)[k] == null && typeof (enterprise as any)[k] === 'string' && isValidHex((enterprise as any)[k])) {
-            (mergedLegacy as any)[k] = (enterprise as any)[k];
+        if ((mergedLegacy as any)[k] == null && typeof (enterpriseDark as any)[k] === 'string' && isValidHex((enterpriseDark as any)[k])) {
+            (mergedLegacy as any)[k] = (enterpriseDark as any)[k];
         }
     }
 
@@ -272,11 +369,20 @@ export async function GET() {
         unlimitedMonthlySubscriptionIconUrl,
         unlimitedYearlySubscriptionIconUrl,
         theme: {
-            version: enterprise.version,
+            version: enterpriseDark.version,
             colors: mergedLegacy,
             navIcons,
             effects,
         },
-        enterprise,
+        features,
+        enterprise: {
+            version: enterpriseDark.version,
+            dark: enterpriseDark,
+            light: enterpriseLight,
+            seed: {
+                primary: seedPrimary,
+                lightPrimary: lightSeedPrimary || seedPrimary,
+            },
+        },
     });
 }

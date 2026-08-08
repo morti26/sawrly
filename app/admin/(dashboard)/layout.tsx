@@ -19,6 +19,7 @@ export default function AdminLayout({
         { label: 'المستويات', href: '/admin/levels' },
         { label: 'أيقونات الحساب والاشتراك', href: '/admin/icon-settings' },
         { label: 'إعدادات مظهر التطبيق', href: '/admin/theme-settings' },
+        { label: 'إدارة قوالب المظهر', href: '/admin/theme-templates' },
         { label: 'العروض', href: '/admin/offers' },
         { label: 'المشاريع', href: '/admin/projects' },
         { label: 'المدفوعات', href: '/admin/payments' },
