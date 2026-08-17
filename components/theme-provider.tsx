@@ -50,13 +50,11 @@ function selectPublicTheme(
     const payload = config?.enterprise;
     if (!payload) return fallback;
 
-    if ("dark" in payload || "light" in payload) {
-        const requestedMode = config?.features?.themeMode;
-        if (requestedMode === "light" && payload.light) return payload.light;
-        return payload.dark ?? payload.light ?? fallback;
-    }
+    if ("primary" in payload) return payload;
 
-    return payload;
+    const requestedMode = config?.features?.themeMode;
+    if (requestedMode === "light" && payload.light) return payload.light;
+    return payload.dark ?? payload.light ?? fallback;
 }
 
 export function useTheme(): ThemeContextValue {
