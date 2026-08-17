@@ -52,3 +52,24 @@ test('admin readiness endpoint is available', () => {
   const readinessRouteSource = fs.readFileSync(readinessRoutePath, 'utf8');
   assert.ok(readinessRouteSource.includes('buildReadinessReport'));
 });
+
+test('theme composer is centralized and backward compatible', () => {
+  const composerPath = path.join(cwd, 'lib', 'theme_composer.ts');
+  const source = fs.readFileSync(composerPath, 'utf8');
+  assert.ok(source.includes('generateVisualTheme'));
+  assert.ok(source.includes('THEME_COMPOSER_PRESETS'));
+  assert.ok(source.includes('backgroundMesh'));
+  assert.ok(source.includes('ambientGlows'));
+  assert.ok(source.includes('variation'));
+
+  const routeSource = fs.readFileSync(path.join(cwd, 'app', 'api', 'admin', 'theme-settings', 'route.ts'), 'utf8');
+  assert.ok(routeSource.includes('themeComposer'));
+
+  const pageSource = fs.readFileSync(path.join(cwd, 'app', 'admin', '(dashboard)', 'theme-settings', 'page.tsx'), 'utf8');
+  assert.ok(pageSource.includes('setEasyMode(true)'));
+  assert.ok(pageSource.includes('grid grid-cols-1 gap-6 lg:grid-cols-5'));
+  assert.ok(pageSource.includes('lg:col-span-2 lg:sticky'));
+  assert.ok(pageSource.includes('space-y-6 lg:col-span-3'));
+  assert.ok(pageSource.includes('easyMode ? "hidden"'));
+  assert.ok(pageSource.includes('Auto WOW'));
+});

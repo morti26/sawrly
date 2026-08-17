@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { saveFile } from '@/lib/upload';
+import { probeVideoDurationSeconds, saveFile } from '@/lib/upload';
 import { ensureCreatorNotFrozen, getUserFromRequest } from '@/lib/auth';
 
 export const runtime = 'nodejs';
+const MAX_VIDEO_DURATION_SECONDS = 60;
 
 export async function POST(req: NextRequest) {
     const user = getUserFromRequest(req);
@@ -34,6 +35,23 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid upload destination' }, { status: 400 });
         }
 
+        const normalizedType = (file.type || '').toLowerCase();
+        const normalizedName = (file.name || '').toLowerCase();
+        const isVideo =
+            normalizedType.startsWith('video/') ||
+            ['.mp4', '.mov', '.m4v', '.webm', '.mkv', '.avi', '.3gp']
+                .some((extension) => normalizedName.endsWith(extension));
+
+        if (isVideo) {
+            const durationSeconds = await probeVideoDurationSeconds(file);
+            if (durationSeconds > MAX_VIDEO_DURATION_SECONDS + 0.25) {
+                return NextResponse.json(
+                    { error: 'Each video must be no longer than one minute.' },
+                    { status: 400 },
+                );
+            }
+        }
+
         const url = await saveFile(file, subDir || 'status');
 
         return NextResponse.json({ url });
@@ -43,7 +61,8 @@ export async function POST(req: NextRequest) {
             message === 'No file provided' ||
             message === 'Uploaded file is empty' ||
             message === 'File size exceeds 150 MB limit' ||
-            message === 'Unsupported file type'
+            message === 'Unsupported file type' ||
+            message === 'Unable to verify video duration'
         ) {
             return NextResponse.json({ error: message }, { status: 400 });
         }

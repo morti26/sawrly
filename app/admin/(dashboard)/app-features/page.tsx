@@ -1,5 +1,7 @@
 "use client";
 
+import NavigationDocsEditor from './NavigationDocsEditor';
+
 /**
  * صفحة "ميزات التطبيق" - قائمة شاملة بكل ما يمكن لتطبيق Sawrly (صورلي) على الجوال فعله.
  * تُستخدم كمرجع سريع في لوحة التحكم لرؤية ما هو مُنفذ بالفعل في النسخة الحالية.
@@ -23,6 +25,52 @@ interface AppFeatureGroup {
     icon: string;
     features: AppFeature[];
 }
+
+interface NavigationFeature {
+    icon: string;
+    title: string;
+    page: string;
+    description: string;
+    details: string;
+}
+
+const BOTTOM_NAVIGATION: NavigationFeature[] = [
+    {
+        icon: '⌂',
+        title: 'الرئيسية',
+        page: 'HomeScreen',
+        description: 'الصفحة الرئيسية لاكتشاف أحدث العروض والمحتوى.',
+        details: 'تتضمن الصورة الرئيسية، العروض المقترحة، الأقسام، الخصومات والتنقل إلى تفاصيل العرض.',
+    },
+    {
+        icon: '⌕',
+        title: 'البحث',
+        page: 'GlobalSearchScreen',
+        description: 'البحث عن المبدعين والعروض بسرعة.',
+        details: 'يدعم البحث النصي، تبويب المبدعين والعروض، وفتح الملف الشخصي أو تفاصيل العرض.',
+    },
+    {
+        icon: '▦',
+        title: 'المتجر والأقسام',
+        page: 'CategoriesScreen',
+        description: 'استعراض الأقسام والمنتجات والعروض حسب التصنيف.',
+        details: 'تظهر أيقونة الشبكة داخل زر + عند فتح هذه الصفحة، ويمكن تصفح الأقسام والمحتوى المصنف.',
+    },
+    {
+        icon: '▢',
+        title: 'طلباتي',
+        page: 'OrdersScreen',
+        description: 'متابعة الطلبات والحجوزات الخاصة بالمستخدم.',
+        details: 'تعرض حالة الطلبات، تفاصيل الطلب، والتحديثات المرتبطة بالشراء أو الحجز.',
+    },
+    {
+        icon: '♙',
+        title: 'الملف الشخصي',
+        page: 'ProfileScreen',
+        description: 'إدارة الحساب والملف الشخصي والإعدادات.',
+        details: 'تتضمن بيانات المستخدم، تعديل الملف، الاشتراك، الإشعارات، الدفع والخصوصية.',
+    },
+];
 
 const STATUS_META: Record<FeatureStatus, { label: string; className: string; dot: string }> = {
     ready: {
@@ -507,6 +555,34 @@ export default function AppFeaturesPage() {
                     <p className="font-bold">أغسطس 2026 • v1.2.2-hotfix</p>
                 </div>
             </div>
+
+            <section className="overflow-hidden rounded-2xl border border-m3-outline-variant/60 bg-surface-card shadow-sm">
+                <header className="border-b border-m3-surface-container-low bg-gradient-to-r from-slate-50 to-surface-card px-6 py-5">
+                    <h2 className="text-lg font-bold text-m3-on-background">أزرار التنقل الرئيسية في التطبيق</h2>
+                    <p className="mt-1 text-sm text-m3-on-surface-variant">
+                        توثيق الصفحات الخمس المرتبطة بشريط التنقل السفلي في تطبيق Flutter.
+                    </p>
+                </header>
+                <div className="grid grid-cols-1 gap-3 p-4 md:grid-cols-2 xl:grid-cols-5">
+                    {BOTTOM_NAVIGATION.map((item) => (
+                        <article key={item.page} className="rounded-xl border border-m3-outline-variant/60 bg-m3-surface-container-lowest p-4 shadow-sm">
+                            <div className="mb-3 flex items-center gap-3">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/15 text-xl font-bold text-m3-primary">
+                                    {item.icon}
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-m3-on-background">{item.title}</h3>
+                                    <code className="text-[10px] text-m3-outline">{item.page}</code>
+                                </div>
+                            </div>
+                            <p className="text-xs font-semibold leading-5 text-m3-on-background">{item.description}</p>
+                            <p className="mt-2 text-xs leading-5 text-m3-on-surface-variant">{item.details}</p>
+                        </article>
+                    ))}
+                </div>
+            </section>
+
+            <NavigationDocsEditor />
 
             <StatsBar />
 

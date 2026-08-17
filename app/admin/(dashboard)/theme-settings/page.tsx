@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import * as Pi from "@phosphor-icons/react";
 import type { EnterpriseTheme } from "@/lib/theme_engine";
+import { generateVisualTheme, THEME_COMPOSER_PRESETS, type ThemeComposerConfig, type ThemeComposerMood, type ThemeComposerPreset } from "@/lib/theme_composer";
 
 type LegacyThemeColors = {
     primary: string | null;
@@ -240,6 +241,19 @@ const EFFECT_FIELDS: { key: EffectField; label: string; desc: string; min: numbe
 ];
 
 const PRESET_THEMES: { name: string; label: string; seed: string; colors: ThemeColors }[] = [
+    {
+        name: "aurora-editorial", label: "Sawrly Aurora", seed: "#A855F7",
+        colors: {
+            ...DEFAULT_COLORS,
+            primary: "#A855F7", primaryLight: "#D8B4FE", primaryDark: "#7E22CE", accentPink: "#F472B6",
+            background: "#0D0B16", surface: "#1B1528", surfaceLight: "#302044", menuBackground: "#17121F",
+            textPrimary: "#FFFFFF", textSecondary: "#C4BBD5", textTertiary: "#8E849F",
+            success: "#34D399", warning: "#FBBF24", error: "#FB7185", info: "#22D3EE",
+            border: "#5B3A75", borderLight: "#38264D",
+            heroStart: "#211136", heroMid: "#7E22CE", heroEnd: "#F472B6",
+            cardBackground: "#211832", cardBorder: "#5B3A75",
+        },
+    },
     {
         name: "purple-dream", label: "حلم بنفسجي", seed: "#9B4DFF",
         colors: { ...DEFAULT_COLORS },
@@ -680,6 +694,38 @@ function withAlpha(colorHex: string, alpha: number): string {
     return `#${full}${alphaHex}`;
 }
 
+function harmonyPalette(startHex: string, midHex: string, endHex: string): Partial<Record<ColorField, string>> {
+    const toHsl = (hex: string) => {
+        const c = colorToSixDigitHex(hex).slice(1);
+        const r = parseInt(c.slice(0, 2), 16) / 255, g = parseInt(c.slice(2, 4), 16) / 255, b = parseInt(c.slice(4, 6), 16) / 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+        let h = 0;
+        if (d) h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+        h = Math.round((h * 60 + 360) % 360);
+        const l = (max + min) / 2, s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+        return { h, s, l };
+    };
+    const toHex = (h: number, s: number, l: number) => {
+        const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs(((h / 60) % 2) - 1)), m = l - c / 2;
+        const rgb = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+        return `#${rgb.map((v) => Math.round((v + m) * 255).toString(16).padStart(2, "0")).join("")}`;
+    };
+    const a = toHsl(startHex), p = toHsl(midHex), z = toHsl(endHex);
+    const bg = toHex(a.h, Math.min(0.62, Math.max(0.28, a.s)), Math.min(0.22, Math.max(0.09, a.l)));
+    const primary = toHex(p.h, Math.min(0.78, Math.max(0.52, p.s)), 0.52);
+    const dark = toHex(p.h, Math.min(0.72, Math.max(0.46, p.s)), 0.32);
+    const light = toHex(p.h, Math.min(0.7, Math.max(0.42, p.s)), 0.72);
+    const accent = toHex(z.h, Math.min(0.86, Math.max(0.62, z.s)), 0.62);
+    const surface = toHex(a.h, Math.min(0.58, Math.max(0.24, a.s)), Math.min(0.28, Math.max(0.14, a.l + 0.04)));
+    return {
+        background: bg, menuBackground: bg, primary, primaryDark: dark, primaryLight: light,
+        accentPink: accent, surface, surfaceLight: toHex(a.h, Math.min(0.5, a.s), Math.min(0.38, Math.max(0.22, a.l + 0.14))),
+        cardBackground: surface, cardBorder: light,
+        textPrimary: "#FFFFFF", textSecondary: "#E8E6F0", textTertiary: "#BDB8CC",
+        heroStart: bg, heroMid: primary, heroEnd: accent,
+    };
+}
+
 function relativeLuminance(hex: string): number {
     const c = colorToSixDigitHex(hex).replace("#", "");
     const r = parseInt(c.slice(0, 2), 16) / 255;
@@ -753,9 +799,15 @@ export default function AdminThemeSettingsPage() {
     const [enterpriseTheme, setEnterpriseTheme] = useState<EnterpriseTheme | null>(null);
     const [wcagRatings, setWcagRatings] = useState<Record<string, WcagBadge>>({});
     const [smartSeed, setSmartSeed] = useState<string>("#9B4DFF");
-    const [smartMode, setSmartMode] = useState<"light" | "dark">("dark");
+    const [smartMode, setSmartMode] = useState<"light" | "dark">("light");
     const [smartGenerating, setSmartGenerating] = useState(false);
     const [activeGroup, setActiveGroup] = useState<string | null>("primary");
+    const [easyMode, setEasyMode] = useState(true);
+    const [previewNonce, setPreviewNonce] = useState(0);
+    const [themeComposer, setThemeComposer] = useState<ThemeComposerConfig>({
+        mode: "easy", preset: "sawrly-aurora", colors: ["#211136", "#7E22CE", "#F472B6"], accent: "#F9A8D4",
+        mood: "premium", intensity: 0.55, variation: 0, brightness: "dark",
+    });
 
     useEffect(() => {
         void loadSettings();
@@ -843,6 +895,26 @@ export default function AdminThemeSettingsPage() {
         return next;
     }, [previewUrls, settings.navIcons, iconIdInputs]);
 
+    const flutterPreviewUrl = useMemo(() => {
+        const generatedPreview = generateVisualTheme(themeComposer);
+        const visuals = generatedPreview.visuals;
+        // Keep the iframe payload small enough for every browser/proxy. Flutter
+        // only needs the runtime colors below; sending all 85 M3 tokens causes
+        // the query string to be truncated and the preview falls back to blue.
+        const previewColorKeys = [
+            "primary", "primaryLight", "primaryDark", "accentPink", "background",
+            "surface", "surfaceLight", "cardBackground", "cardBorder", "menuBackground",
+            "textPrimary", "textSecondary", "textTertiary", "border", "borderLight",
+            "heroStart", "heroMid", "heroEnd", "onPrimary", "onSurface",
+        ] as const;
+        const sourceColors = easyMode ? generatedPreview.enterprise : effectiveColors;
+        const previewColors = Object.fromEntries(previewColorKeys.map((key) => [key, (sourceColors as any)[key]]));
+        const payload = btoa(JSON.stringify({ colors: previewColors, effects: effectiveEffects, visuals }));
+        const direct = Object.fromEntries(previewColorKeys.map((key) => [`preview_${key}`, (previewColors as any)[key] ?? ""]));
+        const query = new URLSearchParams({ previewTheme: payload, ...direct, build: "13", instance: String(previewNonce) });
+        return `/flutter-preview/index.html?${query.toString()}`;
+    }, [effectiveColors, effectiveEffects, themeComposer, easyMode, previewNonce]);
+
     function navFieldToIdField(field: NavIconField): NavIconField | null {
         const mapping: Partial<Record<NavIconField, NavIconField>> = {
             home: "homeId", search: "searchId", categories: "categoriesId", orders: "ordersId", profile: "profileId",
@@ -866,6 +938,7 @@ export default function AdminThemeSettingsPage() {
             const navIcons = { ...EMPTY_NAV_ICONS, ...(data?.navIcons ?? {}) };
             const effects = { ...EMPTY_EFFECTS, ...(data?.effects ?? {}) };
             setSettings({ colors, navIcons, effects });
+            if (data?.themeComposer) setThemeComposer(data.themeComposer as ThemeComposerConfig);
             if (data?.enterprise) setEnterpriseTheme(data.enterprise as EnterpriseTheme);
             if (data?.wcag) setWcagRatings(data.wcag as any);
             if (colors.primary) setSmartSeed(colors.primary);
@@ -896,7 +969,7 @@ export default function AdminThemeSettingsPage() {
 
     function handlePickIconId(field: NavIconField, name: string, weight: string) {
         setMessage(null); setError(null);
-        const id = buildIconId(name, weight);
+        const id = name.startsWith("material:") ? name : buildIconId(name, weight);
         setIconIdInputs((prev) => ({ ...prev, [field]: id }));
     }
 
@@ -908,7 +981,27 @@ export default function AdminThemeSettingsPage() {
 
     function handleColorChange(key: ColorField, value: string) {
         setError(null); setMessage(null);
-        setColorInputs((prev) => ({ ...prev, [key]: value }));
+        setColorInputs((prev) => {
+            const next = { ...prev, [key]: value } as Partial<Record<ColorField, string>>;
+            // Keep the whole visual system coherent while the user mixes the
+            // three background stops. Header, cards and bottom navigation use
+            // these linked roles so they never remain on an unrelated palette.
+            if (key === "heroStart") {
+                next.background = value;
+                next.menuBackground = value;
+                next.primaryDark = value;
+            } else if (key === "heroMid") {
+                next.primary = value;
+                next.surface = value;
+                next.surfaceLight = value;
+                next.cardBackground = value;
+            } else if (key === "heroEnd") {
+                next.primaryLight = value;
+                next.accentPink = value;
+                next.cardBorder = value;
+            }
+            return next;
+        });
     }
 
     function handleEffectChange(key: EffectField, raw: number) {
@@ -924,6 +1017,27 @@ export default function AdminThemeSettingsPage() {
         setSettings((prev) => ({ ...prev, effects: { ...prev.effects, [key]: null } }));
     }
 
+    function applyComposer(next: ThemeComposerConfig) {
+        const generated = generateVisualTheme(next);
+        const generatedColors: Partial<Record<ColorField, string>> = {};
+        for (const key of Object.keys(EMPTY_COLORS) as ColorField[]) {
+            const value = (generated.enterprise as any)[key];
+            if (typeof value === "string") generatedColors[key] = value;
+        }
+        const generatedEffects: Partial<Record<EffectField, number>> = {};
+        for (const field of EFFECT_FIELDS) {
+            const value = (generated.enterprise.effects as any)[field.key];
+            if (typeof value === "number") generatedEffects[field.key] = value;
+        }
+        setThemeComposer(next);
+        setPreviewNonce((value) => value + 1);
+        setColorInputs((prev) => ({ ...prev, ...generatedColors }));
+        setSettings((prev) => ({ ...prev, colors: { ...prev.colors, ...generatedColors } }));
+        setEffectInputs((prev) => ({ ...prev, ...generatedEffects }));
+        setEnterpriseTheme(generated.enterprise);
+        setMessage("✨ تم إنشاء نمط بصري متناسق — راجع المعاينة ثم اضغط حفظ.");
+    }
+
     function handleApplyPreset(preset: (typeof PRESET_THEMES)[number]) {
         setError(null); setMessage(null);
         setSmartSeed(preset.seed);
@@ -934,17 +1048,21 @@ export default function AdminThemeSettingsPage() {
         }
         setColorInputs(inputs);
         setSettings((prev) => ({ ...prev, colors: { ...preset.colors } }));
+        if (preset.name === "aurora-editorial") {
+            setEffectInputs((prev) => ({ ...prev, glassBlur: 20, surfaceOpacity: 0.76, borderOpacity: 0.5, cardShadowOpacity: 0.18, activeGlowOpacity: 0.3 }));
+        }
     }
 
-    async function handleGenerateSmartPalette(writeToDb: boolean) {
+    async function handleGenerateSmartPalette(writeToDb: boolean, seedOverride?: string) {
         setError(null); setMessage(null); setSmartGenerating(true);
         try {
             const token = localStorage.getItem("token");
             if (!token) throw new Error("جلسة الأدمن غير متاحة. أعد تسجيل الدخول.");
-            if (!/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(smartSeed.trim())) {
+            const seed = (seedOverride ?? smartSeed).trim();
+            if (!/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(seed)) {
                 throw new Error("الرجاء إدخال لون صحيح للبذرة (مثل #9B4DFF).");
             }
-            const body: any = { seedPrimary: smartSeed.trim(), mode: smartMode };
+            const body: any = { seedPrimary: seed, mode: smartMode };
             const effectsOverride: any = {};
             for (const f of EFFECT_FIELDS) {
                 const v = effectInputs[f.key] ?? settings.effects[f.key];
@@ -1043,11 +1161,16 @@ export default function AdminThemeSettingsPage() {
             const nextColors: Partial<ThemeColors> = {};
             for (const k of Object.keys(EMPTY_COLORS) as ColorField[]) {
                 const raw = colorInputs[k];
-                if (raw == null) { nextColors[k] = settings.colors[k] ?? null; continue; }
+                if (raw == null) {
+                    // Persist the effective preview value. Previously untouched fields
+                    // were sent as null and the server replaced them with black/defaults.
+                    nextColors[k] = effectiveColors[k] ?? settings.colors[k] ?? null;
+                    continue;
+                }
                 const trimmed = raw.trim();
                 if (trimmed.length === 0) nextColors[k] = null;
                 else if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(trimmed)) nextColors[k] = trimmed;
-                else nextColors[k] = settings.colors[k] ?? null;
+                else nextColors[k] = effectiveColors[k] ?? settings.colors[k] ?? null;
             }
 
             const nextEffects: Partial<ThemeEffects> = {};
@@ -1073,7 +1196,7 @@ export default function AdminThemeSettingsPage() {
             const res = await fetch("/api/admin/theme-settings", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ colors: nextColors, navIcons: nextNavIcons, effects: nextEffects }),
+                body: JSON.stringify({ colors: nextColors, navIcons: nextNavIcons, effects: nextEffects, themeComposer }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data?.error || "فشل حفظ إعدادات المظهر");
@@ -1165,7 +1288,7 @@ export default function AdminThemeSettingsPage() {
     const textTertiary = hexToCss(c.textTertiary ?? c.onSurfaceVariant, DEFAULT_COLORS.textTertiary!);
 
     return (
-        <div dir="rtl" className="space-y-6">
+        <div dir="rtl" className="theme-settings-light space-y-6">
             <div className="flex flex-col gap-2">
                 <h2 className="text-right text-2xl font-bold">إعدادات مظهر التطبيق (Enterprise Theme Engine)</h2>
                 <p className="text-right text-sm text-m3-on-surface-variant">
@@ -1199,10 +1322,61 @@ export default function AdminThemeSettingsPage() {
                 </div>
             ) : null}
 
+            <section className={`rounded-2xl border border-violet-200 bg-gradient-to-br from-white via-violet-50 to-fuchsia-50 p-5 shadow-sm ${easyMode ? "hidden" : ""}`}>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="text-right">
+                        <h3 className="text-xl font-bold text-slate-900">✨ Theme Composer</h3>
+                        <p className="mt-1 text-sm text-slate-600">أنشئ مظهراً احترافياً خلال ثوانٍ — النظام يضبط Material 3 والتباين والتأثيرات تلقائياً.</p>
+                    </div>
+                    <div className="flex rounded-lg border border-violet-200 bg-white p-1 text-sm">
+                        <button type="button" onClick={() => setEasyMode(true)} className={`rounded-md px-3 py-1.5 font-semibold ${easyMode ? "bg-violet-600 text-white" : "text-slate-600"}`}>Easy Mode</button>
+                        <button type="button" onClick={() => setEasyMode(false)} className={`rounded-md px-3 py-1.5 font-semibold ${!easyMode ? "bg-slate-900 text-white" : "text-slate-600"}`}>Advanced</button>
+                    </div>
+                </div>
+                {easyMode ? (
+                    <>
+                        <div className="mt-5 text-right text-sm font-bold text-slate-800">🎨 اختر إحساس اللون</div>
+                        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-5">
+                            {(Object.entries(THEME_COMPOSER_PRESETS) as [Exclude<ThemeComposerPreset, "custom">, (typeof THEME_COMPOSER_PRESETS)[Exclude<ThemeComposerPreset, "custom">]][]).map(([id, preset]) => {
+                                const selected = themeComposer.preset === id;
+                                return <button key={id} type="button" onClick={() => applyComposer({ ...themeComposer, preset: id, colors: [...preset.colors], accent: preset.accent, mood: preset.mood })} className={`overflow-hidden rounded-xl border-2 bg-white text-right transition hover:-translate-y-0.5 ${selected ? "border-violet-600 shadow-lg" : "border-white shadow"}`}>
+                                    <div className="h-12" style={{ background: `linear-gradient(120deg, ${preset.colors[0]}, ${preset.colors[1]}, ${preset.colors[2]})` }} />
+                                    <div className="p-2 text-xs font-bold text-slate-800">{id.replaceAll("-", " ")}</div>
+                                </button>;
+                            })}
+                            <button type="button" onClick={() => setThemeComposer((prev) => ({ ...prev, preset: "custom" }))} className={`rounded-xl border-2 bg-white p-2 text-right transition hover:-translate-y-0.5 ${themeComposer.preset === "custom" ? "border-violet-600 shadow-lg" : "border-white shadow"}`}>
+                                <div className="h-12 rounded-lg" style={{ background: `linear-gradient(120deg, ${themeComposer.colors[0]}, ${themeComposer.colors[1]}, ${themeComposer.colors[2]})` }} />
+                                <div className="p-1 text-xs font-bold text-slate-800">Custom mix</div>
+                            </button>
+                        </div>
+                        {themeComposer.preset === "custom" ? <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-4">
+                            {[0, 1, 2].map((index) => <label key={index} className="rounded-lg border border-violet-200 bg-white p-3 text-right text-xs font-semibold">Color {index + 1}<input type="color" value={themeComposer.colors[index] ?? "#7C3AED"} onChange={(ev) => { const colors = [...themeComposer.colors]; colors[index] = ev.target.value; applyComposer({ ...themeComposer, colors, preset: "custom" }); }} className="mt-2 h-9 w-full cursor-pointer" /></label>)}
+                            <label className="rounded-lg border border-violet-200 bg-white p-3 text-right text-xs font-semibold">Accent<input type="color" value={themeComposer.accent ?? "#F9A8D4"} onChange={(ev) => applyComposer({ ...themeComposer, preset: "custom", accent: ev.target.value })} className="mt-2 h-9 w-full cursor-pointer" /></label>
+                        </div> : null}
+                        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                            <div className="sm:col-span-2">
+                                <div className="text-right text-sm font-bold text-slate-800">✨ كيف تريد الإحساس؟</div>
+                                <div className="mt-2 flex flex-wrap gap-2" dir="rtl">
+                                    {(["soft", "premium", "bold", "minimal", "neon", "luxury"] as ThemeComposerMood[]).map((mood) => <button key={mood} type="button" onClick={() => applyComposer({ ...themeComposer, mood })} className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${themeComposer.mood === mood ? "border-violet-600 bg-violet-600 text-white" : "border-violet-200 bg-white text-slate-700 hover:bg-violet-50"}`}>{mood}</button>)}
+                                </div>
+                            </div>
+                            <label className="text-right text-sm font-bold text-slate-800">Effect strength
+                                <input type="range" min="0" max="1" step="0.01" value={themeComposer.intensity} onChange={(ev) => applyComposer({ ...themeComposer, intensity: Number(ev.target.value) })} className="mt-3 h-2 w-full cursor-pointer accent-violet-600" />
+                                <span className="block text-xs font-normal text-slate-500">Subtle ← {Math.round(themeComposer.intensity * 100)}% → Wow</span>
+                            </label>
+                        </div>
+                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                            <button type="button" onClick={() => applyComposer({ ...themeComposer, variation: themeComposer.variation + 1 })} className="rounded-lg border border-violet-300 bg-white px-4 py-2 text-sm font-semibold text-violet-700">🎲 Ny variation</button>
+                            <button type="button" onClick={() => applyComposer({ ...themeComposer, variation: themeComposer.variation + 1, intensity: Math.max(.5, themeComposer.intensity) })} className="rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-2 text-sm font-bold text-white shadow-lg">✨ Auto WOW</button>
+                        </div>
+                    </>
+                ) : null}
+            </section>
+
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-                <div className="lg:col-span-2">
-                    <div className="sticky top-6 space-y-4">
-                        <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
+                <div className="lg:col-span-2 lg:sticky lg:top-4 lg:h-[calc(100vh-7rem)] lg:self-start">
+                    <div className="flex h-full min-h-0 flex-col gap-4">
+                        <div className="flex min-h-0 flex-1 flex-col rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                             <div className="flex items-center justify-between gap-3">
                                 <div className="text-right">
                                     <h3 className="font-bold text-m3-on-background">معاينة التطبيق</h3>
@@ -1212,7 +1386,17 @@ export default function AdminThemeSettingsPage() {
                                 </div>
                             </div>
 
-                            <div className="mt-6 mx-auto w-[320px] overflow-hidden rounded-[36px] border border-m3-outline-variant bg-m3-on-surface p-2 shadow-xl">
+                            <div className="mt-4 flex min-h-0 flex-1 items-center justify-center">
+                              <div className="mx-auto w-[360px] max-w-full overflow-hidden rounded-[36px] border border-slate-200 bg-slate-900 p-2 shadow-xl">
+                                <iframe
+                                    key={flutterPreviewUrl}
+                                    title="Sawrly Flutter app preview"
+                                    src={flutterPreviewUrl}
+                                    className="h-[calc(100vh-13rem)] min-h-[520px] w-full rounded-[28px] border-0 bg-white"
+                                />
+                              </div>
+                            </div>
+                            <div className="hidden mt-6 mx-auto w-[320px] overflow-hidden rounded-[36px] border border-m3-outline-variant bg-m3-on-surface p-2 shadow-xl">
                                 <div className="flex h-[620px] flex-col overflow-hidden rounded-[28px]" style={previewStyle}>
                                     <div className="flex items-center justify-between px-4 pt-4 pb-3 text-xs"
                                          style={{ color: hexToCss(c.textPrimary, DEFAULT_COLORS.textPrimary!), opacity: 0.85 }}>
@@ -1355,7 +1539,7 @@ export default function AdminThemeSettingsPage() {
                             </div>
                         </div>
 
-                        <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
+                        <div className="sticky bottom-0 z-20 rounded-xl border border-m3-outline-variant/60 bg-white/95 p-5 shadow-lg backdrop-blur">
                             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <button type="button" onClick={() => void loadSettings()}
                                         className="rounded-lg border border-m3-outline-variant/60 px-4 py-2 text-sm font-medium text-m3-on-surface transition hover:bg-m3-background">
@@ -1371,13 +1555,51 @@ export default function AdminThemeSettingsPage() {
                 </div>
 
                 <div className="space-y-6 lg:col-span-3">
-                    {/* Smart Palette */}
-                    <div className="rounded-xl border-2 border-primary/40 bg-gradient-to-br from-violet-50 via-surface-card to-fuchsia-50 p-5 shadow-sm">
+                    {easyMode ? (
+                        <section className="rounded-2xl border border-violet-200 bg-gradient-to-br from-white via-violet-50 to-fuchsia-50 p-5 shadow-sm">
+                            <div className="flex items-center justify-between gap-3">
+                                <div className="text-right">
+                                    <h3 className="text-xl font-bold text-slate-900">✨ Theme Composer</h3>
+                                    <p className="mt-1 text-xs text-slate-600">Välj en stil. Alla färger och effekter samordnas automatiskt.</p>
+                                </div>
+                                <button type="button" onClick={() => setEasyMode(false)} className="rounded-lg border border-violet-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">Advanced</button>
+                            </div>
+                            <div className="mt-4 grid grid-cols-2 gap-2">
+                                {(Object.entries(THEME_COMPOSER_PRESETS) as [Exclude<ThemeComposerPreset, "custom">, (typeof THEME_COMPOSER_PRESETS)[Exclude<ThemeComposerPreset, "custom">]][]).map(([id, preset]) => (
+                                    <button key={id} type="button" onClick={() => applyComposer({ ...themeComposer, preset: id, colors: [...preset.colors], accent: preset.accent, mood: preset.mood })} className={`overflow-hidden rounded-lg border-2 bg-white text-right ${themeComposer.preset === id ? "border-violet-600 shadow" : "border-white"}`}>
+                                        <div className="h-8" style={{ background: `linear-gradient(120deg, ${preset.colors[0]}, ${preset.colors[1]}, ${preset.colors[2]})` }} />
+                                        <div className="px-2 py-1 text-[11px] font-bold text-slate-800">{id.replaceAll("-", " ")}</div>
+                                    </button>
+                                ))}
+                                <button type="button" onClick={() => setThemeComposer((prev) => ({ ...prev, preset: "custom" }))} className={`rounded-lg border-2 bg-white p-2 text-right ${themeComposer.preset === "custom" ? "border-violet-600 shadow" : "border-white"}`}>
+                                    <div className="h-8 rounded" style={{ background: `linear-gradient(120deg, ${themeComposer.colors[0]}, ${themeComposer.colors[1]}, ${themeComposer.colors[2]})` }} />
+                                    <div className="pt-1 text-[11px] font-bold text-slate-800">Custom mix</div>
+                                </button>
+                            </div>
+                            {themeComposer.preset === "custom" ? <div className="mt-3 grid grid-cols-2 gap-2">
+                                {[0, 1, 2].map((index) => <label key={index} className="rounded-lg border border-violet-200 bg-white p-2 text-right text-[11px] font-semibold">Color {index + 1}<input type="color" value={themeComposer.colors[index] ?? "#7C3AED"} onChange={(ev) => { const colors = [...themeComposer.colors]; colors[index] = ev.target.value; applyComposer({ ...themeComposer, colors, preset: "custom" }); }} className="mt-1 h-7 w-full cursor-pointer" /></label>)}
+                                <label className="rounded-lg border border-violet-200 bg-white p-2 text-right text-[11px] font-semibold">Accent<input type="color" value={themeComposer.accent ?? "#F9A8D4"} onChange={(ev) => applyComposer({ ...themeComposer, preset: "custom", accent: ev.target.value })} className="mt-1 h-7 w-full cursor-pointer" /></label>
+                            </div> : null}
+                            <div className="mt-4 flex items-center gap-3">
+                                <label className="flex-1 text-right text-xs font-bold text-slate-800">Effect strength<input type="range" min="0" max="1" step="0.01" value={themeComposer.intensity} onChange={(ev) => applyComposer({ ...themeComposer, intensity: Number(ev.target.value) })} className="mt-2 h-2 w-full cursor-pointer accent-violet-600" /></label>
+                                <button type="button" onClick={() => applyComposer({ ...themeComposer, variation: themeComposer.variation + 1 })} className="rounded-lg border border-violet-300 bg-white px-3 py-2 text-xs font-semibold text-violet-700">🎲 Variation</button>
+                                <button type="button" onClick={() => applyComposer({ ...themeComposer, variation: themeComposer.variation + 1, intensity: Math.max(.5, themeComposer.intensity) })} className="rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-500 px-3 py-2 text-xs font-bold text-white shadow">✨ Auto WOW</button>
+                            </div>
+                        </section>
+                    ) : null}
+                    {!easyMode ? (
+                        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-right text-xs text-slate-600 shadow-sm">
+                            <div className="font-bold text-slate-900">Advanced Mode</div>
+                            <div className="mt-1">Här finns alla detaljerade verktyg. Easy Mode ovan använder samma generator och Smart Palette automatiskt, så inget separat färgsystem skapas.</div>
+                        </div>
+                    ) : null}
+                    {/* Advanced Material 3 palette (kept for designers/admins) */}
+                    <div className="theme-smart-palette rounded-xl border-2 border-primary/35 bg-gradient-to-br from-white via-surface-card to-slate-50 p-5 shadow-sm">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div className="text-right">
                                 <h3 className="flex items-center justify-end gap-2 font-bold text-m3-on-background">
                                     <span className="rounded-md bg-accent px-2 py-0.5 text-[11px] font-bold text-m3-on-surface shadow">
-                                        Enterprise
+                                        Enterprise · Advanced
                                     </span>
                                     لوحة الألوان الذكية (Material Color Utilities)
                                 </h3>
@@ -1405,18 +1627,18 @@ export default function AdminThemeSettingsPage() {
                                            className="min-w-0 flex-1 bg-transparent px-3 py-2 text-left text-sm font-mono text-m3-on-background outline-none placeholder:text-m3-outline" />
                                 </div>
                             </div>
-                            <div className="sm:col-span-3">
+                            <div className="hidden">
                                 <label className="mb-2 block text-right text-xs font-semibold text-m3-on-surface">
                                     الوضع (Mode)
                                 </label>
                                 <div className="flex rounded-lg border border-m3-outline-variant bg-surface-card p-1">
-                                    <button type="button" onClick={() => setSmartMode("dark")}
+                                    <button type="button" onClick={() => { setSmartMode("dark"); setEnterpriseTheme(null); }}
                                             className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition ${
                                                 smartMode === "dark"
                                                     ? "bg-m3-surface-container-highest text-m3-on-surface shadow-inner"
                                                     : "text-m3-on-surface-variant hover:bg-m3-background"
                                             }`}>🌙 داكن</button>
-                                    <button type="button" onClick={() => setSmartMode("light")}
+                                    <button type="button" onClick={() => { setSmartMode("light"); setEnterpriseTheme(null); }}
                                             className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition ${
                                                 smartMode === "light"
                                                     ? "bg-amber-100 text-amber-900 shadow-inner"
@@ -1426,6 +1648,30 @@ export default function AdminThemeSettingsPage() {
                             </div>
                             <div className="flex flex-col justify-end gap-2 sm:col-span-5">
                                 <div className="flex flex-wrap gap-2">
+                                    <button type="button" disabled={smartGenerating}
+                                            onClick={async () => {
+                                                const hue = Math.floor(Math.random() * 360);
+                                                const h = hue / 60, c = 0.68 * (1 - Math.abs(2 * 0.54 - 1)), x = c * (1 - Math.abs((h % 2) - 1)), m = 0.54 - c / 2;
+                                                const rgb = h < 1 ? [c,x,0] : h < 2 ? [x,c,0] : h < 3 ? [0,c,x] : h < 4 ? [0,x,c] : h < 5 ? [x,0,c] : [c,0,x];
+                                                const magicSeed = `#${rgb.map((v) => Math.round((v + m) * 255).toString(16).padStart(2, "0")).join("")}`;
+                                                setSmartSeed(magicSeed);
+                                                await handleGenerateSmartPalette(false, magicSeed);
+                                                // Blend the visual effects from the generated hue instead of
+                                                // applying one fixed preset every time.
+                                                const blendHue = ((rgb[0] * 3 + rgb[1] * 5 + rgb[2] * 7) % 100) / 100;
+                                                setEffectInputs((prev) => ({
+                                                    ...prev,
+                                                    glassBlur: Math.round(12 + blendHue * 14),
+                                                    surfaceOpacity: Number((0.68 + blendHue * 0.2).toFixed(2)),
+                                                    borderOpacity: Number((0.38 + blendHue * 0.24).toFixed(2)),
+                                                    cardShadowOpacity: Number((0.12 + blendHue * 0.14).toFixed(2)),
+                                                    activeGlowOpacity: Number((0.2 + blendHue * 0.22).toFixed(2)),
+                                                    navShadowOpacity: Number((0.14 + blendHue * 0.18).toFixed(2)),
+                                                }));
+                                            }}
+                                            className="flex-1 rounded-lg border border-primary/40 bg-white/80 px-4 py-2 text-sm font-bold text-primary shadow-sm transition hover:bg-primary/10 disabled:opacity-60">
+                                        Smart palette generator
+                                    </button>
                                     <button type="button" disabled={smartGenerating}
                                             onClick={() => void handleGenerateSmartPalette(false)}
                                             className="flex-1 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-m3-on-surface shadow transition hover:bg-primary-container disabled:opacity-60">
@@ -1445,7 +1691,54 @@ export default function AdminThemeSettingsPage() {
                         </div>
                     </div>
 
-                    {/* Presets */}
+                    {/* Background mixer */}
+                    <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
+                        <div className="text-right">
+                            <h3 className="font-bold text-m3-on-background">مزج خلفية التطبيق</h3>
+                            <p className="mt-1 text-sm text-m3-on-surface-variant">
+                                اخلط ثلاث طبقات لونية يدوياً. هذه الألوان تُستخدم للخلفية في المعاينة وتنتقل إلى تطبيق Flutter بعد الحفظ.
+                            </p>
+                        </div>
+                        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                            {([
+                                ["heroStart", "بداية الخلفية", "اللون الأول"],
+                                ["heroMid", "منتصف الخلفية", "اللون الوسطي"],
+                                ["heroEnd", "نهاية الخلفية", "اللون الأخير"],
+                            ] as const).map(([key, label, hint]) => {
+                                const value = colorToSixDigitHex(effectiveColors[key] ?? DEFAULT_COLORS[key] ?? "#7C3AED");
+                                return (
+                                    <div key={key} className="rounded-xl border border-m3-outline-variant/60 bg-m3-background/60 p-3 text-right">
+                                        <div className="mb-2 text-sm font-semibold text-m3-on-background">{label}</div>
+                                        <div className="mb-2 text-[11px] text-m3-on-surface-variant">{hint}</div>
+                                        <div dir="ltr" className="flex items-center overflow-hidden rounded-lg border border-m3-outline-variant bg-surface-card">
+                                            <label className="relative block shrink-0 cursor-pointer border-r border-m3-outline-variant/60 bg-m3-background px-2 py-2">
+                                                <input type="color" value={value} onChange={(ev) => handleColorChange(key, ev.target.value)} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+                                                <div className="h-8 w-8 rounded-md border border-m3-outline-variant shadow-inner" style={{ background: value }} />
+                                            </label>
+                                            <input dir="ltr" value={colorInputs[key] ?? value} onChange={(ev) => handleColorChange(key, ev.target.value)} className="min-w-0 flex-1 bg-transparent px-2 py-2 text-left text-sm font-mono text-m3-on-background outline-none" />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-m3-outline-variant/60 bg-m3-background/50 p-3">
+                            <div className="text-right text-xs text-m3-on-surface-variant">زاوية التدرج والضبابية والشفافية موجودة في قسم تأثيرات التصميم أدناه.</div>
+                            <button type="button" disabled={smartGenerating} onClick={() => {
+                                const palette = harmonyPalette(
+                                    colorInputs.heroStart ?? effectiveColors.heroStart ?? DEFAULT_COLORS.background!,
+                                    colorInputs.heroMid ?? effectiveColors.heroMid ?? DEFAULT_COLORS.primary!,
+                                    colorInputs.heroEnd ?? effectiveColors.heroEnd ?? DEFAULT_COLORS.accentPink!,
+                                );
+                                setColorInputs((prev) => ({ ...prev, ...palette }));
+                                setSettings((prev) => ({ ...prev, colors: { ...prev.colors, ...palette } }));
+                                setMessage("تم تنسيق لوحة الألوان بالكامل — راجع المعاينة ثم اضغط حفظ.");
+                            }} className="rounded-lg border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-bold text-primary transition hover:bg-primary/20 disabled:opacity-60">
+                                🎨 تنسيق الألوان تلقائياً
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Legacy presets (advanced compatibility) */}
                     <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                         <div className="text-right">
                             <h3 className="font-bold text-m3-on-background">قوالب جاهزة (Presets)</h3>
@@ -1571,7 +1864,7 @@ export default function AdminThemeSettingsPage() {
                             if (activeGroup !== grp.id) return null;
                             return (
                                 <div key={grp.id} className="mt-4">
-                                    <div className="mb-3 rounded-lg border border-violet-200 bg-accent/10/60 px-4 py-3 text-right">
+                                    <div className="mb-3 rounded-lg border border-primary/35 bg-primary-container/25 px-4 py-3 text-right">
                                         <div className="font-semibold text-m3-on-primary-container">{grp.title}</div>
                                         <div className="mt-1 text-[12px] text-m3-on-primary-container/80">{grp.desc}</div>
                                     </div>
@@ -1643,6 +1936,25 @@ export default function AdminThemeSettingsPage() {
                     {/* Effects */}
                     <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                         <div className="text-right">
+                            <h3 className="font-bold text-m3-on-background">نموذج شريط التنقل السفلي</h3>
+                            <p className="mt-1 text-sm text-m3-on-surface-variant">اختر مظهراً جاهزاً للشريط، ثم عدّل الضبابية والشفافية يدوياً إذا رغبت.</p>
+                        </div>
+                        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            {[
+                                { label: "زجاجي", blur: 18, opacity: 0.72, shadow: 0.24 },
+                                { label: "زجاجي ناعم", blur: 10, opacity: 0.86, shadow: 0.16 },
+                                { label: "عائم", blur: 4, opacity: 0.94, shadow: 0.32 },
+                                { label: "شفاف", blur: 0, opacity: 0.55, shadow: 0.08 },
+                            ].map((preset) => (
+                                <button key={preset.label} type="button" onClick={() => setEffectInputs((prev) => ({ ...prev, glassBlur: preset.blur, surfaceOpacity: preset.opacity, navShadowOpacity: preset.shadow }))}
+                                    className="rounded-xl border border-m3-outline-variant/60 bg-surface-card px-3 py-3 text-sm font-semibold text-m3-on-background transition hover:border-primary hover:bg-primary/10">
+                                    {preset.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
+                        <div className="text-right">
                             <h3 className="font-bold text-m3-on-background">تأثيرات وتفاصيل التصميم</h3>
                             <p className="mt-1 text-sm text-m3-on-surface-variant">
                                 حرّك المؤشرات لتجربة التدرجات، حواف البطاقات، ظلال الأزرار، وتوهج القسم المفعّل.
@@ -1699,7 +2011,7 @@ export default function AdminThemeSettingsPage() {
                         <div className="text-right">
                             <h3 className="font-bold text-m3-on-background">أيقونات شريط التنقل السفلي</h3>
                             <p className="mt-1 text-sm text-m3-on-surface-variant">
-                                لكل زر حالتان: عادية ومفعّلة. اختر من مكتبة Phosphor (78 أيقونة × 6 أنماط) أو ارفع صورة مخصصة.
+                                لكل زر حالتان: عادية ومفعّلة. اختر من مكتبة Phosphor (78 أيقونة × 6 أنماط)، أو أدخل معرف Material مثل <code dir="ltr">material:home</code>، أو ارفع صورة مخصصة.
                             </p>
                         </div>
                         <div className="mt-4 space-y-5">
@@ -1880,6 +2192,15 @@ function IconPickerModal(props: {
                 </div>
 
                 <div className="space-y-3 border-b border-m3-outline-variant/60 px-5 py-3">
+                    <div className="flex flex-wrap items-center gap-2" dir="ltr">
+                        <span className="text-xs font-semibold text-m3-on-surface-variant">Material</span>
+                        {["home", "search", "category", "shopping_bag", "person", "favorite", "notifications"].map((name) => (
+                            <button key={name} type="button" onClick={() => props.onPick(`material:${name}`, "regular")}
+                                    className="rounded-lg border border-m3-outline-variant/60 bg-surface-card px-2.5 py-1.5 text-xs text-m3-on-surface hover:border-primary hover:bg-accent/10">
+                                {name}
+                            </button>
+                        ))}
+                    </div>
                     <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex flex-wrap items-center gap-1.5">
                             {PHOSPHOR_WEIGHTS.map((w) => {
@@ -1916,7 +2237,10 @@ function IconPickerModal(props: {
                         <div className="grid grid-cols-5 gap-2 sm:grid-cols-7 md:grid-cols-9 lg:grid-cols-12">
                             {filtered.map((item) => {
                                 const Comp = iconComponent(item.name, weight);
-                                if (!Comp) return null;
+                                if (!Comp) {
+                                    const glyphs: Record<string, string> = { house: "⌂", "magnifying-glass": "⌕", "squares-four": "▦", "shopping-bag": "🛍", user: "♙", heart: "♡", star: "☆", bell: "♧", gear: "⚙" };
+                                    return <button key={item.name} type="button" onClick={() => props.onPick(item.name, weight)} className="flex aspect-square flex-col items-center justify-center rounded-xl border border-m3-outline-variant/60 bg-m3-background/50 text-m3-on-surface"><span className="text-xl">{glyphs[item.name] ?? "✦"}</span><span className="truncate text-[9px]">{item.label}</span></button>;
+                                }
                                 return (
                                     <button key={item.name} type="button"
                                             title={`${item.label} — ${item.name} (${weight})`}

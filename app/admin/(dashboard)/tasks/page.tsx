@@ -215,7 +215,13 @@ export default function TasksPage() {
         }
     };
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => {
+        load();
+        // Keep multiple admin sessions synchronized without replacing local
+        // data with a cached/stale response.
+        const timer = window.setInterval(() => { void load(); }, 10000);
+        return () => window.clearInterval(timer);
+    }, []);
 
     const counts = useMemo(() => {
         const c = { total: tasks.length, TODO:0, IN_PROGRESS:0, REVIEW:0, DONE:0, BLOCKED:0, mine:0 } as any;

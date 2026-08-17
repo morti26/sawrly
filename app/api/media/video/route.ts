@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireActiveCreator } from '@/lib/auth';
 import { ensureUserProfileSchema } from '@/lib/feature-schema';
-import { saveFile } from '@/lib/upload';
+import { probeVideoDurationSeconds, saveFile } from '@/lib/upload';
 
 export const runtime = 'nodejs';
 const MAX_FREE_CREATOR_VIDEOS = 4;
@@ -110,7 +110,6 @@ export async function POST(req: NextRequest) {
         const formData = await req.formData();
         const file = formData.get('file') as File;
         const caption = formData.get('caption') as string;
-        const rawDuration = formData.get('durationSeconds');
 
         if (!file) {
             return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
@@ -141,13 +140,6 @@ export async function POST(req: NextRequest) {
                 );
             }
 
-            const durationSeconds = Number(rawDuration ?? 0);
-            if (mediaPlan === 'free' && durationSeconds > MAX_FREE_VIDEO_DURATION_SECONDS) {
-                return NextResponse.json(
-                    { error: 'مدة الفيديو يجب ألا تتجاوز دقيقة واحدة بدون اشتراك.' },
-                    { status: 400 }
-                );
-            }
         }
 
         const normalizedType = (file.type || '').toLowerCase();
@@ -164,6 +156,14 @@ export async function POST(req: NextRequest) {
             }, { status: 400 });
         }
 
+        const verifiedDurationSeconds = await probeVideoDurationSeconds(file);
+        if (verifiedDurationSeconds > MAX_FREE_VIDEO_DURATION_SECONDS + 0.25) {
+            return NextResponse.json(
+                { error: 'مدة كل فيديو يجب ألا تتجاوز دقيقة واحدة.' },
+                { status: 400 }
+            );
+        }
+
         const url = await saveFile(file, 'videos');
 
         // Insert into DB
@@ -175,6 +175,9 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(res.rows[0], { status: 201 });
     } catch (e: any) {
+        if (e instanceof Error && e.message === 'Unable to verify video duration') {
+            return NextResponse.json({ error: e.message }, { status: 400 });
+        }
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

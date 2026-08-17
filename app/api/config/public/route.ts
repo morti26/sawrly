@@ -7,6 +7,7 @@ import {
     normalizeHex,
 } from '@/lib/theme_engine';
 import { ALL_THEME_COLOR_KEYS } from '@/app/api/admin/theme-settings/route';
+import { generateVisualTheme, type ThemeComposerConfig } from '@/lib/theme_composer';
 
 export const dynamic = 'force-dynamic';
 
@@ -232,6 +233,7 @@ export async function GET() {
     const effects = emptyEffects();
     const featuresRaw: Record<string, string | null> = {};
     let lightSeedPrimary: string | null = null;
+    let themeComposer: ThemeComposerConfig | null = null;
 
     const allColorDbOverrides: Partial<EnterpriseTheme> = {} as any;
     let seedPrimary = '#7C3AED';
@@ -325,6 +327,10 @@ export async function GET() {
     } catch (e) {
         console.error('Public Config: failed to read app settings', e);
     }
+    try {
+        const rawComposer = await getAppSetting(APP_SETTING_KEYS.themeComposer);
+        if (rawComposer) themeComposer = JSON.parse(rawComposer) as ThemeComposerConfig;
+    } catch { /* backwards-compatible fallback */ }
 
     if (!adminWhatsApp) {
         console.warn('ADMIN_WHATSAPP_E164 is not set');
@@ -359,6 +365,14 @@ export async function GET() {
         }
     }
 
+    const publicThemeColors = {
+        ...mergedLegacy,
+        heroStart: enterpriseDark.heroStart,
+        heroMid: enterpriseDark.heroMid,
+        heroEnd: enterpriseDark.heroEnd,
+    };
+
+    const composerVisuals = themeComposer ? generateVisualTheme(themeComposer).visuals : null;
     return NextResponse.json({
         adminWhatsAppE164: adminWhatsApp,
         homeLogoUrl,
@@ -370,9 +384,11 @@ export async function GET() {
         unlimitedYearlySubscriptionIconUrl,
         theme: {
             version: enterpriseDark.version,
-            colors: mergedLegacy,
+            colors: publicThemeColors,
             navIcons,
             effects,
+            composer: themeComposer,
+            composerVisuals,
         },
         features,
         enterprise: {

@@ -7,7 +7,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "test": "node --test test/**/*.test.mjs",
+    "test": "node --test test/*.test.mjs",
     "backup:db": "powershell -ExecutionPolicy Bypass -File ./scripts/backup_postgres.ps1",
     "backup:db:schedule": "powershell -ExecutionPolicy Bypass -File ./scripts/register_backup_task.ps1"
   },
