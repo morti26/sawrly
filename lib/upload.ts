@@ -9,6 +9,7 @@ import {
   unlink as unlinkPromise,
 } from 'fs/promises';
 import { dirname, join, normalize, basename } from 'path';
+import { tmpdir } from 'os';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 
@@ -77,6 +78,47 @@ export function normalizeUploadUrl(url: string | null | undefined): string {
   const m = t.match(/^\/(api\/)?uploads\/([^/]+)\/(.+)$/);
   if (m) return buildUploadUrl(m[2], m[3]);
   return t;
+}
+
+/**
+ * Reads the duration from the uploaded video itself. The client supplied
+ * duration is intentionally not trusted because it can be omitted or forged.
+ */
+export async function probeVideoDurationSeconds(file: File): Promise<number> {
+  if (!file || typeof file.arrayBuffer !== 'function') {
+    throw new Error('Invalid video file');
+  }
+
+  const rawName = typeof file.name === 'string' ? file.name.trim() : 'video.mp4';
+  const extension = getFileExtension(rawName) || '.mp4';
+  const tempPath = join(
+    tmpdir(),
+    `sawrly_video_probe_${process.pid}_${Date.now()}_${randomUUID()}${extension}`,
+  );
+
+  try {
+    const data = Buffer.from(new Uint8Array(await file.arrayBuffer()));
+    await writeFilePromise(tempPath, data);
+    const { stdout } = await execFileAsync(
+      'ffprobe',
+      [
+        '-v', 'error',
+        '-show_entries', 'format=duration',
+        '-of', 'default=noprint_wrappers=1:nokey=1',
+        tempPath,
+      ],
+      { timeout: 30_000 },
+    );
+    const duration = Number(String(stdout).trim());
+    if (!Number.isFinite(duration) || duration <= 0) {
+      throw new Error('Invalid video duration');
+    }
+    return duration;
+  } catch {
+    throw new Error('Unable to verify video duration');
+  } finally {
+    try { await unlinkPromise(tempPath); } catch {}
+  }
 }
 
 /** 💾 Huvudfunktion: spara uppladdad fil med auto-konvertering + auto-kontrast! */

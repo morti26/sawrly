@@ -9,6 +9,7 @@ import {
     normalizeHex,
     wcagRating,
 } from '@/lib/theme_engine';
+import type { ThemeComposerConfig } from '@/lib/theme_composer';
 
 const THEME_COLOR_KEYS = [
     ['primary', APP_SETTING_KEYS.themePrimary] as const,
@@ -194,6 +195,7 @@ export type ThemeSettingsResponse = {
     effects: AdminThemeEffects;
     enterprise?: EnterpriseTheme;
     wcag?: Record<string, { ratio: number; aaNormal: boolean; aaaNormal: boolean }>;
+    themeComposer?: ThemeComposerConfig | null;
 };
 
 function _emptyColors(): AdminThemeColors {
@@ -342,7 +344,12 @@ async function readThemeSettings(
         cursor += 1;
     }
 
-    const resp: ThemeSettingsResponse = { colors, navIcons, effects };
+    let themeComposer: ThemeComposerConfig | null = null;
+    try {
+        const rawComposer = await getAppSetting(APP_SETTING_KEYS.themeComposer);
+        if (rawComposer) themeComposer = JSON.parse(rawComposer) as ThemeComposerConfig;
+    } catch { /* old installations may not have a composer value */ }
+    const resp: ThemeSettingsResponse = { colors, navIcons, effects, themeComposer };
     if (includeEnterprise) {
         const ent = await buildEnterpriseFromDb(colors, effects);
         resp.enterprise = ent;
@@ -389,6 +396,7 @@ export async function PUT(req: NextRequest) {
             colors?: Partial<AdminThemeColors> | null;
             navIcons?: Partial<AdminNavIcons> | null;
             effects?: Partial<AdminThemeEffects> | null;
+            themeComposer?: ThemeComposerConfig | null;
         };
 
         const updates: Array<[string, string | null]> = [];
@@ -428,6 +436,9 @@ export async function PUT(req: NextRequest) {
         }
 
         await Promise.all(updates.map(([key, value]) => setAppSetting(key, value)));
+        if (body.themeComposer) {
+            await setAppSetting(APP_SETTING_KEYS.themeComposer, JSON.stringify(body.themeComposer));
+        }
         return NextResponse.json(await readThemeSettings());
     } catch (error) {
         console.error('Admin theme settings PUT error:', error);
@@ -467,13 +478,21 @@ export async function POST(req: NextRequest) {
                     { status: 400 },
                 );
             }
-            const mode: 'light' | 'dark' = body?.mode === 'light' ? 'light' : 'dark';
+            // Auto polish should start with a colorful, readable palette. Dark mode
+            // is opt-in only; the UI no longer exposes it as a global override.
+            const mode: 'light' | 'dark' = 'dark';
             const ent = buildEnterpriseFromSeed(
                 seed,
                 mode,
                 body?.effectsOverride ?? {},
                 body?.overrides ?? {},
             );
+            // Keep the polished theme richly colored instead of neutral white/black.
+            // The hero and primary tones become the app surfaces so every screen
+            // visibly follows the selected seed color.
+            (ent as any).background = (ent as any).heroStart;
+            (ent as any).surface = (ent as any).heroStart;
+            (ent as any).menuBackground = (ent as any).heroStart;
 
             if (body?.writeToDb) {
                 const updates: Array<[string, string | null]> = [];

@@ -4,7 +4,7 @@ import { requireActiveCreator } from '@/lib/auth';
 import { ensureUserProfileSchema } from '@/lib/feature-schema';
 import { saveFile } from '@/lib/upload';
 
-const MAX_FREE_CREATOR_IMAGES = 12;
+const MAX_FREE_CREATOR_IMAGES = 8;
 
 async function getCreatorMediaPlan(userId: string): Promise<'free' | 'monthly' | 'unlimited'> {
     await ensureUserProfileSchema();
@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
                         error:
                             mediaPlan === 'monthly'
                                 ? 'الخطة الشهرية المحدودة تسمح بحد أقصى 16 صورة.'
-                                : 'يلزم اشتراك لرفع أكثر من 12 صورة.',
+                                : 'يلزم اشتراك لرفع أكثر من 8 صور.',
                     },
                     { status: 403 }
                 );

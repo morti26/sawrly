@@ -269,7 +269,10 @@ export async function GET(req: NextRequest) {
 
         const ures = await query(`SELECT id, email, name, role FROM users WHERE role IN ('admin','moderator') ORDER BY name, email`, []);
         const users = ures.rows.map(r => ({ id: String(r.id), email: String(r.email), name: r.name ? String(r.name) : null, role: String(r.role) }));
-        return NextResponse.json({ tasks, users } as TasksResponse);
+        return NextResponse.json(
+            { tasks, users } as TasksResponse,
+            { headers: { "Cache-Control": "no-store, no-cache, must-revalidate", Pragma: "no-cache" } },
+        );
     } catch (e: any) {
         console.error("[tasks GET error]", String(e?.message ?? e));
         return NextResponse.json({ error: e?.message ?? "Server error" }, { status: 500 });

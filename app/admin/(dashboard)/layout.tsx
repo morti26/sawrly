@@ -44,7 +44,7 @@ export default function AdminLayout({
     };
 
     return (
-        <div dir="rtl" className="flex h-screen flex-row bg-m3-background text-m3-on-background">
+        <div dir="rtl" className="admin-shell flex h-screen flex-row bg-m3-background text-m3-on-background">
             <aside className="relative z-20 flex w-64 flex-col bg-m3-surface-container-highest shadow-nav">
                 <div className="mb-4 flex items-center gap-3 border-b border-m3-outline-variant px-6 py-8">
                     <h1 className="text-2xl font-black tracking-tight text-m3-on-surface">لوحة تحكم صورلي</h1>

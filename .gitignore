@@ -8,8 +8,14 @@ dist
 .env
 .env.local
 .env.*.local
-uploads
-static/uploads
+.env.bak*
+.project_history/
+/sawrly_flutter_app/
+/copy_enterprise_files.sh
+/debug-dump-icons.mjs
+/temp_placeholder.txt
+/uploads
+/static/uploads
 coverage
 .turbo
 tsconfig.tsbuildinfo
