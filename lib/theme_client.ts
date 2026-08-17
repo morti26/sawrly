@@ -191,7 +191,18 @@ export interface PublicConfigResponse {
         navIcons?: Record<string, unknown>;
         effects?: Record<string, unknown>;
     };
-    enterprise?: EnterpriseTheme | null;
+    features?: {
+        themeMode?: "dark" | "light" | "system";
+    } | null;
+    enterprise?: EnterpriseTheme | {
+        version?: string;
+        dark?: EnterpriseTheme | null;
+        light?: EnterpriseTheme | null;
+        seed?: {
+            primary?: string;
+            lightPrimary?: string;
+        };
+    } | null;
 }
 
 export async function fetchPublicConfig(signal?: AbortSignal): Promise<PublicConfigResponse | null> {

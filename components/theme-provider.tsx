@@ -43,6 +43,22 @@ interface ThemeContextValue {
 
 const ThemeContext = React.createContext<ThemeContextValue | undefined>(undefined);
 
+function selectPublicTheme(
+    config: PublicConfigResponse | null,
+    fallback: EnterpriseTheme,
+): EnterpriseTheme {
+    const payload = config?.enterprise;
+    if (!payload) return fallback;
+
+    if ("dark" in payload || "light" in payload) {
+        const requestedMode = config?.features?.themeMode;
+        if (requestedMode === "light" && payload.light) return payload.light;
+        return payload.dark ?? payload.light ?? fallback;
+    }
+
+    return payload;
+}
+
 export function useTheme(): ThemeContextValue {
     const ctx = React.useContext(ThemeContext);
     if (!ctx) {
@@ -109,7 +125,7 @@ export function ThemeProvider({
         try {
             const cfg = await fetchPublicConfig(controller.signal);
             setPublicConfig(cfg || null);
-            const newTheme: EnterpriseTheme = cfg?.enterprise ?? initialThemeRef.current;
+            const newTheme = selectPublicTheme(cfg, initialThemeRef.current);
             if (newTheme && typeof (newTheme as any).version === "string") {
                 const v = (newTheme as any).version as string;
                 if (v !== lastAppliedVersionRef.current) {

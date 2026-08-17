@@ -90,12 +90,12 @@ export default async function Home() {
         latestApk?.number != null ? String(latestApk.number).padStart(2, '0') : null;
 
     return (
-        <main id="home" dir="rtl" className="relative min-h-screen overflow-hidden px-6 py-8 text-m3-text-primary">
+        <main id="home" dir="rtl" className="landing-shell relative min-h-screen overflow-hidden px-6 py-8 text-m3-text-primary">
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-black/45 via-black/0 to-black/0" />
 
             <div className="relative mx-auto w-full max-w-7xl">
                 <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <nav className="flex w-fit items-center gap-2 rounded-chip border border-border-outline-variant bg-surface-container/80 p-1 text-sm font-bold text-m3-text-secondary shadow-level-2 backdrop-blur-glass">
+                    <nav className="landing-glass flex w-fit items-center gap-2 rounded-chip border border-border-outline-variant p-1 text-sm font-bold text-m3-text-secondary shadow-level-2 backdrop-blur-glass">
                         <Link href="#home" className="rounded-chip bg-white/10 px-4 py-2 text-m3-on-accent shadow-glow-accent hover:bg-white/[0.15]">
                             الرئيسية
                         </Link>
@@ -104,7 +104,7 @@ export default async function Home() {
                         </Link>
                     </nav>
 
-                    <div className="rounded-chip border border-border-outline-variant bg-surface-container/80 px-4 py-1.5 text-xs font-semibold text-m3-on-surface shadow-level-2 backdrop-blur-glass">
+                    <div className="landing-glass rounded-chip border border-border-outline-variant px-4 py-1.5 text-xs font-semibold text-m3-on-surface shadow-level-2 backdrop-blur-glass">
                         Mobile Experience صورلي
                     </div>
                 </header>
@@ -129,7 +129,7 @@ export default async function Home() {
                         </p>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div className="rounded-card border border-m3-card-border bg-surface-card/90 p-4 shadow-card backdrop-blur-glass">
+                            <div className="landing-glass rounded-card border border-m3-card-border p-4 shadow-card backdrop-blur-glass">
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="grid h-10 w-10 place-items-center rounded-2xl border border-border-outline-variant bg-surface-container-low/80 text-xs font-bold">
                                         iOS
@@ -149,7 +149,7 @@ export default async function Home() {
                                 </div>
                             </div>
 
-                            <div className="rounded-card border border-m3-card-border bg-surface-card/90 p-4 shadow-card backdrop-blur-glass">
+                            <div className="landing-glass rounded-card border border-m3-card-border p-4 shadow-card backdrop-blur-glass">
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="grid h-10 w-10 place-items-center rounded-2xl border border-border-outline-variant bg-surface-container-low/80 text-xs font-bold">
                                         A
@@ -169,7 +169,7 @@ export default async function Home() {
                                 </div>
                             </div>
 
-                            <div className="rounded-card border border-m3-card-border bg-surface-card/90 p-4 shadow-card backdrop-blur-glass">
+                            <div className="landing-glass rounded-card border border-m3-card-border p-4 shadow-card backdrop-blur-glass">
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="grid h-10 w-10 place-items-center rounded-2xl border border-accent/30 bg-accent/15 text-[10px] font-extrabold text-primary-light shadow-glow-accent leading-none">
                                         <div className="grid gap-0.5 text-center">
@@ -221,19 +221,19 @@ export default async function Home() {
                 </section>
 
                 <section id="about" className="mt-10 grid grid-cols-1 gap-4 scroll-mt-10 md:grid-cols-3">
-                    <div className="rounded-card border border-m3-card-border bg-surface-card/90 p-5 shadow-card backdrop-blur-glass">
+                    <div className="landing-glass rounded-card border border-m3-card-border p-5 shadow-card backdrop-blur-glass">
                         <div className="text-sm font-extrabold text-m3-on-surface">{aboutCard1Title}</div>
                         <div className="mt-2 text-xs leading-5 text-m3-text-secondary">
                             {aboutCard1Body}
                         </div>
                     </div>
-                    <div className="rounded-card border border-m3-card-border bg-surface-card/90 p-5 shadow-card backdrop-blur-glass">
+                    <div className="landing-glass rounded-card border border-m3-card-border p-5 shadow-card backdrop-blur-glass">
                         <div className="text-sm font-extrabold text-m3-on-surface">{aboutCard2Title}</div>
                         <div className="mt-2 text-xs leading-5 text-m3-text-secondary">
                             {aboutCard2Body}
                         </div>
                     </div>
-                    <div className="rounded-card border border-m3-card-border bg-surface-card/90 p-5 shadow-card backdrop-blur-glass">
+                    <div className="landing-glass rounded-card border border-m3-card-border p-5 shadow-card backdrop-blur-glass">
                         <div className="text-sm font-extrabold text-m3-on-surface">{aboutCard3Title}</div>
                         <div className="mt-2 text-xs leading-5 text-m3-text-secondary">
                             {aboutCard3Body}
