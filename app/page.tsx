@@ -54,7 +54,30 @@ async function getLatestApkInfo(): Promise<LatestApkInfo | null> {
     }
 }
 
+async function getLandingPageSettings(): Promise<(string | null)[]> {
+    try {
+        return await Promise.all([
+            getAppSetting(APP_SETTING_KEYS.aboutCard1Title),
+            getAppSetting(APP_SETTING_KEYS.aboutCard1Body),
+            getAppSetting(APP_SETTING_KEYS.aboutCard2Title),
+            getAppSetting(APP_SETTING_KEYS.aboutCard2Body),
+            getAppSetting(APP_SETTING_KEYS.aboutCard3Title),
+            getAppSetting(APP_SETTING_KEYS.aboutCard3Body),
+        ]);
+    } catch (error) {
+        // The public landing page must remain available during a temporary
+        // database outage. Its built-in copy is the safe fallback.
+        console.error('Landing page: failed to read optional app settings', error);
+        return [null, null, null, null, null, null];
+    }
+}
+
 export default async function Home() {
+    const [landingSettings, latestApk] = await Promise.all([
+        getLandingPageSettings(),
+        getLatestApkInfo(),
+    ]);
+
     const [
         aboutCard1TitleSetting,
         aboutCard1BodySetting,
@@ -62,16 +85,7 @@ export default async function Home() {
         aboutCard2BodySetting,
         aboutCard3TitleSetting,
         aboutCard3BodySetting,
-        latestApk,
-    ] = await Promise.all([
-        getAppSetting(APP_SETTING_KEYS.aboutCard1Title),
-        getAppSetting(APP_SETTING_KEYS.aboutCard1Body),
-        getAppSetting(APP_SETTING_KEYS.aboutCard2Title),
-        getAppSetting(APP_SETTING_KEYS.aboutCard2Body),
-        getAppSetting(APP_SETTING_KEYS.aboutCard3Title),
-        getAppSetting(APP_SETTING_KEYS.aboutCard3Body),
-        getLatestApkInfo(),
-    ]);
+    ] = landingSettings;
 
     const aboutCard1Title = aboutCard1TitleSetting ?? 'من نحن';
     const aboutCard1Body =
