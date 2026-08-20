@@ -168,6 +168,16 @@ rm -f "`$ARCHIVE"
 
 cd "`$REMOTE_PATH"
 
+# nginx serves /flutter-preview/ from this sibling directory via an alias.
+# Keep it synchronized with the checked-in Next public artifact and ensure the
+# nginx worker can traverse every Flutter asset directory.
+if [ -f "./public/flutter-preview/index.html" ]; then
+  mkdir -p "./flutter-preview"
+  cp -a "./public/flutter-preview/." "./flutter-preview/"
+  find "./flutter-preview" -type d -exec chmod 755 {} +
+  find "./flutter-preview" -type f -exec chmod 644 {} +
+fi
+
 if [ -d "./wwwroot" ]; then
   echo "Removing legacy ./wwwroot to avoid build conflicts"
   rm -rf "./wwwroot"
@@ -208,7 +218,14 @@ echo "Deploy completed in `$REMOTE_PATH"
 "@
 
 Invoke-LoggedStep "Deploying on remote server" {
-    $remoteScript | & ssh @sshArgs $target "bash -s"
+    # PowerShell on Windows builds here-strings with CRLF. Bash reads the CR
+    # as part of `pipefail` and exits before deployment, while ssh can still
+    # leave the outer script looking successful. Send canonical Unix lines and
+    # propagate the remote exit code explicitly.
+    ($remoteScript -replace "`r`n", "`n") | & ssh @sshArgs $target "bash -s"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Remote deployment failed with exit code $LASTEXITCODE"
+    }
 }
 
 Invoke-LoggedStep "Checking public site" {

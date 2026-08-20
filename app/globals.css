@@ -303,6 +303,197 @@ body {
     letter-spacing: 0;
   }
 
+  /* Theme Studio owns the remaining width after the fixed admin rail. Named
+     areas make the visual order deterministic even though the editor is RTL. */
+  .theme-studio-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "editor"
+      "preview";
+    gap: 1.5rem;
+    direction: ltr;
+    min-width: 0;
+  }
+
+  .theme-studio-editor-column {
+    grid-area: editor;
+    min-width: 0;
+  }
+
+  .theme-studio-preview-column {
+    grid-area: preview;
+    min-width: 0;
+  }
+
+  .theme-preview-phone {
+    height: 100%;
+    width: auto;
+    max-height: 716px;
+    aspect-ratio: 446 / 948;
+  }
+
+  @media (min-width: 1024px) {
+    .theme-studio-layout {
+      flex: 1 1 0%;
+      min-height: 0;
+      overflow: hidden;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 330px);
+      grid-template-areas: "editor preview";
+      align-items: start;
+    }
+
+    .theme-studio-preview-column {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      z-index: 10;
+      height: 100%;
+      max-height: 100%;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .theme-studio-editor-column {
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+      padding-inline-end: 0.375rem;
+    }
+
+    .theme-studio-preview-column > div,
+    .theme-studio-preview-column > div > div {
+      max-height: inherit;
+    }
+
+    .theme-settings-preview iframe {
+      color-scheme: dark;
+      contain: strict;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .theme-studio-layout {
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 370px);
+      gap: 2rem;
+    }
+  }
+
+  /* Viewport-height density: the editor owns scrolling while the preview uses
+     exactly the remaining height, including its metadata and action buttons. */
+  @media (min-width: 1024px) and (max-height: 949px) {
+    .theme-studio-main-inner {
+      padding-block: .75rem !important;
+    }
+
+    .theme-settings-light {
+      gap: .5rem !important;
+    }
+
+    .theme-page-header {
+      gap: .2rem !important;
+      padding: .65rem 1rem !important;
+    }
+
+    .theme-page-header h2 {
+      font-size: 1.3rem !important;
+      line-height: 1.25 !important;
+    }
+
+    .theme-page-header p {
+      margin: 0 !important;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1.35 !important;
+    }
+
+    .theme-page-header > div {
+      margin-top: .15rem;
+    }
+
+    .theme-status-row {
+      padding: .45rem .75rem !important;
+      line-height: 1.25;
+    }
+
+    .theme-studio-tabs {
+      padding: .2rem !important;
+    }
+
+    .theme-studio-tab {
+      padding-block: .35rem !important;
+    }
+
+    .theme-studio-layout {
+      gap: 1rem;
+    }
+
+    .theme-preview-stack {
+      gap: .45rem !important;
+    }
+
+    .theme-settings-preview {
+      padding: .55rem !important;
+    }
+
+    .theme-preview-description {
+      display: none;
+    }
+
+    .theme-preview-metadata h3 {
+      font-size: .875rem;
+      line-height: 1.2;
+    }
+
+    .theme-preview-phone-area {
+      margin-top: .35rem !important;
+    }
+
+    .theme-preview-actions {
+      padding: .45rem !important;
+    }
+
+    .theme-preview-actions > div {
+      gap: .45rem !important;
+    }
+
+    .theme-preview-actions button {
+      padding-block: .4rem !important;
+      font-size: .75rem !important;
+      white-space: nowrap;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 699px) {
+    .theme-studio-main-inner {
+      padding-block: .4rem !important;
+    }
+
+    .theme-page-header {
+      padding-block: .4rem !important;
+    }
+
+    .theme-page-header p,
+    .theme-page-header > div {
+      display: none;
+    }
+
+    .theme-studio-tab {
+      padding-block: .25rem !important;
+    }
+
+    .theme-preview-metadata {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+  }
+
   /* Consistent admin shell: calm light workspace and navigation rail. */
   .admin-shell > main {
     /* Keep every admin route (not only the theme editor) on the same readable
@@ -500,6 +691,31 @@ body {
 
   .theme-settings-light button:not(.theme-settings-preview button) {
     color: var(--m3-text-primary);
+  }
+
+  .theme-studio-tab {
+    min-width: max-content;
+    flex: 1 1 0%;
+    border: 1px solid transparent;
+    border-radius: .65rem;
+    padding: .55rem 1rem;
+    color: #526078 !important;
+    font-size: .875rem;
+    font-weight: 700;
+    transition: color 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  }
+
+  .theme-studio-tab-inactive:hover {
+    border-color: #e4dcfb;
+    background: #f8f5ff;
+    color: #6842a6 !important;
+  }
+
+  .theme-studio-tab-active {
+    border-color: rgba(139, 92, 246, .42);
+    background: linear-gradient(135deg, #ede9fe 0%, #fce7f3 100%);
+    color: #4c1d95 !important;
+    box-shadow: 0 7px 18px rgba(124, 58, 237, .16), inset 0 1px 0 rgba(255, 255, 255, .9);
   }
 
   .theme-settings-light .bg-surface-card button,

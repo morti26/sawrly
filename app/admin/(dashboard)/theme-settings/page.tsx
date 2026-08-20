@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as Pi from "@phosphor-icons/react";
 import type { EnterpriseTheme } from "@/lib/theme_engine";
-import { generateVisualTheme, THEME_COMPOSER_PRESETS, type ThemeComposerConfig, type ThemeComposerMood, type ThemeComposerPreset } from "@/lib/theme_composer";
+import { applyCompletePreset, generateVisualTheme, THEME_COMPOSER_PRESETS, type ThemeComposerConfig, type ThemeComposerMood, type ThemeComposerPreset } from "@/lib/theme_composer";
 
 type LegacyThemeColors = {
     primary: string | null;
@@ -781,6 +781,53 @@ const ALL_COLOR_KEYS = new Set([
     ...M3_COLOR_GROUPS.flatMap((g) => g.fields.map((f) => f.key as string)),
 ]);
 
+const PREVIEW_LOGICAL_WIDTH = 430;
+const PREVIEW_LOGICAL_HEIGHT = 932;
+
+function ScaledFlutterPreview({ src }: { src: string }) {
+    const viewportRef = useRef<HTMLDivElement>(null);
+    const [geometry, setGeometry] = useState({ scale: 1, left: 0, top: 0 });
+
+    useLayoutEffect(() => {
+        const viewport = viewportRef.current;
+        if (!viewport) return;
+        const update = () => {
+            const scale = Math.min(
+                viewport.clientWidth / PREVIEW_LOGICAL_WIDTH,
+                viewport.clientHeight / PREVIEW_LOGICAL_HEIGHT,
+            );
+            setGeometry({
+                scale,
+                left: (viewport.clientWidth - PREVIEW_LOGICAL_WIDTH * scale) / 2,
+                top: (viewport.clientHeight - PREVIEW_LOGICAL_HEIGHT * scale) / 2,
+            });
+        };
+        update();
+        const observer = new ResizeObserver(update);
+        observer.observe(viewport);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <div ref={viewportRef} className="theme-preview-viewport relative h-full w-full overflow-hidden rounded-[28px] bg-slate-950">
+            <iframe
+                key={src}
+                title="Sawrly Flutter app preview"
+                src={src}
+                className="absolute block origin-top-left overflow-hidden border-0 bg-slate-950"
+                style={{
+                    width: PREVIEW_LOGICAL_WIDTH,
+                    height: PREVIEW_LOGICAL_HEIGHT,
+                    left: geometry.left,
+                    top: geometry.top,
+                    transform: `scale(${geometry.scale})`,
+                }}
+                scrolling="no"
+            />
+        </div>
+    );
+}
+
 export default function AdminThemeSettingsPage() {
     const [settings, setSettings] = useState<ThemeSettings>({
         colors: EMPTY_COLORS, navIcons: EMPTY_NAV_ICONS, effects: EMPTY_EFFECTS,
@@ -803,10 +850,11 @@ export default function AdminThemeSettingsPage() {
     const [smartGenerating, setSmartGenerating] = useState(false);
     const [activeGroup, setActiveGroup] = useState<string | null>("primary");
     const [easyMode, setEasyMode] = useState(true);
+    const [studioSection, setStudioSection] = useState<"quick" | "style" | "colors" | "components" | "advanced">("quick");
     const [previewNonce, setPreviewNonce] = useState(0);
     const [themeComposer, setThemeComposer] = useState<ThemeComposerConfig>({
-        mode: "easy", preset: "sawrly-aurora", colors: ["#211136", "#7E22CE", "#F472B6"], accent: "#F9A8D4",
-        mood: "premium", intensity: 0.55, variation: 0, brightness: "dark",
+        mode: "easy", preset: "sawrly-noir", colors: ["#200810", "#9F1239", "#0D0509"], accent: "#DB2777",
+        mood: "luxury", intensity: 0.5, variation: 0, brightness: "dark",
     });
 
     useEffect(() => {
@@ -908,12 +956,19 @@ export default function AdminThemeSettingsPage() {
             "heroStart", "heroMid", "heroEnd", "onPrimary", "onSurface",
         ] as const;
         const sourceColors = easyMode ? generatedPreview.enterprise : effectiveColors;
+        const sourceEffects = easyMode ? generatedPreview.enterprise.effects : effectiveEffects;
         const previewColors = Object.fromEntries(previewColorKeys.map((key) => [key, (sourceColors as any)[key]]));
-        const payload = btoa(JSON.stringify({ colors: previewColors, effects: effectiveEffects, visuals }));
-        const direct = Object.fromEntries(previewColorKeys.map((key) => [`preview_${key}`, (previewColors as any)[key] ?? ""]));
-        const query = new URLSearchParams({ previewTheme: payload, ...direct, build: "13", instance: String(previewNonce) });
+        const payload = btoa(JSON.stringify({
+            schemaVersion: generatedPreview.resolved?.schemaVersion,
+            styleDNA: generatedPreview.resolved?.styleDNA,
+            colors: previewColors,
+            effects: sourceEffects,
+            visuals,
+            navIcons: effectiveNavIcons,
+        }));
+        const query = new URLSearchParams({ previewTheme: payload, build: "15", instance: String(previewNonce) });
         return `/flutter-preview/index.html?${query.toString()}`;
-    }, [effectiveColors, effectiveEffects, themeComposer, easyMode, previewNonce]);
+    }, [effectiveColors, effectiveEffects, effectiveNavIcons, themeComposer, easyMode, previewNonce]);
 
     function navFieldToIdField(field: NavIconField): NavIconField | null {
         const mapping: Partial<Record<NavIconField, NavIconField>> = {
@@ -971,6 +1026,14 @@ export default function AdminThemeSettingsPage() {
         setMessage(null); setError(null);
         const id = name.startsWith("material:") ? name : buildIconId(name, weight);
         setIconIdInputs((prev) => ({ ...prev, [field]: id }));
+    }
+
+    function openStudioSection(section: "quick" | "style" | "colors" | "components" | "advanced") {
+        setStudioSection(section);
+        setEasyMode(section === "quick");
+        if (section !== "quick") {
+            requestAnimationFrame(() => document.getElementById(`studio-${section}`)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        }
     }
 
     function handleClearIconId(field: NavIconField) {
@@ -1031,9 +1094,11 @@ export default function AdminThemeSettingsPage() {
         }
         setThemeComposer(next);
         setPreviewNonce((value) => value + 1);
-        setColorInputs((prev) => ({ ...prev, ...generatedColors }));
-        setSettings((prev) => ({ ...prev, colors: { ...prev.colors, ...generatedColors } }));
-        setEffectInputs((prev) => ({ ...prev, ...generatedEffects }));
+        // A named Quick Design preset is a complete theme. Replace generated
+        // state atomically so stale values from the previous preset cannot win.
+        setColorInputs(generatedColors);
+        setSettings((prev) => ({ ...prev, colors: { ...EMPTY_COLORS, ...generatedColors } }));
+        setEffectInputs(generatedEffects);
         setEnterpriseTheme(generated.enterprise);
         setMessage("✨ تم إنشاء نمط بصري متناسق — راجع المعاينة ثم اضغط حفظ.");
     }
@@ -1288,8 +1353,8 @@ export default function AdminThemeSettingsPage() {
     const textTertiary = hexToCss(c.textTertiary ?? c.onSurfaceVariant, DEFAULT_COLORS.textTertiary!);
 
     return (
-        <div dir="rtl" className="theme-settings-light space-y-6">
-            <div className="flex flex-col gap-2">
+        <div dir="rtl" className="theme-settings-light flex h-full min-h-0 flex-col gap-4 overflow-y-auto lg:overflow-hidden">
+            <div className="theme-page-header flex flex-col gap-2">
                 <h2 className="text-right text-2xl font-bold">إعدادات مظهر التطبيق (Enterprise Theme Engine)</h2>
                 <p className="text-right text-sm text-m3-on-surface-variant">
                     نظام الألوان الآن على مستوى Enterprise — Material 3 + 85 لوناً + 5 ألواح لونية نغمية (Tonal
@@ -1312,34 +1377,57 @@ export default function AdminThemeSettingsPage() {
             </div>
 
             {message ? (
-                <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-right text-sm text-emerald-700">
+                <div className="theme-status-row rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-right text-sm text-emerald-700">
                     {message}
                 </div>
             ) : null}
             {error ? (
-                <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-right text-sm text-rose-700">
+                <div className="theme-status-row rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-right text-sm text-rose-700">
                     {error}
                 </div>
             ) : null}
 
-            <section className={`rounded-2xl border border-violet-200 bg-gradient-to-br from-white via-violet-50 to-fuchsia-50 p-5 shadow-sm ${easyMode ? "hidden" : ""}`}>
+            <nav aria-label="Theme Studio sections" className="theme-studio-tabs sticky top-0 z-30 flex gap-1 overflow-x-auto rounded-xl border border-slate-200 bg-white/95 p-1.5 shadow-sm backdrop-blur" dir="ltr">
+                {([['quick', 'Quick Design'], ['style', 'Style'], ['colors', 'Colors'], ['components', 'Components'], ['advanced', 'Advanced']] as const).map(([id, label]) => (
+                    <button key={id} type="button" onClick={() => openStudioSection(id)} aria-current={studioSection === id ? "page" : undefined} className={`theme-studio-tab ${studioSection === id ? "theme-studio-tab-active" : "theme-studio-tab-inactive"}`}>{label}</button>
+                ))}
+            </nav>
+
+            <section id="studio-quick" className="hidden rounded-2xl border border-violet-200 bg-gradient-to-br from-white via-violet-50 to-fuchsia-50 p-5 shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="text-right">
-                        <h3 className="text-xl font-bold text-slate-900">✨ Theme Composer</h3>
+                        <h3 className="text-xl font-bold text-slate-900">Quick Design</h3>
                         <p className="mt-1 text-sm text-slate-600">أنشئ مظهراً احترافياً خلال ثوانٍ — النظام يضبط Material 3 والتباين والتأثيرات تلقائياً.</p>
                     </div>
                     <div className="flex rounded-lg border border-violet-200 bg-white p-1 text-sm">
-                        <button type="button" onClick={() => setEasyMode(true)} className={`rounded-md px-3 py-1.5 font-semibold ${easyMode ? "bg-violet-600 text-white" : "text-slate-600"}`}>Easy Mode</button>
-                        <button type="button" onClick={() => setEasyMode(false)} className={`rounded-md px-3 py-1.5 font-semibold ${!easyMode ? "bg-slate-900 text-white" : "text-slate-600"}`}>Advanced</button>
+                        <button type="button" onClick={() => openStudioSection("quick")} className={`rounded-md px-3 py-1.5 font-semibold ${easyMode ? "bg-violet-600 text-white" : "text-slate-600"}`}>Quick</button>
+                        <button type="button" onClick={() => openStudioSection("advanced")} className={`rounded-md px-3 py-1.5 font-semibold ${!easyMode ? "bg-slate-900 text-white" : "text-slate-600"}`}>Expert</button>
                     </div>
                 </div>
                 {easyMode ? (
                     <>
+                        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                            <label className="rounded-xl border border-violet-200 bg-white p-3 text-right text-xs font-semibold text-slate-700">Main color
+                                <input type="color" value={themeComposer.colors[1] ?? "#9F1239"} onChange={(ev) => { const colors = [...themeComposer.colors]; colors[1] = ev.target.value; applyComposer({ ...themeComposer, colors }); }} className="mt-2 h-10 w-full cursor-pointer" />
+                            </label>
+                            <label className="rounded-xl border border-violet-200 bg-white p-3 text-right text-xs font-semibold text-slate-700">Accent color
+                                <input type="color" value={themeComposer.accent ?? "#DB2777"} onChange={(ev) => applyComposer({ ...themeComposer, accent: ev.target.value })} className="mt-2 h-10 w-full cursor-pointer" />
+                            </label>
+                            <label className="rounded-xl border border-violet-200 bg-white p-3 text-right text-xs font-semibold text-slate-700">Brightness
+                                <select value={themeComposer.brightness} onChange={(ev) => applyComposer({ ...themeComposer, brightness: ev.target.value as "light" | "dark" })} className="mt-2 h-10 w-full rounded-lg border border-slate-200 bg-white px-2">
+                                    <option value="dark">Dark</option><option value="light">Light</option>
+                                </select>
+                            </label>
+                            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-right text-xs text-emerald-800">
+                                <strong className="block text-sm">Auto contrast: On</strong>
+                                Critical text and controls are protected to WCAG AA during generation.
+                            </div>
+                        </div>
                         <div className="mt-5 text-right text-sm font-bold text-slate-800">🎨 اختر إحساس اللون</div>
                         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-5">
                             {(Object.entries(THEME_COMPOSER_PRESETS) as [Exclude<ThemeComposerPreset, "custom">, (typeof THEME_COMPOSER_PRESETS)[Exclude<ThemeComposerPreset, "custom">]][]).map(([id, preset]) => {
                                 const selected = themeComposer.preset === id;
-                                return <button key={id} type="button" onClick={() => applyComposer({ ...themeComposer, preset: id, colors: [...preset.colors], accent: preset.accent, mood: preset.mood })} className={`overflow-hidden rounded-xl border-2 bg-white text-right transition hover:-translate-y-0.5 ${selected ? "border-violet-600 shadow-lg" : "border-white shadow"}`}>
+                                return <button key={id} type="button" onClick={() => applyComposer(applyCompletePreset(themeComposer, id))} className={`overflow-hidden rounded-xl border-2 bg-white text-right transition hover:-translate-y-0.5 ${selected ? "border-violet-600 shadow-lg" : "border-white shadow"}`}>
                                     <div className="h-12" style={{ background: `linear-gradient(120deg, ${preset.colors[0]}, ${preset.colors[1]}, ${preset.colors[2]})` }} />
                                     <div className="p-2 text-xs font-bold text-slate-800">{id.replaceAll("-", " ")}</div>
                                 </button>;
@@ -1373,27 +1461,22 @@ export default function AdminThemeSettingsPage() {
                 ) : null}
             </section>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-                <div className="lg:col-span-2 lg:sticky lg:top-4 lg:h-[calc(100vh-7rem)] lg:self-start">
-                    <div className="flex h-full min-h-0 flex-col gap-4">
-                        <div className="flex min-h-0 flex-1 flex-col rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
-                            <div className="flex items-center justify-between gap-3">
+            <div className="theme-studio-layout">
+                <div dir="rtl" className="theme-studio-preview-column">
+                    <div className="theme-preview-stack flex h-full min-h-0 flex-col gap-4">
+                        <div className="theme-settings-preview isolate flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-m3-outline-variant/60 bg-surface-card p-3 shadow-sm sm:p-4">
+                            <div className="theme-preview-metadata flex shrink-0 items-center justify-between gap-3">
                                 <div className="text-right">
                                     <h3 className="font-bold text-m3-on-background">معاينة التطبيق</h3>
-                                    <p className="mt-1 text-sm text-m3-on-surface-variant">
+                                    <p className="theme-preview-description mt-1 text-sm text-m3-on-surface-variant">
                                         معاينة المباشرة تعكس التدرج البطولي (Hero)، الحاويات الزجاجية، الحدود، وشريط التنقل بالكامل.
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="mt-4 flex min-h-0 flex-1 items-center justify-center">
-                              <div className="mx-auto w-[360px] max-w-full overflow-hidden rounded-[36px] border border-slate-200 bg-slate-900 p-2 shadow-xl">
-                                <iframe
-                                    key={flutterPreviewUrl}
-                                    title="Sawrly Flutter app preview"
-                                    src={flutterPreviewUrl}
-                                    className="h-[calc(100vh-13rem)] min-h-[520px] w-full rounded-[28px] border-0 bg-white"
-                                />
+                            <div className="theme-preview-phone-area mt-3 flex min-h-0 flex-1 items-center justify-center overflow-hidden">
+                              <div className="theme-preview-phone relative isolate mx-auto max-w-full overflow-hidden rounded-[36px] border border-slate-300 bg-slate-950 p-2 shadow-xl [contain:layout_paint]">
+                                <ScaledFlutterPreview src={flutterPreviewUrl} />
                               </div>
                             </div>
                             <div className="hidden mt-6 mx-auto w-[320px] overflow-hidden rounded-[36px] border border-m3-outline-variant bg-m3-on-surface p-2 shadow-xl">
@@ -1534,12 +1617,9 @@ export default function AdminThemeSettingsPage() {
                                 </div>
                             </div>
 
-                            <div className="mt-4 text-right text-xs text-m3-on-surface-variant">
-                                أي لون تركه فارغاً يستخدم القيمة المشتقة من <strong>Smart Palette</strong>. الألوان الأساسية لـ M3 مضمونة بدرجة WCAG AA كحد أدنى.
-                            </div>
                         </div>
 
-                        <div className="sticky bottom-0 z-20 rounded-xl border border-m3-outline-variant/60 bg-white/95 p-5 shadow-lg backdrop-blur">
+                        <div className="theme-preview-actions shrink-0 rounded-xl border border-m3-outline-variant/60 bg-white/95 p-5 shadow-lg backdrop-blur">
                             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <button type="button" onClick={() => void loadSettings()}
                                         className="rounded-lg border border-m3-outline-variant/60 px-4 py-2 text-sm font-medium text-m3-on-surface transition hover:bg-m3-background">
@@ -1554,7 +1634,7 @@ export default function AdminThemeSettingsPage() {
                     </div>
                 </div>
 
-                <div className="space-y-6 lg:col-span-3">
+                <div dir="rtl" className="theme-studio-editor-column space-y-6">
                     {easyMode ? (
                         <section className="rounded-2xl border border-violet-200 bg-gradient-to-br from-white via-violet-50 to-fuchsia-50 p-5 shadow-sm">
                             <div className="flex items-center justify-between gap-3">
@@ -1566,7 +1646,7 @@ export default function AdminThemeSettingsPage() {
                             </div>
                             <div className="mt-4 grid grid-cols-2 gap-2">
                                 {(Object.entries(THEME_COMPOSER_PRESETS) as [Exclude<ThemeComposerPreset, "custom">, (typeof THEME_COMPOSER_PRESETS)[Exclude<ThemeComposerPreset, "custom">]][]).map(([id, preset]) => (
-                                    <button key={id} type="button" onClick={() => applyComposer({ ...themeComposer, preset: id, colors: [...preset.colors], accent: preset.accent, mood: preset.mood })} className={`overflow-hidden rounded-lg border-2 bg-white text-right ${themeComposer.preset === id ? "border-violet-600 shadow" : "border-white"}`}>
+                                    <button key={id} type="button" onClick={() => applyComposer(applyCompletePreset(themeComposer, id))} className={`overflow-hidden rounded-lg border-2 bg-white text-right ${themeComposer.preset === id ? "border-violet-600 shadow" : "border-white"}`}>
                                         <div className="h-8" style={{ background: `linear-gradient(120deg, ${preset.colors[0]}, ${preset.colors[1]}, ${preset.colors[2]})` }} />
                                         <div className="px-2 py-1 text-[11px] font-bold text-slate-800">{id.replaceAll("-", " ")}</div>
                                     </button>
@@ -1587,14 +1667,15 @@ export default function AdminThemeSettingsPage() {
                             </div>
                         </section>
                     ) : null}
+                    <div className={easyMode ? "hidden" : "contents"}>
                     {!easyMode ? (
-                        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-right text-xs text-slate-600 shadow-sm">
+                        <div id="studio-advanced" className="scroll-mt-20 rounded-xl border border-slate-200 bg-white px-4 py-3 text-right text-xs text-slate-600 shadow-sm">
                             <div className="font-bold text-slate-900">Advanced Mode</div>
                             <div className="mt-1">Här finns alla detaljerade verktyg. Easy Mode ovan använder samma generator och Smart Palette automatiskt, så inget separat färgsystem skapas.</div>
                         </div>
                     ) : null}
                     {/* Advanced Material 3 palette (kept for designers/admins) */}
-                    <div className="theme-smart-palette rounded-xl border-2 border-primary/35 bg-gradient-to-br from-white via-surface-card to-slate-50 p-5 shadow-sm">
+                    <div id="studio-colors" className="theme-smart-palette scroll-mt-20 rounded-xl border-2 border-primary/35 bg-gradient-to-br from-white via-surface-card to-slate-50 p-5 shadow-sm">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div className="text-right">
                                 <h3 className="flex items-center justify-end gap-2 font-bold text-m3-on-background">
@@ -1692,7 +1773,7 @@ export default function AdminThemeSettingsPage() {
                     </div>
 
                     {/* Background mixer */}
-                    <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
+                    <div id="studio-style" className="scroll-mt-20 rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                         <div className="text-right">
                             <h3 className="font-bold text-m3-on-background">مزج خلفية التطبيق</h3>
                             <p className="mt-1 text-sm text-m3-on-surface-variant">
@@ -2007,7 +2088,7 @@ export default function AdminThemeSettingsPage() {
                     </div>
 
                     {/* Nav Icons */}
-                    <div className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
+                    <div id="studio-components" className="scroll-mt-20 rounded-xl border border-m3-outline-variant/60 bg-surface-card p-5 shadow-sm">
                         <div className="text-right">
                             <h3 className="font-bold text-m3-on-background">أيقونات شريط التنقل السفلي</h3>
                             <p className="mt-1 text-sm text-m3-on-surface-variant">
@@ -2130,6 +2211,8 @@ export default function AdminThemeSettingsPage() {
                                 );
                             })}
                         </div>
+                    </div>
+
                     </div>
 
                     {iconPickerField ? (

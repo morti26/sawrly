@@ -180,13 +180,13 @@ export default function AdminLayout({
 
             {/* MAIN */}
             <main
-                className="flex-1 overflow-y-auto"
+                className={`flex-1 ${pathname === '/admin/theme-settings' ? 'theme-studio-main overflow-hidden' : 'overflow-y-auto'}`}
                 style={{
                     backgroundColor: '#151923',
                     color: '#FFFFFF',
                 }}
             >
-                <div className="mx-auto max-w-7xl p-8">{children}</div>
+                <div className={`mx-auto w-full p-4 sm:p-6 lg:p-8 ${pathname === '/admin/theme-settings' ? 'theme-studio-main-inner h-full max-w-[100rem] overflow-hidden' : 'max-w-7xl'}`}>{children}</div>
             </main>
         </div>
     );

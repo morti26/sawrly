@@ -372,7 +372,8 @@ export async function GET() {
         heroEnd: enterpriseDark.heroEnd,
     };
 
-    const composerVisuals = themeComposer ? generateVisualTheme(themeComposer).visuals : null;
+    const generatedComposer = themeComposer ? generateVisualTheme(themeComposer) : null;
+    const composerVisuals = generatedComposer?.visuals ?? null;
     return NextResponse.json({
         adminWhatsAppE164: adminWhatsApp,
         homeLogoUrl,
@@ -389,6 +390,12 @@ export async function GET() {
             effects,
             composer: themeComposer,
             composerVisuals,
+            schemaVersion: generatedComposer?.resolved?.schemaVersion ?? 1,
+            styleDNA: generatedComposer?.resolved?.styleDNA ?? null,
+            backgroundRecipe: generatedComposer?.resolved?.background ?? null,
+            surfaces: generatedComposer?.resolved?.surfaces ?? null,
+            components: generatedComposer?.resolved?.components ?? null,
+            accessibility: generatedComposer?.resolved?.accessibility ?? null,
         },
         features,
         enterprise: {
