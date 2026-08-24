@@ -225,7 +225,7 @@ export default function SupportChatPage() {
                                     const isAdmin = msg.sender_type === 'admin';
                                     return (
                                         <div key={msg.id} className={`flex flex-col ${isAdmin ? 'items-end' : 'items-start'}`}>
-                                            <div className={`max-w-[70%] rounded-lg p-3 ${isAdmin ? 'bg-blue-600 text-m3-on-surface rounded-tl-none' : 'bg-surface-card text-m3-on-surface rounded-tr-none shadow-sm'}`}>
+                                            <div className={`max-w-[70%] rounded-lg p-3 ${isAdmin ? 'bg-blue-600 text-white rounded-tl-none' : 'bg-surface-card text-m3-on-surface rounded-tr-none shadow-sm'}`}>
                                                 <p className="text-sm">{msg.content}</p>
                                             </div>
                                             <span className="text-xs text-m3-outline mt-1">
@@ -251,7 +251,7 @@ export default function SupportChatPage() {
                                 <button
                                     type="submit"
                                     disabled={!newMessage.trim()}
-                                    className="bg-blue-600 text-m3-on-surface p-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                    className="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
                                 >
                                     <Send size={20} className="transform rotate-180" />
                                 </button>

@@ -749,7 +749,7 @@ function WcagTag({ rating }: { rating: WcagBadge }) {
     if (rating.aaaNormal) {
         return (
             <span
-                className="mr-2 rounded-md bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-m3-on-surface shadow-sm"
+                className="mr-2 rounded-md bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm"
                 title={`WCAG AAA — ${rating.ratio.toFixed(2)}:1`}
             >
                 ⭐ AAA {rating.ratio.toFixed(1)}
@@ -759,7 +759,7 @@ function WcagTag({ rating }: { rating: WcagBadge }) {
     if (rating.aaNormal) {
         return (
             <span
-                className="mr-2 rounded-md bg-green-600 px-2 py-0.5 text-[10px] font-bold text-m3-on-surface"
+                className="mr-2 rounded-md bg-green-600 px-2 py-0.5 text-[10px] font-bold text-white"
                 title={`WCAG AA — ${rating.ratio.toFixed(2)}:1`}
             >
                 ✅ AA {rating.ratio.toFixed(1)}
@@ -768,7 +768,7 @@ function WcagTag({ rating }: { rating: WcagBadge }) {
     }
     return (
         <span
-            className="mr-2 rounded-md bg-rose-600 px-2 py-0.5 text-[10px] font-bold text-m3-on-surface"
+            className="mr-2 rounded-md bg-rose-600 px-2 py-0.5 text-[10px] font-bold text-white"
             title={`Failed WCAG AA — ${rating.ratio.toFixed(2)}:1 (requires 4.5)`}
         >
             ❌ {rating.ratio.toFixed(1)}
@@ -1626,7 +1626,7 @@ export default function AdminThemeSettingsPage() {
                                     إعادة التحميل
                                 </button>
                                 <button type="button" onClick={() => void handleSave()} disabled={saving || loading}
-                                        className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-m3-on-surface transition hover:bg-primary-container disabled:cursor-not-allowed disabled:bg-accent/60">
+                                        className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-accent/60">
                                     {saving ? "جارٍ الحفظ..." : "حفظ المظهر والأيقونات"}
                                 </button>
                             </div>
@@ -1679,7 +1679,7 @@ export default function AdminThemeSettingsPage() {
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div className="text-right">
                                 <h3 className="flex items-center justify-end gap-2 font-bold text-m3-on-background">
-                                    <span className="rounded-md bg-accent px-2 py-0.5 text-[11px] font-bold text-m3-on-surface shadow">
+                                    <span className="rounded-md bg-accent px-2 py-0.5 text-[11px] font-bold text-white shadow">
                                         Enterprise · Advanced
                                     </span>
                                     لوحة الألوان الذكية (Material Color Utilities)
@@ -1755,12 +1755,12 @@ export default function AdminThemeSettingsPage() {
                                     </button>
                                     <button type="button" disabled={smartGenerating}
                                             onClick={() => void handleGenerateSmartPalette(false)}
-                                            className="flex-1 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-m3-on-surface shadow transition hover:bg-primary-container disabled:opacity-60">
+                                            className="flex-1 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-primary-dark disabled:opacity-60">
                                         {smartGenerating ? "جارٍ التوليد..." : "⚡ معاينة فقط"}
                                     </button>
                                     <button type="button" disabled={smartGenerating}
                                             onClick={() => void handleGenerateSmartPalette(true)}
-                                            className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-m3-on-surface shadow transition hover:bg-emerald-700 disabled:opacity-60">
+                                            className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-emerald-700 disabled:opacity-60">
                                         💾 تطبيق وحفظ مباشر
                                     </button>
                                 </div>
@@ -1930,7 +1930,7 @@ export default function AdminThemeSettingsPage() {
                                 <button key={grp.id} type="button" onClick={() => setActiveGroup(activeGroup === grp.id ? null : grp.id)}
                                         className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
                                             activeGroup === grp.id
-                                                ? "border-primary bg-accent text-m3-on-surface shadow-sm"
+                                                ? "border-primary bg-accent text-white shadow-sm"
                                                 : "border-m3-outline-variant/60 bg-surface-card text-m3-on-surface hover:border-primary/40 hover:bg-accent/10"
                                         }`}>
                                     {grp.title}
@@ -2164,7 +2164,7 @@ export default function AdminThemeSettingsPage() {
                                                 <div className="text-sm font-semibold text-m3-on-background">حالة مفعّلة (عند فتح القسم)</div>
                                                 <div className="grid grid-cols-2 gap-2">
                                                     <button type="button" onClick={() => setIconPickerField(activeIdKey)}
-                                                            className="rounded-lg bg-accent px-3 py-2 text-center text-sm font-medium text-m3-on-surface transition hover:bg-primary-container">
+                                                            className="rounded-lg bg-accent px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-primary-dark">
                                                         اختر من المكتبة
                                                     </button>
                                                     <button type="button" onClick={() => handleClearIconId(activeIdKey)} disabled={!activeId}

@@ -293,7 +293,7 @@ export default function AdminIconSettingsPage() {
                         type="button"
                         onClick={() => void handleSave()}
                         disabled={saving || loading}
-                        className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-m3-on-surface transition hover:bg-primary-container disabled:cursor-not-allowed disabled:bg-accent/60"
+                        className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-accent/60"
                     >
                         {saving ? 'جارٍ الحفظ...' : 'حفظ الأيقونات'}
                     </button>

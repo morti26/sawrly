@@ -294,7 +294,7 @@ export default function SubscriptionPlansPage() {
                     </button>
                     <button
                         onClick={openCreate}
-                        className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-m3-on-surface shadow-md transition hover:bg-primary-container"
+                        className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-primary-dark"
                     >
                         + خطة جديدة
                     </button>
@@ -319,7 +319,7 @@ export default function SubscriptionPlansPage() {
                             </p>
                         </div>
                     </div>
-                    <div className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold text-m3-on-surface">
+                    <div className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold text-white">
                         {helpOpen ? "إخفاء" : "عرض"}
                     </div>
                 </button>
@@ -378,7 +378,7 @@ export default function SubscriptionPlansPage() {
                             p.is_popular ? "border-primary ring-2 ring-accent/30" : "border-m3-outline-variant/60"
                         } ${!p.is_active ? "opacity-60" : ""}`}>
                             {p.is_popular && (
-                                <div className="bg-gradient-to-l from-fuchsia-500 to-accent px-4 py-1 text-center text-xs font-bold text-m3-on-surface">
+                                <div className="bg-gradient-to-l from-fuchsia-500 to-accent px-4 py-1 text-center text-xs font-bold text-white">
                                     الأكثر شعبية
                                 </div>
                             )}
@@ -611,7 +611,7 @@ export default function SubscriptionPlansPage() {
                             </button>
                             <button onClick={save}
                                     disabled={saving}
-                                    className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-m3-on-surface shadow-md transition hover:bg-primary-container disabled:opacity-60">
+                                    className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-primary-dark disabled:opacity-60">
                                 {saving ? "جاري الحفظ..." : (editing.id ? "حفظ التغييرات" : "إنشاء الخطة")}
                             </button>
                         </div>

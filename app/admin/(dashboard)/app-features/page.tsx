@@ -550,8 +550,8 @@ export default function AppFeaturesPage() {
                         هذه قائمة بكل ما هو مُنفّذ فعلياً داخل تطبيق صورلي على الهاتف (النسخة الحالية). تُستخدم كمرجع لمراجعة ما تم إنجازه قبل إرسال النسخة للعميل.
                     </p>
                 </div>
-                <div className="rounded-xl bg-gradient-to-br from-accent to-fuchsia-500 px-5 py-3 text-right text-m3-on-surface shadow-md shadow-glow-accent/20">
-                    <p className="text-xs text-m3-on-surface/80">آخر تحديث للقائمة</p>
+                <div className="rounded-xl bg-gradient-to-br from-accent to-fuchsia-500 px-5 py-3 text-right text-white shadow-md shadow-glow-accent/20">
+                    <p className="text-xs text-white/80">آخر تحديث للقائمة</p>
                     <p className="font-bold">أغسطس 2026 • v1.2.2-hotfix</p>
                 </div>
             </div>

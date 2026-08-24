@@ -144,7 +144,7 @@ export default function AdminReportsPage() {
                 </div>
                 <button
                     onClick={fetchReports}
-                    className="px-4 py-2 rounded bg-m3-on-surface text-m3-on-surface hover:bg-m3-surface-container-high"
+                    className="px-4 py-2 rounded bg-m3-primary text-m3-on-primary hover:bg-primary-dark"
                 >
                     تحديث
                 </button>
@@ -153,7 +153,7 @@ export default function AdminReportsPage() {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                 <button
                     onClick={() => setFilter("all")}
-                    className={`rounded border px-3 py-2 text-sm ${filter === "all" ? "bg-m3-on-surface text-m3-on-surface border-m3-outline" : "bg-surface-card text-m3-on-surface border-m3-outline-variant"}`}
+                    className={`rounded border px-3 py-2 text-sm ${filter === "all" ? "bg-m3-primary text-m3-on-primary border-m3-outline" : "bg-surface-card text-m3-on-surface border-m3-outline-variant"}`}
                 >
                     الكل ({counts.all})
                 </button>
@@ -161,7 +161,7 @@ export default function AdminReportsPage() {
                     <button
                         key={status}
                         onClick={() => setFilter(status)}
-                        className={`rounded border px-3 py-2 text-sm ${filter === status ? "bg-m3-on-surface text-m3-on-surface border-m3-outline" : "bg-surface-card text-m3-on-surface border-m3-outline-variant"}`}
+                        className={`rounded border px-3 py-2 text-sm ${filter === status ? "bg-m3-primary text-m3-on-primary border-m3-outline" : "bg-surface-card text-m3-on-surface border-m3-outline-variant"}`}
                     >
                         {statusLabels[status]} ({counts[status]})
                     </button>
@@ -261,14 +261,14 @@ export default function AdminReportsPage() {
                                             <button
                                                 disabled={isUpdating}
                                                 onClick={() => updateStatus(report, "in_review")}
-                                                className="px-3 py-2 rounded bg-blue-600 text-m3-on-surface text-sm disabled:opacity-50"
+                                                className="px-3 py-2 rounded bg-blue-600 text-white text-sm disabled:opacity-50"
                                             >
                                                 قيد المراجعة
                                             </button>
                                             <button
                                                 disabled={isUpdating}
                                                 onClick={() => updateStatus(report, "resolved")}
-                                                className="px-3 py-2 rounded bg-green-600 text-m3-on-surface text-sm disabled:opacity-50"
+                                                className="px-3 py-2 rounded bg-green-600 text-white text-sm disabled:opacity-50"
                                             >
                                                 حل البلاغ
                                             </button>
@@ -292,7 +292,7 @@ export default function AdminReportsPage() {
                                     void updateStatus(report, "resolved", true);
                                 }
                             }}
-                            className="px-3 py-2 rounded bg-red-600 text-m3-on-surface text-sm disabled:opacity-50"
+                            className="px-3 py-2 rounded bg-red-600 text-white text-sm disabled:opacity-50"
                         >
                             {report.target_type === "story" ? "حل + حذف القصة" : "حل + حذف الوسائط"}
                         </button>

@@ -480,7 +480,7 @@ export default function AdminSettingsPage() {
                     </div>
                     <Link
                         href="/admin/icon-settings"
-                        className="inline-flex items-center justify-center rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-m3-on-surface transition hover:bg-primary-container"
+                        className="inline-flex items-center justify-center rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
                     >
                         صفحة أيقونات الحساب والاشتراك
                     </Link>
@@ -521,7 +521,7 @@ export default function AdminSettingsPage() {
                                     type="file"
                                     accept="image/*"
                                     onChange={handleFileChange}
-                                    className="block w-full text-sm text-m3-on-surface file:mr-4 file:py-2 file:px-3 file:rounded file:border-0 file:bg-blue-600 file:text-m3-on-surface hover:file:bg-blue-700"
+                                    className="block w-full text-sm text-m3-on-surface file:mr-4 file:py-2 file:px-3 file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700"
                                 />
                                 <p className="text-xs text-m3-on-surface-variant">
                                     عند اختيار صورة ثم الضغط على حفظ، سيتم رفعها واعتمادها مباشرة في التطبيق.
@@ -808,7 +808,7 @@ export default function AdminSettingsPage() {
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving || isLoading}
-                                className="bg-blue-600 text-m3-on-surface px-5 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
                             >
                                 {isSaving ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
                             </button>

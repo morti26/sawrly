@@ -303,6 +303,46 @@ body {
     letter-spacing: 0;
   }
 
+  /* Ljus admin-yta för inloggning och fristående adminsidor (scopad). */
+  .admin-light-surface {
+    --m3-background: #f4f6fb;
+    --m3-surface: #ffffff;
+    --m3-surface-container-lowest: #ffffff;
+    --m3-surface-container-low: #f8f9fc;
+    --m3-surface-container: #ffffff;
+    --m3-surface-container-high: #eef1f7;
+    --m3-surface-container-highest: #e3e8f1;
+    --m3-card-background: #ffffff;
+    --m3-menu-background: #ffffff;
+    --m3-on-background: #172033;
+    --m3-on-surface: #172033;
+    --m3-on-surface-variant: #465268;
+    --m3-text-primary: #172033;
+    --m3-text-secondary: #465268;
+    --m3-text-tertiary: #647188;
+    --m3-outline: #667085;
+    --m3-outline-variant: #cbd3e1;
+    --m3-border: #b9c4d5;
+    --m3-card-border: #d5dce8;
+    --m3-primary: #ff4a97;
+    --m3-on-primary: #ffffff;
+    --m3-primary-container: #5a2e4a;
+    --m3-on-primary-container: #ffd9ea;
+    --m3-accent-pink: #ff4a97;
+    --m3-on-accent-pink: #ffffff;
+    --color-background: #f4f6fb;
+    --color-background-light: #f8f9fc;
+    --color-surface: #ffffff;
+    --color-surface-light: #eef1f7;
+    --color-text-primary: #172033;
+    --color-text-secondary: #465268;
+    --color-text-tertiary: #647188;
+    --color-border: #b9c4d5;
+    --color-border-light: #d5dce8;
+    color: #172033;
+    background: #f4f6fb;
+  }
+
   /* Theme Studio owns the remaining width after the fixed admin rail. Named
      areas make the visual order deterministic even though the editor is RTL. */
   .theme-studio-layout {

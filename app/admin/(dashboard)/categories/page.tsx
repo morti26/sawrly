@@ -245,7 +245,7 @@ export default function CategoriesPage() {
                     </div>
 
                     <div className="flex gap-4 pt-6 border-t border-m3-surface-container-low">
-                        <button type="submit" className="bg-green-500 text-m3-on-surface px-8 py-3 rounded-xl hover:bg-green-600 transition-colors shadow-md shadow-green-500/30 hover:shadow-lg font-bold text-lg flex items-center justify-center min-w-[150px]">
+                        <button type="submit" className="bg-green-500 text-white px-8 py-3 rounded-xl hover:bg-green-600 transition-colors shadow-md shadow-green-500/30 hover:shadow-lg font-bold text-lg flex items-center justify-center min-w-[150px]">
                             {isEditing ? 'تحديث القسم' : 'حفظ القسم'}
                         </button>
                         {isEditing && (
@@ -276,7 +276,7 @@ export default function CategoriesPage() {
                                 </div>
                             )}
                             {!cat.is_active && (
-                                <div className="absolute top-4 right-4 bg-red-500/90 backdrop-blur-sm text-m3-on-surface px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                <div className="absolute top-4 right-4 bg-red-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">
                                     غير نشط
                                 </div>
                             )}

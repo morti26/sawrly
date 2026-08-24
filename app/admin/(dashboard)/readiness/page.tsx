@@ -85,7 +85,7 @@ export default function ReadinessPage() {
                 <button
                     type="button"
                     onClick={() => void load()}
-                    className="rounded-lg bg-m3-on-surface px-4 py-2 text-sm font-semibold text-m3-on-surface hover:bg-m3-surface-container-high"
+                    className="rounded-lg bg-m3-primary px-4 py-2 text-sm font-semibold text-m3-on-primary hover:bg-primary-dark"
                 >
                     تحديث الفحص
                 </button>

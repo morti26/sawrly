@@ -91,6 +91,7 @@ CREATE INDEX IF NOT EXISTS idx_task_comments_user ON task_comments(user_id);
 `;
 
 function num(n: unknown, fallback: number): number {
+    if (n === null || n === undefined || n === "") return fallback;
     const x = Number(n);
     return Number.isFinite(x) ? x : fallback;
 }

@@ -176,7 +176,7 @@ export default function NotificationsPage() {
                     <button
                         type="submit"
                         disabled={isSubmitting || (!isBroadcast && !targetUserId)}
-                        className="w-full bg-blue-600 text-m3-on-surface py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50"
+                        className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50"
                     >
                         {isSubmitting ? 'جاري الإرسال...' : 'إرسال الإشعار'}
                     </button>

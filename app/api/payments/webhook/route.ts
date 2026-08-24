@@ -231,6 +231,16 @@ export async function POST(req: NextRequest) {
                 paymentStatus = updatedPaymentRes.rows[0]?.status || 'confirmed';
             }
 
+            if (!payment.quote_id) {
+                await client.query(
+                    `UPDATE user_subscriptions
+                        SET status='active', started_at=NOW(), amount_paid=(SELECT amount FROM payments WHERE id=$1),
+                            updated_at=NOW()
+                      WHERE last_payment_id=$1`,
+                    [payment.id]
+                );
+            }
+
             if (payment.quote_id && payment.quote_creator_id && payment.quote_client_id) {
                 const existingProjectRes = await client.query(
                     `

@@ -144,7 +144,7 @@ function AttachmentLightbox({ src, onClose }: { src: string | null; onClose: () 
                             </div>
                         </div>
                         <a href={src} target="_blank" rel="noreferrer"
-                           className="mt-3 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-m3-on-surface hover:bg-primary-container">
+                           className="mt-3 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark">
                             فتح / تحميل ↗
                         </a>
                     </div>
@@ -372,6 +372,8 @@ export default function TasksPage() {
         return u.created_by_name?.trim() ? u.created_by_name : u.created_by_email;
     };
 
+    const orderedTasks = [...tasks].sort((a, b) => Number(a.status === "DONE") - Number(b.status === "DONE"));
+
     return (
         <div className="flex flex-col gap-6 p-6">
             {toast && (
@@ -410,7 +412,7 @@ export default function TasksPage() {
                     </button>
                     <button
                         onClick={openNew}
-                        className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-m3-on-surface shadow-md transition hover:bg-primary-container">
+                        className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-primary-dark">
                         + مهمة جديدة
                     </button>
                 </div>
@@ -480,18 +482,28 @@ export default function TasksPage() {
                         ابدأ بإنشاء أول مهمة أو خلل لتعقبه مع الفريق.
                     </p>
                     <button onClick={openNew}
-                            className="mt-5 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-m3-on-surface hover:bg-primary-container">
+                            className="mt-5 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark">
                         + مهمة جديدة
                     </button>
                 </div>
             ) : (
+                <>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {tasks.map(t => {
+                    {orderedTasks.map((t, index) => {
                         const sm = STATUS_META[t.status];
                         const tm = TYPE_META[t.type];
                         const pm = PRIO_META[t.priority];
+                        const firstCompleted = t.status === "DONE" && (index === 0 || orderedTasks[index - 1].status !== "DONE");
                         return (
-                            <article key={t.id}
+                            <div key={t.id} className="contents">
+                            {firstCompleted && (
+                                <div className="col-span-full my-2 flex items-center gap-3" aria-label="المهام المكتملة">
+                                    <div className="h-px flex-1 bg-m3-outline-variant" />
+                                    <span className="rounded-full bg-emerald-100 px-4 py-1 text-xs font-bold text-emerald-800 ring-1 ring-emerald-300">المهام المكتملة</span>
+                                    <div className="h-px flex-1 bg-m3-outline-variant" />
+                                </div>
+                            )}
+                            <article
                                      onClick={() => openTask(t)}
                                      className={`group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-surface-card p-5 shadow-sm transition hover:shadow-lg ${
                                          t.status === "DONE" ? "border-emerald-200 opacity-85" : "border-m3-outline-variant/60 hover:-translate-y-0.5"
@@ -552,7 +564,7 @@ export default function TasksPage() {
                                         </div>
                                         {t.assigned_to_id && (
                                             <div title={`مُعين: ${nameOfUser(t,"as")}`}
-                                                 className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-m3-on-surface ring-2 ring-m3-outline-variant">
+                                                 className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white ring-2 ring-m3-outline-variant">
                                                 {initials(t.assigned_to_name ?? null, t.assigned_to_email ?? "??")}
                                             </div>
                                         )}
@@ -577,9 +589,11 @@ export default function TasksPage() {
                                     </div>
                                 </div>
                             </article>
+                            </div>
                         );
                     })}
                 </div>
+                </>
             )}
 
             {/* Dialog: new / edit / show */}
@@ -648,7 +662,7 @@ export default function TasksPage() {
                                         <label className={`cursor-pointer rounded-lg border px-3 py-1.5 text-[11px] font-semibold shadow-sm transition ${
                                             attachBusy
                                                 ? "border-m3-outline-variant/60 bg-m3-surface-container-lowest text-m3-outline"
-                                                : "border-indigo-200 bg-primary text-m3-on-surface hover:bg-primary-container"
+                                                : "border-indigo-200 bg-primary text-white hover:bg-primary-dark"
                                         }`}>
                                             {attachBusy ? "جاري الرفع…" : "+ إرفاق ملفات"}
                                             <input type="file" multiple accept="image/*,video/*" className="hidden" disabled={attachBusy}
@@ -690,7 +704,7 @@ export default function TasksPage() {
                                                 <button
                                                     type="button"
                                                     onClick={() => removeAttachment("task", url)}
-                                                    className="pointer-events-none absolute left-1.5 top-1.5 rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-m3-on-surface shadow opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-rose-600">
+                                                    className="pointer-events-none absolute left-1.5 top-1.5 rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-rose-600">
                                                     ✕ حذف
                                                 </button>
                                             </div>
@@ -730,7 +744,7 @@ export default function TasksPage() {
                                                             )}
                                                             <button type="button"
                                                                     onClick={() => removeAttachment("comment", url)}
-                                                                    className="absolute left-0 top-0 h-4 w-4 rounded-br-lg bg-rose-500 text-[9px] font-bold text-m3-on-surface hover:bg-rose-600">
+                                                                    className="absolute left-0 top-0 h-4 w-4 rounded-br-lg bg-rose-500 text-[9px] font-bold text-white hover:bg-rose-600">
                                                                 ✕
                                                             </button>
                                                         </div>
@@ -770,7 +784,7 @@ export default function TasksPage() {
                                                 <div key={c.id} className="rounded-xl border border-m3-outline-variant/60 bg-surface-card p-3 shadow-sm">
                                                     <div className="flex items-start justify-between gap-3">
                                                         <div className="flex items-center gap-2">
-                                                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-m3-on-surface">
+                                                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-white">
                                                                 {initials(c.user_name ?? null, c.user_email ?? "??")}
                                                             </div>
                                                             <div>
@@ -881,7 +895,7 @@ export default function TasksPage() {
 
                                 <div className="mt-3 flex flex-col gap-2">
                                     <button onClick={save} disabled={saving}
-                                            className="rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-m3-on-surface shadow-md transition hover:bg-primary-container disabled:opacity-60">
+                                            className="rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-primary-dark disabled:opacity-60">
                                         {saving ? "جاري الحفظ..." : (edit.id ? "حفظ التغييرات" : "إنشاء المهمة")}
                                     </button>
                                     <button onClick={() => setOpen(false)}

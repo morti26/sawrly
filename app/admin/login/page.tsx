@@ -65,7 +65,7 @@ export default function AdminLogin() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-m3-surface-container-lowest text-m3-on-background">
+        <div className="admin-light-surface min-h-screen flex items-center justify-center text-m3-on-background">
             <div className="bg-surface-card p-8 rounded shadow-md w-96">
                 <h1 className="text-2xl font-bold mb-6 text-center text-m3-on-background">تسجيل دخول صورلي</h1>
                 {error && <div className="bg-red-100 text-red-700 p-2 mb-4 rounded text-sm">{error}</div>}
@@ -96,7 +96,7 @@ export default function AdminLogin() {
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-m3-on-surface text-m3-on-surface p-2 rounded hover:bg-m3-surface-container-high transition shadow-sm"
+                        className="w-full bg-m3-primary text-m3-on-primary p-2 rounded hover:bg-primary-dark transition shadow-sm"
                     >
                         دخول
                     </button>
