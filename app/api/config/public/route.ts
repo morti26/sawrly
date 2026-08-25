@@ -344,19 +344,39 @@ export async function GET() {
 
     const features = parseFeatures(featuresRaw);
 
-    const enterpriseDark: EnterpriseTheme = buildEnterpriseFromSeed(
+    // Theme Composer is the source of truth for Quick Design presets. The
+    // previous runtime path only returned composerVisuals while rebuilding
+    // `theme.colors` from the legacy database seed. That made the preview show
+    // the selected palette but the app keep the previous maroon background.
+    // Generate the same enterprise palette used by the admin preview before
+    // selecting the public runtime colors.
+    const generatedComposer = themeComposer
+        ? generateVisualTheme(themeComposer)
+        : null;
+    const composerEnterprise = generatedComposer?.enterprise ?? null;
+
+    const generatedDark = composerEnterprise?.isDark ? composerEnterprise : null;
+    const generatedLight = composerEnterprise && !composerEnterprise.isDark
+        ? composerEnterprise
+        : null;
+
+    const fallbackEnterpriseDark: EnterpriseTheme = buildEnterpriseFromSeed(
         seedPrimary,
         'dark',
         effectsOverride,
         allColorDbOverrides,
     );
 
-    const enterpriseLight: EnterpriseTheme = buildEnterpriseFromSeed(
+    const fallbackEnterpriseLight: EnterpriseTheme = buildEnterpriseFromSeed(
         lightSeedPrimary && isValidHexColor(lightSeedPrimary) ? lightSeedPrimary : seedPrimary,
         'light',
         effectsOverride,
         allColorDbOverrides,
     );
+
+    const enterpriseDark: EnterpriseTheme = generatedDark ?? fallbackEnterpriseDark;
+    const enterpriseLight: EnterpriseTheme = generatedLight ?? fallbackEnterpriseLight;
+    const activeEnterprise = composerEnterprise ?? enterpriseDark;
 
     const mergedLegacy: LegacyColors = { ...colors };
     for (const [k] of LEGACY_COLOR_KEYS) {
@@ -365,14 +385,17 @@ export async function GET() {
         }
     }
 
-    const publicThemeColors = {
-        ...mergedLegacy,
-        heroStart: enterpriseDark.heroStart,
-        heroMid: enterpriseDark.heroMid,
-        heroEnd: enterpriseDark.heroEnd,
-    };
+    const publicThemeColors: Record<string, string | null> = { ...mergedLegacy };
+    // Include every runtime color from the active composer palette. Keeping
+    // this mapping explicit avoids serialising the non-color enterprise
+    // metadata while ensuring no legacy maroon key survives in the app.
+    for (const [key] of ALL_THEME_COLOR_KEYS) {
+        const value = (activeEnterprise as any)[key];
+        if (typeof value === 'string' && isValidHex(value)) {
+            publicThemeColors[key] = value;
+        }
+    }
 
-    const generatedComposer = themeComposer ? generateVisualTheme(themeComposer) : null;
     const composerVisuals = generatedComposer?.visuals ?? null;
     return NextResponse.json({
         adminWhatsAppE164: adminWhatsApp,
@@ -384,7 +407,7 @@ export async function GET() {
         unlimitedMonthlySubscriptionIconUrl,
         unlimitedYearlySubscriptionIconUrl,
         theme: {
-            version: enterpriseDark.version,
+            version: activeEnterprise.version,
             colors: publicThemeColors,
             navIcons,
             effects,
