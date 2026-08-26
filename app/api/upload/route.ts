@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
         const file = formData.get('file') as File;
         const rawSubDir = (formData.get('subDir') ?? searchParams.get('subDir')) as unknown;
         const subDir = typeof rawSubDir === 'string' ? rawSubDir.trim() : '';
-        const allowedSubDirs = new Set(['status', 'offers', 'photos', 'videos', 'events', 'banners', 'badges']);
+        const allowedSubDirs = new Set(['status', 'offers', 'photos', 'videos', 'events', 'banners', 'badges', 'identity-verification']);
 
         if (!file) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400 });
