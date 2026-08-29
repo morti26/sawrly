@@ -1,0 +1,1527 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../../core/theme/app_theme_service.dart';
+import '../../core/services/media_service.dart';
+import '../../models/user.dart';
+import '../../core/auth/auth_service.dart';
+
+const List<String> _allCountries = [
+  'Afghanistan',
+  'Albania',
+  'Algeria',
+  'Andorra',
+  'Angola',
+  'Antigua and Barbuda',
+  'Argentina',
+  'Armenia',
+  'Australia',
+  'Austria',
+  'Azerbaijan',
+  'Bahamas',
+  'Bahrain',
+  'Bangladesh',
+  'Barbados',
+  'Belarus',
+  'Belgium',
+  'Belize',
+  'Benin',
+  'Bhutan',
+  'Bolivia',
+  'Bosnia and Herzegovina',
+  'Botswana',
+  'Brazil',
+  'Brunei',
+  'Bulgaria',
+  'Burkina Faso',
+  'Burundi',
+  'Cabo Verde',
+  'Cambodia',
+  'Cameroon',
+  'Canada',
+  'Central African Republic',
+  'Chad',
+  'Chile',
+  'China',
+  'Colombia',
+  'Comoros',
+  'Congo',
+  'Costa Rica',
+  'Croatia',
+  'Cuba',
+  'Cyprus',
+  'Czech Republic',
+  'Denmark',
+  'Djibouti',
+  'Dominica',
+  'Dominican Republic',
+  'DR Congo',
+  'Ecuador',
+  'Egypt',
+  'El Salvador',
+  'Equatorial Guinea',
+  'Eritrea',
+  'Estonia',
+  'Eswatini',
+  'Ethiopia',
+  'Fiji',
+  'Finland',
+  'France',
+  'Gabon',
+  'Gambia',
+  'Georgia',
+  'Germany',
+  'Ghana',
+  'Greece',
+  'Grenada',
+  'Guatemala',
+  'Guinea',
+  'Guinea-Bissau',
+  'Guyana',
+  'Haiti',
+  'Honduras',
+  'Hungary',
+  'Iceland',
+  'India',
+  'Indonesia',
+  'Iran',
+  'Iraq',
+  'Ireland',
+  'Israel',
+  'Italy',
+  'Ivory Coast',
+  'Jamaica',
+  'Japan',
+  'Jordan',
+  'Kazakhstan',
+  'Kenya',
+  'Kiribati',
+  'Kuwait',
+  'Kyrgyzstan',
+  'Laos',
+  'Latvia',
+  'Lebanon',
+  'Lesotho',
+  'Liberia',
+  'Libya',
+  'Liechtenstein',
+  'Lithuania',
+  'Luxembourg',
+  'Madagascar',
+  'Malawi',
+  'Malaysia',
+  'Maldives',
+  'Mali',
+  'Malta',
+  'Marshall Islands',
+  'Mauritania',
+  'Mauritius',
+  'Mexico',
+  'Micronesia',
+  'Moldova',
+  'Monaco',
+  'Mongolia',
+  'Montenegro',
+  'Morocco',
+  'Mozambique',
+  'Myanmar',
+  'Namibia',
+  'Nauru',
+  'Nepal',
+  'Netherlands',
+  'New Zealand',
+  'Nicaragua',
+  'Niger',
+  'Nigeria',
+  'North Korea',
+  'North Macedonia',
+  'Norway',
+  'Oman',
+  'Pakistan',
+  'Palau',
+  'Palestine',
+  'Panama',
+  'Papua New Guinea',
+  'Paraguay',
+  'Peru',
+  'Philippines',
+  'Poland',
+  'Portugal',
+  'Qatar',
+  'Romania',
+  'Russia',
+  'Rwanda',
+  'Saint Kitts and Nevis',
+  'Saint Lucia',
+  'Saint Vincent and the Grenadines',
+  'Samoa',
+  'San Marino',
+  'Sao Tome and Principe',
+  'Saudi Arabia',
+  'Senegal',
+  'Serbia',
+  'Seychelles',
+  'Sierra Leone',
+  'Singapore',
+  'Slovakia',
+  'Slovenia',
+  'Solomon Islands',
+  'Somalia',
+  'South Africa',
+  'South Korea',
+  'South Sudan',
+  'Spain',
+  'Sri Lanka',
+  'Sudan',
+  'Suriname',
+  'Sweden',
+  'Switzerland',
+  'Syria',
+  'Taiwan',
+  'Tajikistan',
+  'Tanzania',
+  'Thailand',
+  'Timor-Leste',
+  'Togo',
+  'Tonga',
+  'Trinidad and Tobago',
+  'Tunisia',
+  'Turkey',
+  'Turkmenistan',
+  'Tuvalu',
+  'Uganda',
+  'Ukraine',
+  'United Arab Emirates',
+  'United Kingdom',
+  'United States',
+  'Uruguay',
+  'Uzbekistan',
+  'Vanuatu',
+  'Vatican City',
+  'Venezuela',
+  'Vietnam',
+  'Yemen',
+  'Zambia',
+  'Zimbabwe',
+];
+
+const List<String> _iraqiCities = [
+  'Baghdad',
+  'Basra',
+  'Mosul',
+  'Erbil',
+  'Sulaymaniyah',
+  'Duhok',
+  'Kirkuk',
+  'Najaf',
+  'Karbala',
+  'Hilla',
+  'Nasiriyah',
+  'Amarah',
+  'Kut',
+  'Diwaniyah',
+  'Baqubah',
+  'Ramadi',
+  'Fallujah',
+  'Samarra',
+  'Tikrit',
+  'Kufa',
+  'Zakho',
+  'Halabja',
+  'Sinjar',
+  'Tal Afar',
+  'Khanaqin',
+  'Mandali',
+  'Kalar',
+  'Chamchamal',
+  'Akre',
+  'Shaqlawa',
+  'Soran',
+  'Ranya',
+  'Rawanduz',
+  'Makhmur',
+  'Qaladiza',
+  'Penjwen',
+  'Amedi',
+  'Fao',
+  'Zubair',
+  'Abu al-Khasib',
+  'Qurna',
+  'Shatra',
+  'Suq al-Shuyukh',
+  'Rifai',
+  'Qalat Sukkar',
+  'Maysan',
+  'Ali al-Gharbi',
+  'Numaniyah',
+  'Aziziyah',
+  'Badra',
+  "Mada'in",
+  'Taji',
+  'Mahmudiyah',
+  'Haswa',
+  'Musayyib',
+  'Iskandariyah',
+  'Kifri',
+  'Khalis',
+  'Muqdadiyah',
+  'Jalawla',
+  'Rutba',
+  'Hit',
+  'Haditha',
+  'Anah',
+  'Rawa',
+  'Balad',
+  'Dujail',
+  'Bayji',
+  'Sharqat',
+];
+
+class EditProfileScreen extends StatefulWidget {
+  final User user;
+
+  const EditProfileScreen({super.key, required this.user});
+
+  @override
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  late TextEditingController _nameController;
+  late TextEditingController _bioController;
+  late TextEditingController _countryController;
+  late TextEditingController _cityController;
+  String _gender = "Male";
+  String? _selectedCountry;
+  final Set<String> _selectedCities = <String>{};
+  File? _newProfileImage;
+  File? _newCoverImage;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.user.name);
+    _bioController = TextEditingController(text: widget.user.bio ?? "");
+    _countryController = TextEditingController(text: widget.user.country ?? "");
+    _cityController = TextEditingController(text: widget.user.city ?? "");
+    _gender = widget.user.gender ?? "Male";
+    _selectedCountry = _normalizeInitialCountry(widget.user.country);
+    _selectedCities.addAll(_normalizeInitialCities(widget.user.city));
+    _countryController.text = _selectedCountry ?? '';
+    _syncSelectedCitiesText();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _bioController.dispose();
+    _countryController.dispose();
+    _cityController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickProfileImage() async {
+    final file = await context.read<MediaService>().pickImage();
+    if (file != null) {
+      setState(() => _newProfileImage = file);
+    }
+  }
+
+  Future<void> _pickCoverImage() async {
+    final file = await context.read<MediaService>().pickImage();
+    if (file != null) {
+      setState(() => _newCoverImage = file);
+    }
+  }
+
+  Future<void> _saveProfile() async {
+    final nameTrimmed = _nameController.text.trim();
+    final bioTrimmed = _bioController.text.trim();
+    if (nameTrimmed.length > 30) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("الاسم يجب ألا يتجاوز 30 حرفاً")),
+        );
+      }
+      return;
+    }
+    if (bioTrimmed.length > 140) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("النبذة يجب ألا تتجاوز 140 حرفاً")),
+        );
+      }
+      return;
+    }
+
+    debugPrint("EditProfileScreen: Save pressed!");
+    setState(() => _isSaving = true);
+
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final mediaService = context.read<MediaService>();
+    final authService = context.read<AuthService>();
+
+    String? avatarUrl = widget.user.avatarUrl;
+    String? coverUrl = widget.user.coverImageUrl;
+
+    try {
+      if (_newProfileImage != null) {
+        final uploadedUrl = await mediaService.uploadFile(_newProfileImage!);
+        if (uploadedUrl == null) {
+          throw Exception("Failed to upload profile image");
+        }
+        avatarUrl = uploadedUrl;
+      }
+
+      if (_newCoverImage != null) {
+        final uploadedUrl = await mediaService.uploadFile(_newCoverImage!);
+        if (uploadedUrl == null) {
+          throw Exception("Failed to upload cover image");
+        }
+        coverUrl = uploadedUrl;
+      }
+
+      final success = await authService.updateProfile(
+        name: nameTrimmed,
+        bio: bioTrimmed,
+        gender: _gender,
+        avatarUrl: avatarUrl,
+        coverImageUrl: coverUrl,
+        country: _selectedCountry?.trim() ?? '',
+        city: _isIraqSelected ? _cityController.text.trim() : '',
+      );
+
+      if (success && mounted) {
+        navigator.pop();
+        messenger.showSnackBar(
+          const SnackBar(content: Text("تم تحديث الملف الشخصي بنجاح!")),
+        );
+      } else if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(authService.error ?? "Update failed")),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        messenger.showSnackBar(SnackBar(content: Text("$e")));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    context.watch<AuthService>();
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: colors.background,
+        foregroundColor: colors.textPrimary,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: colors.background,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: colors.textPrimary),
+          onPressed: () => Navigator.pop(context),
+        ),
+        centerTitle: true,
+        title: Text("تعديل الملف الشخصي",
+            style: TextStyle(
+                color: colors.textPrimary, fontWeight: FontWeight.bold)),
+        actions: [
+          TextButton(
+            onPressed: _isSaving ? null : _saveProfile,
+            child: _isSaving
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: colors.textPrimary))
+                : Text("حفظ",
+                    style: TextStyle(
+                        color: colors.textPrimary,
+                        fontWeight: FontWeight.bold)),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
+        child: Column(
+          children: [
+            _buildMediaSection(),
+            const SizedBox(height: 20),
+            _buildSectionCard(
+              children: [
+                _buildServiceAreaIntroTile(),
+                _buildTextFieldTile(
+                  label: "الاسم",
+                  controller: _nameController,
+                  icon: Icons.person_outline_rounded,
+                  maxLength: 30,
+                  textInputAction: TextInputAction.next,
+                ),
+                _buildCountryTile(),
+                if (_isIraqSelected) _buildIraqiCitiesTile(),
+                if (!_isIraqSelected) _buildCityInfoTile(),
+                if (_serviceAreaPreview.isNotEmpty)
+                  _buildServiceAreaPreviewTile(),
+                _buildGenderTile(),
+                _buildTextFieldTile(
+                  label: "نبذة / توقيع",
+                  controller: _bioController,
+                  icon: Icons.edit_note_rounded,
+                  maxLines: 4,
+                  maxLength: 140,
+                  textInputAction: TextInputAction.newline,
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final authService = context.read<AuthService>();
+                  final navigator = Navigator.of(context);
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('تسجيل الخروج'),
+                      content:
+                          const Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('إلغاء'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: Text(
+                            'خروج',
+                            style: TextStyle(color: colors.error),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (confirm == true) {
+                    await authService.logout();
+                    if (!mounted) return;
+                    navigator.popUntil((route) => route.isFirst);
+                  }
+                },
+                icon: Icon(Icons.logout, color: colors.error),
+                label: Text(
+                  'تسجيل الخروج',
+                  style: TextStyle(color: colors.error),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: colors.error),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMediaSection() {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    return _buildSectionCard(
+      children: [
+        _buildImageTile(
+          title: "صورة الغلاف",
+          subtitle: "اضغط لتغيير الغلاف",
+          onTap: _pickCoverImage,
+          preview: _buildCoverPreview(),
+        ),
+        _buildImageTile(
+          title: "صورة الملف الشخصي",
+          subtitle: "اضغط لتغيير الصورة",
+          onTap: _pickProfileImage,
+          preview: _buildAvatarPreview(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionCard({required List<Widget> children}) {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    // Lägg till konsekventa mellanrum mellan varje barn automatiskt
+    final spaced = <Widget>[];
+    for (int i = 0; i < children.length; i++) {
+      if (i > 0) {
+        spaced.add(const SizedBox(height: 12));
+      }
+      spaced.add(children[i]);
+    }
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Color.lerp(colors.background, colors.surface, 0.78)!,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.textPrimary.withValues(alpha: 0.08)),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.25),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start, children: spaced),
+    );
+  }
+
+  Widget _buildImageTile({
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    required Widget preview,
+  }) {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: colors.textPrimary.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      title,
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        color: colors.textSecondary.withValues(alpha: 0.85),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              preview,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCoverPreview() {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    final imageProvider = _newCoverImage != null
+        ? FileImage(_newCoverImage!)
+        : _buildNetworkImage(widget.user.coverImageUrl);
+
+    return Container(
+      width: 108,
+      height: 68,
+      decoration: BoxDecoration(
+        color: colors.surfaceLight,
+        borderRadius: BorderRadius.circular(14),
+        image: imageProvider != null
+            ? DecorationImage(image: imageProvider, fit: BoxFit.cover)
+            : null,
+      ),
+      child: imageProvider == null
+          ? Icon(Icons.image_outlined, color: colors.textTertiary)
+          : Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: Theme.of(context)
+                    .colorScheme
+                    .shadow
+                    .withValues(alpha: 0.12),
+              ),
+              child:
+                  Icon(Icons.camera_alt_outlined, color: colors.textSecondary),
+            ),
+    );
+  }
+
+  Widget _buildAvatarPreview() {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    final imageProvider = _newProfileImage != null
+        ? FileImage(_newProfileImage!)
+        : _buildNetworkImage(widget.user.avatarUrl);
+
+    return Stack(
+      children: [
+        Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: colors.surfaceLight,
+            image: imageProvider != null
+                ? DecorationImage(image: imageProvider, fit: BoxFit.cover)
+                : null,
+          ),
+          child: imageProvider == null
+              ? Icon(Icons.person_outline, color: colors.textTertiary)
+              : null,
+        ),
+        Positioned(
+          bottom: 0,
+          right: 0,
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: colors.background,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.camera_alt_outlined,
+              color: colors.textPrimary,
+              size: 12,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  ImageProvider? _buildNetworkImage(String? rawUrl) {
+    final url = rawUrl?.trim() ?? '';
+    if (url.isEmpty) return null;
+    final normalized = url.startsWith('/') ? "https://sawrly.com$url" : url;
+    return NetworkImage(normalized);
+  }
+
+  bool get _isIraqSelected => _isIraqValue(_selectedCountry);
+
+  String get _serviceAreaPreview {
+    final parts = <String>[];
+    if (_cityController.text.trim().isNotEmpty) {
+      parts.add(_cityController.text.trim());
+    }
+    if ((_selectedCountry ?? '').trim().isNotEmpty) {
+      parts.add(_selectedCountry!.trim());
+    }
+    return parts.join(' - ');
+  }
+
+  bool _isIraqValue(String? value) {
+    final normalized = value?.trim().toLowerCase() ?? '';
+    return normalized == 'iraq' ||
+        normalized == 'republic of iraq' ||
+        normalized == 'العراق' ||
+        normalized == 'جمهورية العراق';
+  }
+
+  String? _normalizeInitialCountry(String? value) {
+    final trimmed = value?.trim() ?? '';
+    if (trimmed.isEmpty) return null;
+    if (_isIraqValue(trimmed)) return 'Iraq';
+    final exactMatch = _allCountries.where((country) => country == trimmed);
+    if (exactMatch.isNotEmpty) return exactMatch.first;
+    final caseInsensitiveMatch = _allCountries.where(
+      (country) => country.toLowerCase() == trimmed.toLowerCase(),
+    );
+    if (caseInsensitiveMatch.isNotEmpty) return caseInsensitiveMatch.first;
+    return trimmed;
+  }
+
+  List<String> _normalizeInitialCities(String? value) {
+    final raw = value?.trim() ?? '';
+    if (raw.isEmpty) return const [];
+
+    final parts = raw
+        .split(RegExp(r',|،'))
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .toList();
+
+    final normalized = <String>[];
+    for (final part in parts) {
+      final exactMatch = _iraqiCities.where((city) => city == part);
+      if (exactMatch.isNotEmpty) {
+        normalized.add(exactMatch.first);
+        continue;
+      }
+
+      final caseInsensitiveMatch = _iraqiCities.where(
+        (city) => city.toLowerCase() == part.toLowerCase(),
+      );
+      if (caseInsensitiveMatch.isNotEmpty) {
+        normalized.add(caseInsensitiveMatch.first);
+        continue;
+      }
+
+      normalized.add(part);
+    }
+    return normalized;
+  }
+
+  List<String> get _countryOptionsForUi {
+    final countries = [..._allCountries];
+    final selectedCountry = _selectedCountry?.trim() ?? '';
+    if (selectedCountry.isNotEmpty && !countries.contains(selectedCountry)) {
+      countries.add(selectedCountry);
+    }
+    return countries;
+  }
+
+  List<String> get _iraqiCitiesForUi {
+    final cities = [..._iraqiCities];
+    for (final selectedCity in _selectedCities) {
+      if (!cities.contains(selectedCity)) {
+        cities.add(selectedCity);
+      }
+    }
+    return cities;
+  }
+
+  void _syncSelectedCitiesText() {
+    _cityController.text = _selectedCities.join(', ');
+  }
+
+  Widget _buildServiceAreaIntroTile() {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: colors.primary.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: colors.primary.withValues(alpha: 0.28),
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.travel_explore_rounded,
+              color: colors.primaryLight,
+              size: 18,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                "حدد أماكن تقديم الخدمة ليظهر ذلك للآخرين في ملفك الشخصي.",
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: colors.textSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildServiceAreaPreviewTile() {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        decoration: BoxDecoration(
+          color: colors.textPrimary.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.visibility_outlined,
+              color: colors.textTertiary,
+              size: 18,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                _serviceAreaPreview,
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: colors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            SizedBox(
+              width: 92,
+              child: Text(
+                "سيظهر للناس",
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: colors.textSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCountryTile() {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: colors.textPrimary.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.public_rounded,
+              color: colors.textSecondary,
+              size: 18,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: OutlinedButton(
+                  onPressed: _showCountryPicker,
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                      color: colors.textPrimary.withValues(alpha: 0.18),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    (_selectedCountry?.isNotEmpty ?? false)
+                        ? _selectedCountry!
+                        : "اختر بلد الخدمة",
+                    style: TextStyle(color: colors.textPrimary),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            SizedBox(
+              width: 78,
+              child: Text(
+                "بلد الخدمة",
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: colors.textSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIraqiCitiesTile() {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: colors.textPrimary.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.location_city_outlined,
+                  color: colors.textSecondary,
+                  size: 18,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: OutlinedButton(
+                      onPressed: _showIraqiCitiesPicker,
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: colors.textPrimary.withValues(alpha: 0.18),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        _selectedCities.isEmpty
+                            ? "اختر مدن الخدمة"
+                            : "تم اختيار ${_selectedCities.length} مدينة",
+                        style: TextStyle(color: colors.textPrimary),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: 78,
+                  child: Text(
+                    "مدن الخدمة",
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      color: colors.textSecondary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (_selectedCities.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.end,
+                  children: _selectedCities
+                      .map(
+                        (city) => InputChip(
+                          label: Text(city),
+                          onDeleted: () {
+                            setState(() {
+                              _selectedCities.remove(city);
+                              _syncSelectedCitiesText();
+                            });
+                          },
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showIraqiCitiesPicker() async {
+    final theme = context.read<AppThemeService>();
+    final colors = theme.colors;
+    final tempSelectedCities = {..._selectedCities};
+    final searchController = TextEditingController();
+    String searchQuery = '';
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Color.lerp(colors.background, colors.surface, 0.78)!,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final theme = context.watch<AppThemeService>();
+            final colors = theme.colors;
+            final config = theme.config;
+            return SafeArea(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.72,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      child: Row(
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(sheetContext),
+                            child: const Text("إلغاء"),
+                          ),
+                          const Spacer(),
+                          Text(
+                            "اختر مدن الخدمة",
+                            style: TextStyle(
+                              color: colors.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedCities
+                                  ..clear()
+                                  ..addAll(tempSelectedCities);
+                                _syncSelectedCitiesText();
+                              });
+                              Navigator.pop(sheetContext);
+                            },
+                            child: const Text("تم"),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: (value) {
+                          setSheetState(() {
+                            searchQuery = value.trim().toLowerCase();
+                          });
+                        },
+                        style: TextStyle(color: colors.textPrimary),
+                        decoration: InputDecoration(
+                          hintText: "ابحث عن مدينة خدمة",
+                          hintStyle: TextStyle(
+                              color:
+                                  colors.textTertiary.withValues(alpha: 0.7)),
+                          prefixIcon:
+                              Icon(Icons.search, color: colors.textTertiary),
+                          filled: true,
+                          fillColor: colors.textPrimary.withValues(alpha: 0.06),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    Expanded(
+                      child: ListView.builder(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        itemCount: _iraqiCitiesForUi
+                            .where(
+                              (city) =>
+                                  city.toLowerCase().contains(searchQuery),
+                            )
+                            .length,
+                        itemBuilder: (context, index) {
+                          final filteredCities = _iraqiCitiesForUi
+                              .where(
+                                (city) =>
+                                    city.toLowerCase().contains(searchQuery),
+                              )
+                              .toList();
+                          final city = filteredCities[index];
+                          final isSelected = tempSelectedCities.contains(city);
+                          return CheckboxListTile(
+                            value: isSelected,
+                            activeColor: colors.primary,
+                            checkColor: colors.textPrimary,
+                            title: Text(
+                              city,
+                              textAlign: TextAlign.right,
+                              style: TextStyle(color: colors.textPrimary),
+                            ),
+                            controlAffinity: ListTileControlAffinity.leading,
+                            onChanged: (checked) {
+                              setSheetState(() {
+                                if (checked == true) {
+                                  tempSelectedCities.add(city);
+                                } else {
+                                  tempSelectedCities.remove(city);
+                                }
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+    searchController.dispose();
+  }
+
+  Future<void> _showCountryPicker() async {
+    final theme = context.read<AppThemeService>();
+    final colors = theme.colors;
+    String searchQuery = '';
+
+    final selectedCountry = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Color.lerp(colors.background, colors.surface, 0.78)!,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final theme = context.watch<AppThemeService>();
+            final colors = theme.colors;
+            final config = theme.config;
+            return SafeArea(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.78,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      child: Row(
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(sheetContext),
+                            child: const Text("إلغاء"),
+                          ),
+                          const Spacer(),
+                          Text(
+                            "اختر بلد الخدمة",
+                            style: TextStyle(
+                              color: colors.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Spacer(),
+                          const SizedBox(width: 48),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                      child: TextField(
+                        onChanged: (value) {
+                          setSheetState(() {
+                            searchQuery = value.trim().toLowerCase();
+                          });
+                        },
+                        style: TextStyle(color: colors.textPrimary),
+                        decoration: InputDecoration(
+                          hintText: "ابحث عن بلد الخدمة",
+                          hintStyle: TextStyle(
+                              color:
+                                  colors.textTertiary.withValues(alpha: 0.7)),
+                          prefixIcon:
+                              Icon(Icons.search, color: colors.textTertiary),
+                          filled: true,
+                          fillColor: colors.textPrimary.withValues(alpha: 0.06),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    Expanded(
+                      child: ListView.builder(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        itemCount: _countryOptionsForUi
+                            .where(
+                              (country) =>
+                                  country.toLowerCase().contains(searchQuery),
+                            )
+                            .length,
+                        itemBuilder: (context, index) {
+                          final filteredCountries = _countryOptionsForUi
+                              .where(
+                                (country) =>
+                                    country.toLowerCase().contains(searchQuery),
+                              )
+                              .toList();
+                          final country = filteredCountries[index];
+                          final isSelected = country == _selectedCountry;
+                          return ListTile(
+                            title: Text(
+                              country,
+                              style: TextStyle(color: colors.textPrimary),
+                            ),
+                            trailing: isSelected
+                                ? Icon(
+                                    Icons.check_rounded,
+                                    color: colors.primary,
+                                  )
+                                : null,
+                            onTap: () {
+                              Navigator.pop(sheetContext, country);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    if (!mounted || selectedCountry == null) return;
+
+    setState(() {
+      _selectedCountry = selectedCountry;
+      _countryController.text = selectedCountry;
+      if (!_isIraqValue(selectedCountry)) {
+        _selectedCities.clear();
+        _cityController.clear();
+      }
+    });
+  }
+
+  Widget _buildCityInfoTile() {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        decoration: BoxDecoration(
+          color: colors.textPrimary.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.info_outline_rounded,
+              color: colors.textTertiary,
+              size: 18,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                "يمكنك الآن اختيار مدن الخدمة عند تحديد العراق. في باقي الدول سيظهر بلد الخدمة فقط.",
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: colors.textSecondary.withValues(alpha: 0.85),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            SizedBox(
+              width: 78,
+              child: Text(
+                "مدن الخدمة",
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: colors.textSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextFieldTile({
+    required String label,
+    required TextEditingController controller,
+    required IconData icon,
+    int maxLines = 1,
+    int? maxLength,
+    TextInputAction? textInputAction,
+  }) {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: colors.textPrimary.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          crossAxisAlignment: maxLines > 1
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
+          children: [
+            Icon(icon, color: colors.textSecondary, size: 18),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                controller: controller,
+                maxLines: maxLines,
+                minLines: maxLines > 1 ? maxLines : 1,
+                inputFormatters: [
+                  if (maxLength != null)
+                    LengthLimitingTextInputFormatter(maxLength),
+                ],
+                textAlign: TextAlign.right,
+                textInputAction: textInputAction,
+                maxLength: maxLength,
+                buildCounter: (
+                  context, {
+                  required currentLength,
+                  required isFocused,
+                  maxLength,
+                }) =>
+                    null,
+                style: TextStyle(
+                  color: colors.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: InputDecoration(
+                  isDense: true,
+                  border: InputBorder.none,
+                  hintText: label,
+                  hintStyle: TextStyle(
+                      color: colors.textTertiary.withValues(alpha: 0.7)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            SizedBox(
+              width: 78,
+              child: Text(
+                label,
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: colors.textSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGenderTile() {
+    final theme = context.watch<AppThemeService>();
+    final colors = theme.colors;
+    final config = theme.config;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: colors.textPrimary.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.wc_rounded, color: colors.textSecondary, size: 18),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _gender,
+                    dropdownColor: colors.surface,
+                    style: TextStyle(color: colors.textPrimary, fontSize: 14),
+                    items: const [
+                      DropdownMenuItem(value: "Male", child: Text("ذكر")),
+                      DropdownMenuItem(value: "Female", child: Text("أنثى")),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) {
+                        setState(() => _gender = val);
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            SizedBox(
+              width: 78,
+              child: Text(
+                "الجنس",
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: colors.textSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
